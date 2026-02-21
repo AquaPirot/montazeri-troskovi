@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6C5CE7"/>
+      <stop offset="100%" style="stop-color:#8B5CF6"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+  <text x="96" y="78" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="800" fill="white" letter-spacing="-0.5">PROHORECA</text>
+  <text x="96" y="104" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="600" fill="rgba(255,255,255,0.7)">AG GROUP</text>
+  <line x1="50" y1="116" x2="142" y2="116" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+  <text x="96" y="140" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="700" fill="#00CEC9" letter-spacing="3">TROŠKOVI</text>
+  <rect x="36" y="152" width="120" height="3" rx="1.5" fill="#00CEC9" opacity="0.5"/>
+</svg>
