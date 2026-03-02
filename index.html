@@ -96,6 +96,12 @@
         .exp-amount { width: 110px; }
         .exp-amount input { width: 100%; padding: 12px; text-align: right; background: var(--bg-card); border: 1px solid var(--border); color: var(--warning); border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; outline: none; }
         .exp-amount input:focus, .exp-cat select:focus { border-color: var(--warning); }
+        
+        /* Novi metod placanja */
+        .exp-pay-row { margin-bottom: 10px; }
+        .exp-pay-row select { width: 100%; padding: 10px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: var(--text-main); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; outline: none; appearance: none; cursor: pointer; }
+        .exp-pay-row select:focus { border-color: var(--primary); }
+
         .btn-remove-exp { position: absolute; top: -8px; right: -8px; width: 26px; height: 26px; background: var(--danger); border: none; border-radius: 50%; color: #FFF; font-size: 12px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         
         .total-box { display: flex; flex-direction: column; gap: 8px; background: var(--bg-input); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-md); margin-top: 16px; }
@@ -212,12 +218,13 @@
             </div>
 
             <div class="card">
-                <label class="label">Početno stanje (Depozit / Kartica)</label>
+                <label class="label">Početno stanje - KEŠ (Depozit)</label>
                 <div class="deposit-row">
-                    <span class="deposit-icon">💳</span>
+                    <span class="deposit-icon">💵</span>
                     <input type="number" class="deposit-input" id="depozit" placeholder="0" oninput="calculateTotal()">
                     <span style="padding-right: 15px; color: var(--primary); font-weight: 600;">RSD</span>
                 </div>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: -10px;">Unesi samo iznos u gotovini. Sredstva na kartici se ne unose ovde.</p>
             </div>
 
             <div class="card">
@@ -229,10 +236,11 @@
                 <button class="btn-add-expense" onclick="addExpense()">+ Dodaj trošak</button>
 
                 <div class="total-box" id="totalBox">
-                    <div class="total-row"><span>Depozit:</span> <strong id="dispDepozit">0 RSD</strong></div>
-                    <div class="total-row"><span>Troškovi:</span> <strong id="dispTroskovi" style="color: var(--warning)">0 RSD</strong></div>
+                    <div class="total-row"><span>Depozit (Keš):</span> <strong id="dispDepozit">0 RSD</strong></div>
+                    <div class="total-row"><span>Potrošeno (Keš):</span> <strong id="dispTroskoviKes" style="color: var(--warning)">0 RSD</strong></div>
+                    <div class="total-row"><span>Potrošeno (Kartica):</span> <strong id="dispTroskoviKartica" style="color: #60A5FA">0 RSD</strong></div>
                     <div class="total-divider"></div>
-                    <div class="total-row total-final"><span>Preostalo:</span> <strong id="dispPreostalo">0 RSD</strong></div>
+                    <div class="total-row total-final"><span>Preostalo u Kešu:</span> <strong id="dispPreostalo">0 RSD</strong></div>
                 </div>
             </div>
 
@@ -333,7 +341,7 @@
                 workers = [...defaultWorkers];
             }
             renderWorkers();
-            calculateTotal(); // Initialize financial box
+            calculateTotal(); 
         });
 
         // --- NAVIGATION ---
@@ -457,12 +465,10 @@
                 const finalName = newName.trim();
                 workers[index] = finalName;
                 
-                // Update selection if they were selected
                 if(selectedWorkers.has(oldName)) {
                     selectedWorkers.delete(oldName);
                     selectedWorkers.add(finalName);
                     
-                    // Update hours data preservation
                     const hrInput = document.querySelector(`.hour-input[data-worker="${oldName}"]`);
                     if(hrInput) hrInput.dataset.worker = finalName;
                 }
@@ -499,7 +505,6 @@
             }
             card.style.display = 'block';
             
-            // Preserve existing inputs
             const existingInputs = {};
             document.querySelectorAll('.hour-input').forEach(inp => {
                 existingInputs[inp.dataset.worker] = inp.value;
@@ -548,6 +553,12 @@
                         <input type="number" id="amt-${id}" placeholder="Iznos" oninput="calculateTotal()">
                     </div>
                 </div>
+                <div class="exp-pay-row">
+                    <select id="payMethod-${id}" onchange="calculateTotal()">
+                        <option value="Keš">💵 Plaćeno: Kešom (Iz depozita)</option>
+                        <option value="Kartica">💳 Plaćeno: Karticom firme</option>
+                    </select>
+                </div>
                 <input type="text" class="input" id="desc-${id}" placeholder="Kratak opis (Gde, šta?)" style="padding: 10px; font-size: 14px;">
             `;
             document.getElementById('expensesList').appendChild(div);
@@ -565,29 +576,36 @@
 
         function calculateTotal() {
             const depozit = parseFloat(document.getElementById('depozit').value) || 0;
-            let totalTroskovi = 0;
+            let totalKes = 0;
+            let totalKartica = 0;
             
             expenses.forEach(id => {
                 const val = parseFloat(document.getElementById(`amt-${id}`).value) || 0;
-                totalTroskovi += val;
+                const method = document.getElementById(`payMethod-${id}`).value;
+                if(method === 'Keš') {
+                    totalKes += val;
+                } else {
+                    totalKartica += val;
+                }
             });
 
-            const preostalo = depozit - totalTroskovi;
+            // Preostalo se racuna SAMO za gotovinu (Keš)
+            const preostaloKes = depozit - totalKes;
 
-            // Update UI
             document.getElementById('dispDepozit').textContent = depozit.toLocaleString('sr-RS') + ' RSD';
-            document.getElementById('dispTroskovi').textContent = totalTroskovi.toLocaleString('sr-RS') + ' RSD';
+            document.getElementById('dispTroskoviKes').textContent = totalKes.toLocaleString('sr-RS') + ' RSD';
+            document.getElementById('dispTroskoviKartica').textContent = totalKartica.toLocaleString('sr-RS') + ' RSD';
             
             const preostaloEl = document.getElementById('dispPreostalo');
-            preostaloEl.textContent = preostalo.toLocaleString('sr-RS') + ' RSD';
+            preostaloEl.textContent = preostaloKes.toLocaleString('sr-RS') + ' RSD';
             
-            if(preostalo < 0) {
+            if(preostaloKes < 0) {
                 preostaloEl.classList.add('negative-balance');
             } else {
                 preostaloEl.classList.remove('negative-balance');
             }
 
-            return { depozit, totalTroskovi, preostalo };
+            return { depozit, totalKes, totalKartica, totalTroskovi: (totalKes + totalKartica), preostaloKes };
         }
 
         // --- GENERATE REPORT ---
@@ -613,28 +631,35 @@
                 report += `• ${w}: ${h}h\n`;
                 totalHours += h;
             });
-            report += `----------------------\nUkupno radnih sati: ${totalHours}h\n\n`;
+            report += `──────────────────────\nUkupno radnih sati: ${totalHours}h\n\n`;
 
             // FINANCES
             const fin = calculateTotal();
             report += `💰 FINANSIJE I TROŠKOVI:\n`;
-            report += `Početni depozit: ${fin.depozit.toLocaleString('sr-RS')} RSD\n\n`;
+            report += `Početni depozit (Keš): ${fin.depozit.toLocaleString('sr-RS')} RSD\n\n`;
             
             if(expenses.length > 0) {
                 report += `Specifikacija troškova:\n`;
                 expenses.forEach(id => {
                     const cat = document.getElementById(`cat-${id}`).value;
                     const amt = parseFloat(document.getElementById(`amt-${id}`).value) || 0;
+                    const method = document.getElementById(`payMethod-${id}`).value;
                     const desc = document.getElementById(`desc-${id}`).value.trim();
-                    report += `• ${cat}: ${amt.toLocaleString('sr-RS')} RSD ${desc ? `(${desc})` : ''}\n`;
+                    
+                    const paymentIcon = method === 'Keš' ? '💵 Keš' : '💳 Kartica';
+                    report += `• ${cat}: ${amt.toLocaleString('sr-RS')} RSD [${paymentIcon}] ${desc ? `(${desc})` : ''}\n`;
                 });
-                report += `----------------------\nUkupno troškovi: ${fin.totalTroskovi.toLocaleString('sr-RS')} RSD\n\n`;
+                
+                report += `──────────────────────\n`;
+                if(fin.totalKes > 0) report += `Ukupno plaćeno Kešom: ${fin.totalKes.toLocaleString('sr-RS')} RSD\n`;
+                if(fin.totalKartica > 0) report += `Ukupno plaćeno Karticom: ${fin.totalKartica.toLocaleString('sr-RS')} RSD\n`;
+                report += `Ukupno svi troškovi: ${fin.totalTroskovi.toLocaleString('sr-RS')} RSD\n\n`;
             } else {
                 report += `Nije bilo troškova.\n\n`;
             }
 
-            const ostatakSimbol = fin.preostalo < 0 ? "⚠️ U MINUSU: " : "💵 Preostalo: ";
-            report += `${ostatakSimbol}${fin.preostalo.toLocaleString('sr-RS')} RSD\n\n`;
+            const ostatakSimbol = fin.preostaloKes < 0 ? "⚠️ U MINUSU (Radnik dao svoj novac): " : "💵 Preostalo Keša: ";
+            report += `${ostatakSimbol}${fin.preostaloKes.toLocaleString('sr-RS')} RSD\n\n`;
 
             // NOTES
             if(nabavka) {
