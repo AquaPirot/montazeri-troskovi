@@ -97,7 +97,6 @@
         .exp-amount input { width: 100%; padding: 12px; text-align: right; background: var(--bg-card); border: 1px solid var(--border); color: var(--warning); border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; outline: none; }
         .exp-amount input:focus, .exp-cat select:focus { border-color: var(--warning); }
         
-        /* Novi metod placanja */
         .exp-pay-row { margin-bottom: 10px; }
         .exp-pay-row select { width: 100%; padding: 10px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); color: var(--text-main); border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; outline: none; appearance: none; cursor: pointer; }
         .exp-pay-row select:focus { border-color: var(--primary); }
@@ -129,7 +128,6 @@
         .btn-share { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 16px; border-radius: var(--radius-md); font-weight: 700; font-size: 15px; color: #FFF; border: none; cursor: pointer; }
         .btn-copy { background: var(--border); }
         .btn-wa { background: #25D366; }
-        .btn-vi { background: #7360F2; }
 
         .toast { position: fixed; bottom: -60px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 14px 24px; border-radius: 30px; font-weight: 600; font-size: 14px; transition: bottom 0.3s ease; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .toast.show { bottom: 30px; }
@@ -285,7 +283,6 @@
             <div class="share-grid">
                 <button class="btn-share btn-copy" onclick="copyReport()">📋 Kopiraj tekst</button>
                 <button class="btn-share btn-wa" onclick="shareWa()">💬 Pošalji na WhatsApp</button>
-                <button class="btn-share btn-vi" onclick="shareViber()">📱 Pošalji na Viber</button>
                 <button class="btn btn-secondary" style="margin-top: 10px;" onclick="location.reload()">🔄 Započni novi izveštaj</button>
             </div>
         </div>
@@ -709,10 +706,6 @@
 
         function shareWa() {
             window.location.href = `whatsapp://send?text=${encodeURIComponent(finalReportText)}`;
-        }
-
-        function shareViber() {
-            window.location.href = `viber://forward?text=${encodeURIComponent(finalReportText)}`;
         }
     </script>
 </body>
