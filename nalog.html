@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Dnevni Nalog — Pergole Pro</title>
+    <meta name="theme-color" content="#0B0F19">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #0B0F19;
+            --bg-card: #151C2C;
+            --bg-input: #1E293B;
+            --blue: #3B82F6;
+            --blue-dark: #2563EB;
+            --blue-glow: rgba(59,130,246,0.15);
+            --orange: #F97316;
+            --orange-dark: #EA580C;
+            --orange-glow: rgba(249,115,22,0.15);
+            --red: #EF4444;
+            --red-glow: rgba(239,68,68,0.15);
+            --green: #10B981;
+            --green-glow: rgba(16,185,129,0.2);
+            --text-main: #F1F5F9;
+            --text-muted: #64748B;
+            --border: #1E293B;
+            --border-light: #334155;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
+
+        .container { max-width: 580px; margin: 0 auto; }
+
+        /* ── HEADER ─────────────────────────────────── */
+        .app-header {
+            background: rgba(11,15,25,0.96);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid var(--border-light);
+            padding: 14px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header-logo { font-size: 17px; font-weight: 800; background: linear-gradient(135deg,#60A5FA,#3B82F6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
+        .header-sub { font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        .header-date { background: var(--bg-input); border: 1px solid var(--border-light); padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+
+        /* ── LAYOUT ──────────────────────────────────── */
+        .section { padding: 14px 14px 0; }
+        .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted); padding: 0 4px; margin-bottom: 8px; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 12px; }
+        .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .card-title { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+        .badge { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 20px; background: var(--blue); color: #fff; min-width: 28px; text-align: center; transition: background 0.2s; }
+        .badge.orange { background: var(--orange); }
+        .badge.zero { background: var(--bg-input); color: var(--text-muted); }
+
+        /* ── FORM ────────────────────────────────────── */
+        .form-row { margin-bottom: 12px; }
+        .form-label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 6px; }
+        .form-input {
+            width: 100%; background: var(--bg-input); border: 2px solid transparent;
+            color: var(--text-main); padding: 13px 14px; border-radius: var(--radius-md);
+            font-size: 15px; font-weight: 500; font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+        }
+        .form-input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-glow); }
+        .form-input.o:focus { border-color: var(--orange); box-shadow: 0 0 0 4px var(--orange-glow); }
+        .form-input::placeholder { color: #475569; }
+        select.form-input { appearance: none; cursor: pointer; }
+        .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* ── BUTTONS ─────────────────────────────────── */
+        .btn { width: 100%; padding: 14px; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; gap: 8px; transition: transform 0.15s, background 0.15s; }
+        .btn:active { transform: scale(0.97); }
+        .btn-blue { background: var(--blue); color: #fff; box-shadow: 0 4px 14px var(--blue-glow); }
+        .btn-blue:hover { background: var(--blue-dark); }
+        .btn-orange { background: var(--orange); color: #fff; box-shadow: 0 4px 14px var(--orange-glow); }
+        .btn-orange:hover { background: var(--orange-dark); }
+        .btn-ghost { background: transparent; border: 2px dashed var(--border-light); color: var(--text-muted); font-size: 14px; }
+        .btn-ghost:hover, .btn-ghost:active { border-color: var(--blue); color: var(--blue); background: var(--blue-glow); }
+        .btn-ghost.o:hover, .btn-ghost.o:active { border-color: var(--orange); color: var(--orange); background: var(--orange-glow); }
+        .btn-green { background: var(--green); color: #fff; font-size: 17px; font-weight: 800; padding: 18px; box-shadow: 0 6px 20px var(--green-glow); }
+        .btn-danger { background: transparent; border: 1px solid rgba(239,68,68,0.25); color: var(--red); font-size: 14px; margin-top: 8px; }
+        .btn-icon-sm { width: auto; padding: 0 16px; height: 48px; flex-shrink: 0; }
+
+        /* ── TASK CHIPS (UI LIST) ─────────────────────── */
+        .tasks-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .task-chip { background: var(--bg-input); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 12px 14px; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; animation: slideIn 0.2s ease; }
+        .task-chip.hitno { border-color: rgba(239,68,68,0.5); background: rgba(239,68,68,0.05); }
+        @keyframes slideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+        .chip-body { flex: 1; min-width: 0; }
+        .chip-name { font-size: 14px; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chip-task { font-size: 13px; font-weight: 600; color: var(--blue); margin-top: 2px; }
+        .chip-task.o { color: var(--orange); }
+        .chip-note { font-size: 12px; color: var(--text-muted); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .chip-tags { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+        .chip-tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: var(--bg-card); color: var(--text-muted); border: 1px solid var(--border-light); }
+        .chip-tag.time { color: var(--green); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.07); }
+        .chip-tag.urgent { color: #fff; background: var(--red); border-color: var(--red); }
+        .chip-del { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: var(--red); width: 32px; height: 32px; border-radius: var(--radius-sm); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s, color 0.15s; }
+        .chip-del:active { background: var(--red); color: #fff; }
+
+        /* ── TOAST ────────────────────────────────────── */
+        .toast { position: fixed; bottom: -70px; left: 50%; transform: translateX(-50%); background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-main); padding: 12px 22px; border-radius: 30px; font-weight: 600; font-size: 14px; transition: bottom 0.3s cubic-bezier(0.4,0,0.2,1); z-index: 9999; box-shadow: 0 8px 28px rgba(0,0,0,0.4); white-space: nowrap; }
+        .toast.show { bottom: 32px; }
+        .toast.ok { background: var(--green); border-color: var(--green); color: #fff; }
+        .toast.err { background: var(--red); border-color: var(--red); color: #fff; }
+
+        /* ── ACTIONS BOTTOM ──────────────────────────── */
+        .actions { padding: 14px; }
+
+        /* ════════════════════════════════════════════════
+           EXPORT DOCUMENT (white, print-ready)
+           ════════════════════════════════════════════════ */
+        #export-wrapper { background: #f1f5f9; border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; margin: 0 14px 16px; }
+        #export-area { background: #ffffff; padding: 30px 26px; font-family: 'Inter', sans-serif; }
+
+        /* Document top row */
+        .doc-top { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 2.5px solid #0f172a; }
+        .doc-co-name { font-size: 20px; font-weight: 900; color: #0f172a; letter-spacing: -0.5px; }
+        .doc-co-sub { font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+        .doc-type { text-align: right; }
+        .doc-type-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #2563eb; }
+        .doc-type-num { font-size: 11px; color: #94a3b8; font-weight: 600; margin-top: 3px; }
+
+        /* Meta grid */
+        .doc-meta { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 18px; }
+        .doc-meta-cell { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 9px 12px; }
+        .doc-meta-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 4px; }
+        .doc-meta-val { font-size: 13px; font-weight: 700; color: #0f172a; }
+
+        /* General notice */
+        .doc-notice { background: #fefce8; border: 1px solid #fef08a; border-left: 4px solid #eab308; border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; display: none; }
+        .doc-notice-title { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: #a16207; margin-bottom: 6px; }
+        .doc-notice-list { margin: 0; padding-left: 18px; }
+        .doc-notice-list li { font-size: 13px; font-weight: 600; color: #713f12; margin-bottom: 4px; }
+
+        /* Section divider */
+        .doc-sec-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #334155; margin: 22px 0 10px; display: flex; align-items: center; gap: 8px; }
+        .doc-sec-title::after { content:''; flex:1; height:1px; background:#e2e8f0; }
+        .doc-sec-blue { color: #2563eb; }
+        .doc-sec-orange { color: #ea580c; }
+
+        /* Task cards in document */
+        .doc-cards { display: flex; flex-direction: column; gap: 10px; }
+
+        .doc-card { border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; }
+        .doc-card.hitno { border-color: #fca5a5; background: #fff5f5; }
+        .doc-card.teren-card { border-left: 5px solid #ea580c; }
+        .doc-card.radio-card { border-left: 5px solid #2563eb; }
+
+        .doc-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+        .doc-card-name { font-size: 15px; font-weight: 800; color: #0f172a; }
+        .doc-card-time { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; white-space: nowrap; }
+        .doc-card-time.urgent { background: #ef4444; color: #fff; border-color: #ef4444; }
+
+        .doc-card-task { font-size: 13px; font-weight: 600; color: #2563eb; margin-bottom: 4px; }
+        .doc-card-task.orange { color: #ea580c; }
+        .doc-card-urgent-flag { font-size: 11px; font-weight: 800; color: #ef4444; text-transform: uppercase; margin: 4px 0; }
+        .doc-card-note { font-size: 12px; color: #64748b; background: #f8fafc; border: 1px solid #f1f5f9; padding: 6px 10px; border-radius: 6px; margin-top: 6px; }
+
+        /* Teren details */
+        .doc-teren-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 10px 12px; }
+        .doc-teren-cell-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: #c2410c; margin-bottom: 2px; }
+        .doc-teren-cell-val { font-size: 13px; font-weight: 700; color: #7c2d12; }
+
+        /* Worker confirm checkbox */
+        .doc-confirm { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e2e8f0; }
+        .doc-confirm-box { width: 18px; height: 18px; border: 2px solid #cbd5e1; border-radius: 4px; flex-shrink: 0; }
+        .doc-confirm-lbl { font-size: 11px; font-weight: 600; color: #94a3b8; }
+
+        /* Empty state */
+        #doc-empty { text-align: center; padding: 32px 20px; color: #94a3b8; font-size: 14px; }
+        #doc-empty .icon { font-size: 36px; margin-bottom: 8px; }
+
+        /* Document footer */
+        .doc-footer { margin-top: 28px; padding-top: 14px; border-top: 1px dashed #e2e8f0; display: flex; justify-content: space-between; align-items: flex-end; }
+        .doc-footer-left div { font-size: 11px; color: #94a3b8; line-height: 1.6; }
+        .doc-footer-left strong { font-weight: 700; color: #334155; }
+        .doc-footer-sig { text-align: right; }
+        .doc-sig-line { width: 130px; height: 1px; background: #cbd5e1; margin-bottom: 5px; margin-left: auto; }
+        .doc-sig-lbl { font-size: 10px; color: #94a3b8; font-weight: 600; }
+
+        /* sections hidden by default */
+        #doc-sec-radionica, #doc-sec-teren { display: none; }
+
+        /* hide on export */
+        .exporting .hide-export { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- APP HEADER -->
+    <header class="app-header">
+        <div>
+            <div class="header-logo">Pergole Pro</div>
+            <div class="header-sub">Dnevni Radni Nalog</div>
+        </div>
+        <div class="header-date" id="hdr-date">--.--.----</div>
+    </header>
+
+    <!-- NALOG META -->
+    <div class="section" style="margin-top:16px;">
+        <div class="section-label">Podaci naloga</div>
+        <div class="card">
+            <div class="g2">
+                <div class="form-row" style="margin-bottom:0">
+                    <label class="form-label">Datum</label>
+                    <input type="date" class="form-input" id="inp-datum" oninput="syncHeader()">
+                </div>
+                <div class="form-row" style="margin-bottom:0">
+                    <label class="form-label">Smena</label>
+                    <select class="form-input" id="inp-smena" onchange="syncHeader()">
+                        <option>I Smena</option>
+                        <option>II Smena</option>
+                        <option>TEREN</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row" style="margin-top:12px; margin-bottom:0">
+                <label class="form-label">Nalog izdao</label>
+                <input type="text" class="form-input" id="inp-izdavalac" placeholder="Ime / pozicija (npr. Uprava)" oninput="syncHeader()">
+            </div>
+        </div>
+    </div>
+
+    <!-- OPSTE PORUKE -->
+    <div class="section">
+        <div class="section-label">Poruka za sve radnike</div>
+        <div class="card">
+            <div class="form-row" style="margin-bottom:0; display:flex; gap:10px;">
+                <input type="text" class="form-input" id="inp-opste" placeholder="Npr. Složiti alat na kraju smene" style="flex:1;" onkeydown="if(event.key==='Enter') dodajOpste()">
+                <button class="btn btn-blue btn-icon-sm" onclick="dodajOpste()">+</button>
+            </div>
+            <div id="ui-opste" class="tasks-list"></div>
+        </div>
+    </div>
+
+    <!-- RADIONICA -->
+    <div class="section">
+        <div class="section-label">Radionica</div>
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title" style="color:var(--blue);">🏭 Radionica / Faze izrade</div>
+                <div class="badge zero" id="bdg-radio">0</div>
+            </div>
+            <div class="form-row">
+                <label class="form-label">Ime radnika</label>
+                <input type="text" class="form-input" id="inp-r-radnik" placeholder="Npr. Marko">
+            </div>
+            <div class="form-row">
+                <label class="form-label">Zadatak / Faza</label>
+                <input type="text" class="form-input" id="inp-r-faza" list="faze-dl" placeholder="Npr. Sečenje aluminijuma">
+                <datalist id="faze-dl">
+                    <option value="Sečenje aluminijuma">
+                    <option value="Šivenje platna / cerade">
+                    <option value="Pakovanje aksesoira i motora">
+                    <option value="Priprema profila">
+                    <option value="Montaža u radionici">
+                    <option value="Bojenje / lakovanje">
+                    <option value="Pakovanje za isporuku">
+                    <option value="Kontrola kvaliteta">
+                </datalist>
+            </div>
+            <div class="g2">
+                <div class="form-row">
+                    <label class="form-label">Rok / Vreme</label>
+                    <input type="text" class="form-input" id="inp-r-rok" placeholder="Npr. 12:00">
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Prioritet</label>
+                    <select class="form-input" id="inp-r-prior">
+                        <option value="normal">Normalno</option>
+                        <option value="hitno">🔴 HITNO</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <label class="form-label">Projekat / Napomena</label>
+                <input type="text" class="form-input" id="inp-r-nota" placeholder="Npr. Pergola za kafić Baza">
+            </div>
+            <button class="btn btn-ghost" onclick="dodajRadionicu()">+ Dodaj zadatak za radionicu</button>
+            <div id="ui-radio" class="tasks-list"></div>
+        </div>
+    </div>
+
+    <!-- TEREN -->
+    <div class="section">
+        <div class="section-label">Teren i montaža</div>
+        <div class="card">
+            <div class="card-head">
+                <div class="card-title" style="color:var(--orange);">🚐 Teren / Montaža</div>
+                <div class="badge orange zero" id="bdg-teren">0</div>
+            </div>
+            <div class="form-row">
+                <label class="form-label">Ekipa (Ko ide)</label>
+                <input type="text" class="form-input o" id="inp-t-ekipa" placeholder="Npr. Jovan i Milan">
+            </div>
+            <div class="form-row">
+                <label class="form-label">Lokacija / Posao</label>
+                <input type="text" class="form-input o" id="inp-t-posao" placeholder="Npr. Montaža — Restoran Jezero">
+            </div>
+            <div class="g2">
+                <div class="form-row">
+                    <label class="form-label">Vozilo</label>
+                    <input type="text" class="form-input o" id="inp-t-vozilo" placeholder="Npr. Beli Kombi">
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Rok izlaska</label>
+                    <input type="text" class="form-input o" id="inp-t-rok" placeholder="u 08:00h">
+                </div>
+            </div>
+            <div class="g2">
+                <div class="form-row">
+                    <label class="form-label">📦 Pakuje kombi</label>
+                    <input type="text" class="form-input o" id="inp-t-pak" placeholder="Ko pakuje?">
+                </div>
+                <div class="form-row">
+                    <label class="form-label">🛠️ Glavni montaža</label>
+                    <input type="text" class="form-input o" id="inp-t-mont" placeholder="Majstor">
+                </div>
+            </div>
+            <button class="btn btn-ghost o" onclick="dodajTeren()">+ Dodaj ekipu za teren</button>
+            <div id="ui-teren" class="tasks-list"></div>
+        </div>
+    </div>
+
+    <!-- PREGLED -->
+    <div class="section">
+        <div class="section-label">Pregled naloga</div>
+    </div>
+
+    <div id="export-wrapper">
+        <div id="export-area">
+
+            <!-- Document Header -->
+            <div class="doc-top">
+                <div>
+                    <div class="doc-co-name">Pergole Pro</div>
+                    <div class="doc-co-sub">Proizvodnja i Montaža</div>
+                </div>
+                <div class="doc-type">
+                    <div class="doc-type-label">Radni Nalog</div>
+                    <div class="doc-type-num" id="doc-num">#---</div>
+                </div>
+            </div>
+
+            <!-- Meta -->
+            <div class="doc-meta">
+                <div class="doc-meta-cell">
+                    <div class="doc-meta-lbl">Datum</div>
+                    <div class="doc-meta-val" id="doc-datum">—</div>
+                </div>
+                <div class="doc-meta-cell">
+                    <div class="doc-meta-lbl">Smena</div>
+                    <div class="doc-meta-val" id="doc-smena">—</div>
+                </div>
+                <div class="doc-meta-cell">
+                    <div class="doc-meta-lbl">Nalog izdao</div>
+                    <div class="doc-meta-val" id="doc-izdavalac">—</div>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div id="doc-empty">
+                <div class="icon">📋</div>
+                <div>Dodaj zadatke iz formi iznad da bi se prikazali ovde.</div>
+            </div>
+
+            <!-- General notice -->
+            <div class="doc-notice" id="doc-notice">
+                <div class="doc-notice-title">📢 Obavezno za sve radnike</div>
+                <ul class="doc-notice-list" id="doc-opste-list"></ul>
+            </div>
+
+            <!-- Radionica -->
+            <div id="doc-sec-radionica">
+                <div class="doc-sec-title"><span class="doc-sec-blue">🏭</span> Radionica</div>
+                <div class="doc-cards" id="doc-radio-cards"></div>
+            </div>
+
+            <!-- Teren -->
+            <div id="doc-sec-teren">
+                <div class="doc-sec-title"><span class="doc-sec-orange">🚐</span> Montaža i Teren</div>
+                <div class="doc-cards" id="doc-teren-cards"></div>
+            </div>
+
+            <!-- Footer -->
+            <div class="doc-footer">
+                <div class="doc-footer-left">
+                    <div><strong id="doc-footer-izdavalac">Izdao: Uprava</strong></div>
+                    <div id="doc-footer-time"></div>
+                </div>
+                <div class="doc-footer-sig">
+                    <div class="doc-sig-line"></div>
+                    <div class="doc-sig-lbl">Potpis odgovornog lica</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- AKCIJE -->
+    <div class="actions">
+        <button class="btn btn-green" onclick="exportSlika()">📸 Preuzmi Nalog (PNG)</button>
+        <button class="btn btn-danger" onclick="resetSve()">♻️ Novi nalog — obriši sve</button>
+    </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+const S = {
+    datum: '',
+    smena: 'I Smena',
+    izdavalac: '',
+    opste: [],      // string[]
+    radionica: [],  // task objects
+    teren: [],      // task objects
+    uid: 0,
+};
+
+const STORAGE_KEY = 'pergole_nalog_v2';
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    // Safe today date — no UTC offset issue
+    const t = new Date();
+    S.datum = `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`;
+    document.getElementById('inp-datum').value = S.datum;
+
+    loadStorage();
+    renderAll();
+});
+
+function pad(n) { return String(n).padStart(2, '0'); }
+
+function fmtDate(s) {
+    if (!s) return '—';
+    const [y, m, d] = s.split('-');
+    return `${d}.${m}.${y}.`;
+}
+
+// ══════════════════════════════════════════════════════
+//  PERSISTENCE
+// ══════════════════════════════════════════════════════
+function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); } catch (_) {}
+}
+
+function loadStorage() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        if (d.datum) { S.datum = d.datum; document.getElementById('inp-datum').value = d.datum; }
+        if (d.smena) { S.smena = d.smena; document.getElementById('inp-smena').value = d.smena; }
+        if (d.izdavalac) { S.izdavalac = d.izdavalac; document.getElementById('inp-izdavalac').value = d.izdavalac; }
+        if (d.opste) S.opste = d.opste;
+        if (d.radionica) S.radionica = d.radionica;
+        if (d.teren) S.teren = d.teren;
+        if (d.uid) S.uid = d.uid;
+    } catch (_) {}
+}
+
+// ══════════════════════════════════════════════════════
+//  HEADER SYNC
+// ══════════════════════════════════════════════════════
+function syncHeader() {
+    S.datum = document.getElementById('inp-datum').value;
+    S.smena = document.getElementById('inp-smena').value;
+    S.izdavalac = document.getElementById('inp-izdavalac').value.trim();
+    renderDocHeader();
+    save();
+}
+
+function renderDocHeader() {
+    document.getElementById('hdr-date').textContent = fmtDate(S.datum);
+    document.getElementById('doc-datum').textContent = fmtDate(S.datum);
+    document.getElementById('doc-smena').textContent = S.smena || '—';
+    const iz = S.izdavalac || 'Uprava';
+    document.getElementById('doc-izdavalac').textContent = iz;
+    setText('doc-footer-izdavalac', `Izdao: ${iz}`);
+    document.getElementById('doc-num').textContent = S.datum ? `#${S.datum.replace(/-/g,'')}` : '#---';
+}
+
+// ══════════════════════════════════════════════════════
+//  OPSTE PORUKE
+// ══════════════════════════════════════════════════════
+function dodajOpste() {
+    const inp = document.getElementById('inp-opste');
+    const txt = inp.value.trim();
+    if (!txt) return;
+    S.opste.push(txt);
+    inp.value = '';
+    renderOpste();
+    save();
+    toast('Poruka dodana ✓', 'ok');
+}
+
+function deleteOpste(i) {
+    S.opste.splice(i, 1);
+    renderOpste();
+    save();
+}
+
+function renderOpste() {
+    // UI chips
+    const ul = document.getElementById('ui-opste');
+    ul.innerHTML = '';
+    S.opste.forEach((txt, i) => ul.appendChild(buildChip(txt, null, null, null, () => deleteOpste(i))));
+
+    // Document
+    const notice = document.getElementById('doc-notice');
+    const list = document.getElementById('doc-opste-list');
+    list.innerHTML = '';
+    if (S.opste.length > 0) {
+        notice.style.display = 'block';
+        S.opste.forEach(txt => {
+            const li = document.createElement('li');
+            li.textContent = txt;
+            list.appendChild(li);
+        });
+    } else {
+        notice.style.display = 'none';
+    }
+    checkEmpty();
+}
+
+// ══════════════════════════════════════════════════════
+//  RADIONICA
+// ══════════════════════════════════════════════════════
+function dodajRadionicu() {
+    const radnik = document.getElementById('inp-r-radnik').value.trim();
+    const faza   = document.getElementById('inp-r-faza').value.trim();
+    if (!radnik || !faza) { toast('⚠️ Ime i zadatak su obavezni!', 'err'); return; }
+
+    S.uid++;
+    S.radionica.push({
+        id: S.uid,
+        radnik,
+        faza,
+        rok: document.getElementById('inp-r-rok').value.trim(),
+        prior: document.getElementById('inp-r-prior').value,
+        nota: document.getElementById('inp-r-nota').value.trim(),
+    });
+
+    clearInputs(['inp-r-radnik','inp-r-faza','inp-r-rok','inp-r-nota']);
+    document.getElementById('inp-r-prior').value = 'normal';
+    document.getElementById('inp-r-radnik').focus();
+
+    renderRadionica();
+    save();
+    toast('Zadatak dodan ✓', 'ok');
+}
+
+function deleteRadionica(id) {
+    S.radionica = S.radionica.filter(t => t.id !== id);
+    renderRadionica();
+    save();
+}
+
+function renderRadionica() {
+    const ul = document.getElementById('ui-radio');
+    ul.innerHTML = '';
+    S.radionica.forEach(t => ul.appendChild(
+        buildChip(t.radnik, t.faza, t.rok, t.prior, () => deleteRadionica(t.id))
+    ));
+
+    updateBadge('bdg-radio', S.radionica.length, 'blue');
+
+    const sec = document.getElementById('doc-sec-radionica');
+    const cards = document.getElementById('doc-radio-cards');
+    cards.innerHTML = '';
+    if (S.radionica.length > 0) {
+        sec.style.display = 'block';
+        S.radionica.forEach(t => cards.appendChild(buildDocCard(t)));
+    } else {
+        sec.style.display = 'none';
+    }
+    checkEmpty();
+}
+
+// ══════════════════════════════════════════════════════
+//  TEREN
+// ══════════════════════════════════════════════════════
+function dodajTeren() {
+    const ekipa = document.getElementById('inp-t-ekipa').value.trim();
+    const posao = document.getElementById('inp-t-posao').value.trim();
+    if (!ekipa || !posao) { toast('⚠️ Ekipa i lokacija su obavezni!', 'err'); return; }
+
+    S.uid++;
+    S.teren.push({
+        id: S.uid,
+        ekipa,
+        posao,
+        vozilo:  document.getElementById('inp-t-vozilo').value.trim() || '—',
+        rok:     document.getElementById('inp-t-rok').value.trim(),
+        pak:     document.getElementById('inp-t-pak').value.trim() || '—',
+        mont:    document.getElementById('inp-t-mont').value.trim() || '—',
+    });
+
+    clearInputs(['inp-t-ekipa','inp-t-posao','inp-t-vozilo','inp-t-rok','inp-t-pak','inp-t-mont']);
+    document.getElementById('inp-t-ekipa').focus();
+
+    renderTeren();
+    save();
+    toast('Ekipa dodana ✓', 'ok');
+}
+
+function deleteTeren(id) {
+    S.teren = S.teren.filter(t => t.id !== id);
+    renderTeren();
+    save();
+}
+
+function renderTeren() {
+    const ul = document.getElementById('ui-teren');
+    ul.innerHTML = '';
+    S.teren.forEach(t => ul.appendChild(buildTerenChip(t)));
+
+    updateBadge('bdg-teren', S.teren.length, 'orange');
+
+    const sec = document.getElementById('doc-sec-teren');
+    const cards = document.getElementById('doc-teren-cards');
+    cards.innerHTML = '';
+    if (S.teren.length > 0) {
+        sec.style.display = 'block';
+        S.teren.forEach(t => cards.appendChild(buildDocTerenCard(t)));
+    } else {
+        sec.style.display = 'none';
+    }
+    checkEmpty();
+}
+
+// ══════════════════════════════════════════════════════
+//  DOM BUILDERS (no innerHTML for user data = XSS safe)
+// ══════════════════════════════════════════════════════
+function buildChip(name, task, rok, prior, onDel) {
+    const chip = el('div', `task-chip${prior === 'hitno' ? ' hitno' : ''}`);
+    const body = el('div', 'chip-body');
+
+    const nameEl = el('div', 'chip-name');
+    nameEl.textContent = name;
+    body.appendChild(nameEl);
+
+    if (task) {
+        const taskEl = el('div', 'chip-task');
+        taskEl.textContent = task;
+        body.appendChild(taskEl);
+    }
+
+    if (rok || prior === 'hitno') {
+        const tags = el('div', 'chip-tags');
+        if (rok) { const t = el('span', 'chip-tag time'); t.textContent = `⏰ ${rok}`; tags.appendChild(t); }
+        if (prior === 'hitno') { const t = el('span', 'chip-tag urgent'); t.textContent = 'HITNO'; tags.appendChild(t); }
+        body.appendChild(tags);
+    }
+
+    const del = el('button', 'chip-del');
+    del.textContent = '✕';
+    del.onclick = onDel;
+
+    chip.appendChild(body);
+    chip.appendChild(del);
+    return chip;
+}
+
+function buildTerenChip(t) {
+    const chip = el('div', 'task-chip');
+    const body = el('div', 'chip-body');
+
+    const nameEl = el('div', 'chip-name'); nameEl.textContent = t.ekipa; body.appendChild(nameEl);
+    const posEl = el('div', 'chip-task o'); posEl.textContent = t.posao; body.appendChild(posEl);
+
+    const tags = el('div', 'chip-tags');
+    if (t.rok) { const tg = el('span', 'chip-tag time'); tg.textContent = `⏰ ${t.rok}`; tags.appendChild(tg); }
+    const vt = el('span', 'chip-tag'); vt.textContent = `🚐 ${t.vozilo}`; tags.appendChild(vt);
+    body.appendChild(tags);
+
+    const del = el('button', 'chip-del');
+    del.textContent = '✕';
+    del.onclick = () => deleteTeren(t.id);
+
+    chip.appendChild(body);
+    chip.appendChild(del);
+    return chip;
+}
+
+function buildDocCard(t) {
+    const card = el('div', `doc-card radio-card${t.prior === 'hitno' ? ' hitno' : ''}`);
+
+    // Top row
+    const top = el('div', 'doc-card-top');
+    const nameEl = el('div', 'doc-card-name'); nameEl.textContent = `👤 ${t.radnik}`; top.appendChild(nameEl);
+    if (t.rok) {
+        const timeEl = el('div', `doc-card-time${t.prior === 'hitno' ? ' urgent' : ''}`);
+        timeEl.textContent = `⏰ ${t.rok}`;
+        top.appendChild(timeEl);
+    }
+    card.appendChild(top);
+
+    // Task
+    const taskEl = el('div', 'doc-card-task'); taskEl.textContent = `✂️ ${t.faza}`; card.appendChild(taskEl);
+
+    // Hitno flag
+    if (t.prior === 'hitno') {
+        const flag = el('div', 'doc-card-urgent-flag'); flag.textContent = '🔴 HITNO — Prioritetan zadatak!'; card.appendChild(flag);
+    }
+
+    // Note
+    if (t.nota) {
+        const noteEl = el('div', 'doc-card-note'); noteEl.textContent = `📝 ${t.nota}`; card.appendChild(noteEl);
+    }
+
+    // Confirm box
+    card.appendChild(buildConfirmBox('Potvrđeno / Završeno'));
+    return card;
+}
+
+function buildDocTerenCard(t) {
+    const card = el('div', 'doc-card teren-card');
+
+    const top = el('div', 'doc-card-top');
+    const nameEl = el('div', 'doc-card-name'); nameEl.textContent = `👥 ${t.ekipa}`; top.appendChild(nameEl);
+    if (t.rok) {
+        const timeEl = el('div', 'doc-card-time'); timeEl.textContent = `⏰ ${t.rok}`; top.appendChild(timeEl);
+    }
+    card.appendChild(top);
+
+    const posaoEl = el('div', 'doc-card-task orange'); posaoEl.textContent = `📍 ${t.posao}`; card.appendChild(posaoEl);
+
+    // Details grid
+    const grid = el('div', 'doc-teren-grid');
+    [
+        { lbl:'Vozilo', val: t.vozilo },
+        { lbl:'Rok izlaska', val: t.rok || '—' },
+        { lbl:'Pakuje kombi', val: t.pak },
+        { lbl:'Glavni za montažu', val: t.mont },
+    ].forEach(item => {
+        const cell = el('div');
+        const lbl = el('div', 'doc-teren-cell-lbl'); lbl.textContent = item.lbl;
+        const val = el('div', 'doc-teren-cell-val'); val.textContent = item.val;
+        cell.appendChild(lbl);
+        cell.appendChild(val);
+        grid.appendChild(cell);
+    });
+    card.appendChild(grid);
+
+    card.appendChild(buildConfirmBox('Ekipa potvrdila — može na teren'));
+    return card;
+}
+
+function buildConfirmBox(label) {
+    const row = el('div', 'doc-confirm');
+    const box = el('div', 'doc-confirm-box');
+    const lbl = el('div', 'doc-confirm-lbl'); lbl.textContent = label;
+    row.appendChild(box);
+    row.appendChild(lbl);
+    return row;
+}
+
+// ══════════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════════
+function el(tag, cls) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    return e;
+}
+
+function setText(id, txt) {
+    const e = document.getElementById(id);
+    if (e) e.textContent = txt;
+}
+
+function clearInputs(ids) {
+    ids.forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+}
+
+function updateBadge(id, count, color) {
+    const b = document.getElementById(id);
+    b.textContent = count;
+    b.className = `badge ${count === 0 ? 'zero' : color === 'orange' ? 'orange' : ''}`;
+}
+
+function checkEmpty() {
+    const has = S.opste.length || S.radionica.length || S.teren.length;
+    document.getElementById('doc-empty').style.display = has ? 'none' : 'block';
+}
+
+function toast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type || ''} show`;
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function renderAll() {
+    renderDocHeader();
+    renderOpste();
+    renderRadionica();
+    renderTeren();
+}
+
+// ══════════════════════════════════════════════════════
+//  RESET
+// ══════════════════════════════════════════════════════
+function resetSve() {
+    if (!confirm('Obrisati sve zadatke i krenuti sa praznim nalogom?')) return;
+    S.opste = []; S.radionica = []; S.teren = []; S.uid = 0;
+    const t = new Date();
+    S.datum = `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`;
+    document.getElementById('inp-datum').value = S.datum;
+    save();
+    renderAll();
+    toast('Nalog obrisan ✓', 'ok');
+}
+
+// ══════════════════════════════════════════════════════
+//  EXPORT
+// ══════════════════════════════════════════════════════
+function exportSlika() {
+    const has = S.opste.length || S.radionica.length || S.teren.length;
+    if (!has) { toast('⚠️ Dodaj bar jedan zadatak!', 'err'); return; }
+
+    // Stamp time
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('sr-RS', { hour:'2-digit', minute:'2-digit' });
+    setText('doc-footer-time', `Kreirano: ${fmtDate(S.datum)} u ${timeStr}`);
+    setText('doc-footer-izdavalac', `Izdao: ${S.izdavalac || 'Uprava'}`);
+
+    const wrapper = document.getElementById('export-wrapper');
+    wrapper.classList.add('exporting');
+    window.scrollTo(0, 0);
+
+    html2canvas(wrapper, {
+        scale: 2.5,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        logging: false,
+    }).then(canvas => {
+        wrapper.classList.remove('exporting');
+        const link = document.createElement('a');
+        link.download = `Nalog_${(S.datum||'').replace(/-/g,'')}_${S.smena.replace(/ /g,'')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        toast('Nalog preuzet ✓', 'ok');
+    }).catch(() => {
+        wrapper.classList.remove('exporting');
+        toast('Greška pri kreiranju slike', 'err');
+    });
+}
+</script>
+
+</body>
+</html>
