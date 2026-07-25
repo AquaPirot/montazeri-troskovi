@@ -1,0 +1,109 @@
+===========================================================
+  PROHORECA AG GROUP - TEREN
+  Evidencija i obracun terenskog rada monterskih ekipa
+===========================================================
+
+Sta je u paketu
+---------------
+
+  aplikacija/       ovo ide na server
+  dokumentacija/    README.md i prototip.html - NE ide na server
+
+
+POSTAVLJANJE - PET KORAKA
+=========================
+
+1. NAPRAVI BAZU
+
+   cPanel > MySQL Databases
+   - napravi bazu i korisnika baze
+   - dodaj korisnika bazi sa svim privilegijama (ALL PRIVILEGES)
+   - zapisi: naziv baze, korisnicko ime i lozinku
+
+
+2. UVEZI TABELE
+
+   cPanel > phpMyAdmin > izaberi bazu > kartica "Import"
+   - izaberi fajl:  aplikacija/sql/schema.sql
+   - klikni "Go"
+
+   Time se prave sve tabele i prvi nalog za kancelariju:
+
+       korisnicko ime:  admin
+       lozinka:         admin123
+
+
+3. PREBACI FAJLOVE
+
+   Sadrzaj foldera "aplikacija" (dakle index.php, inc, pages,
+   assets, sql, uploads, .htaccess i .user.ini) prebaci u folder
+   subdomena, na primer:
+
+       /home/korisnik/teren.prohoreca.rs/
+
+   Pazi: prebacuje se SADRZAJ foldera "aplikacija", a ne sam folder.
+   Kad zavrsis, index.php mora da bude direktno u folderu subdomena.
+
+   Ako preko cPanel File Manager-a saljes zip i raspakujes ga na
+   serveru, ukljuci prikaz skrivenih fajlova (Settings > Show Hidden
+   Files) da bi se prekopirali i .htaccess i .user.ini.
+
+
+4. PODESI VEZU SA BAZOM
+
+   U folderu subdomena kopiraj  config.primer.php  u  config.php
+   i upisi podatke iz prvog koraka:
+
+       'db_host'  => 'localhost',
+       'db_naziv' => 'korisnik_teren',
+       'db_user'  => 'korisnik_teren',
+       'db_pass'  => 'lozinka_baze',
+
+   Fajl config.primer.php slobodno ostavi, on ne smeta.
+
+
+5. PRAVA PRISTUPA
+
+   Folder  uploads  mora da bude upisiv: 755
+   (na nekim hostinzima je potrebno 775)
+
+
+PRVO POKRETANJE
+===============
+
+  1. Otvori subdomen u pregledacu
+  2. Prijavi se kao  admin / admin123
+  3. ODMAH PROMENI LOZINKU
+     (krug sa inicijalima gore desno > Promena lozinke)
+  4. Vozila    > dodaj vozila i ocekivanu potrosnju (L/100 km)
+  5. Korisnici > dodaj sefove ekipa sa pocetnim lozinkama
+
+  Sefovi ekipa se prijavljuju na istoj adresi i odmah vide
+  svoja cetiri dugmeta.
+
+  Preporuka za telefone: Chrome na Androidu > otvori adresu >
+  meni sa tri tacke > "Dodaj na pocetni ekran".
+
+
+VAZNO
+=====
+
+  - Baza je prazna. Nema demo podataka osim naloga "admin".
+  - Promeni lozinku naloga "admin" pre nego sto date pristup ekipama.
+  - Ukljuci besplatan SSL: cPanel > SSL/TLS Status > Run AutoSSL,
+    pa forsiraj HTTPS. Bez toga se lozinke salju nezasticeno.
+  - Folder dokumentacija NE prebacuj na server.
+
+
+ZAHTEVI SERVERA
+===============
+
+  PHP 8.1 ili noviji, sa ekstenzijom pdo_mysql
+  (pozeljno i gd i exif - tada se fotografije automatski smanjuju)
+  MySQL 5.7+ ili MariaDB 10.3+
+  Apache sa .htaccess (standardno na cPanel-u)
+
+
+Detaljno uputstvo je u  dokumentacija/README.md
+Prototip za pokazivanje ekipi:  dokumentacija/prototip.html
+(otvara se duplim klikom, radi bez servera i bez interneta)
