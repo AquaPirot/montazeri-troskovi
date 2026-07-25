@@ -82,6 +82,19 @@
     var d = n.split('.');
     return (neg ? '-' : '') + d[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (d[1] ? ',' + d[1] : '');
   }
+  /* Čita broj isto kao PHP: "62,5", "40.000", "12.469,50", "1 250". */
+  function brojIz(v) {
+    if (v === null || v === undefined) return null;
+    v = String(v).replace(/[\s ]/g, '');
+    if (v === '') return null;
+    var tacka = v.indexOf('.') !== -1, zarez = v.indexOf(',') !== -1;
+    if (tacka && zarez)      v = v.replace(/\./g, '').replace(',', '.');
+    else if (zarez)          v = v.replace(',', '.');
+    else if (tacka && /^-?\d{1,3}(\.\d{3})+$/.test(v)) v = v.replace(/\./g, '');
+    var n = Number(v);
+    return isNaN(n) ? null : n;
+  }
+
   function osveziPovratak() {
     var f = document.querySelector('[data-povratak]');
     if (!f) return;
@@ -93,8 +106,8 @@
     var kmPolje = f.querySelector('[name=km_kraj]');
     var kmIzlaz = f.querySelector('[data-km-rezultat]');
     if (kmPolje && kmIzlaz) {
-      var v = parseInt(kmPolje.value, 10);
-      if (!v) {
+      var v = brojIz(kmPolje.value);
+      if (v === null) {
         kmIzlaz.innerHTML = 'Ukupno pređeno: —';
       } else if (v < kmStart) {
         kmIzlaz.innerHTML = '<b style="color:var(--crvena)">Manje od polazne kilometraže (' + broj(kmStart, 0) + ').</b>';
@@ -107,8 +120,8 @@
     if (!izlaz) return;
     var pe = f.querySelector('[name=vraceno_eur]');
     var pr = f.querySelector('[name=vraceno_rsd]');
-    var e = pe && pe.value !== '' ? parseFloat(pe.value.replace(',', '.')) : null;
-    var r = pr && pr.value !== '' ? parseFloat(pr.value.replace(',', '.')) : null;
+    var e = pe ? brojIz(pe.value) : null;
+    var r = pr ? brojIz(pr.value) : null;
 
     if (e === null && r === null) { izlaz.innerHTML = ''; return; }
     var de = e === null ? 0 : e - ocekEur;

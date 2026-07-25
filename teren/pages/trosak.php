@@ -85,7 +85,7 @@ pocetak_strane('Dodaj trošak', ['nazad' => $nazad]);
     <div class="polje">
         <label for="iz">Iznos</label>
         <div class="dva iznos">
-            <input class="unos veliki" id="iz" name="iznos" type="number" step="0.01" min="0.01" required
+            <input class="unos veliki" id="iz" name="iznos" type="text" required
                    inputmode="decimal" placeholder="0,00" value="<?= h(post('iznos')) ?>">
             <div class="plocice k2" style="gap:6px">
                 <?= plocica('valuta', 'EUR', 'EUR', $izVal === 'EUR', '', 'zlato valuta') ?>
@@ -112,16 +112,14 @@ pocetak_strane('Dodaj trošak', ['nazad' => $nazad]);
         <div class="polje">
             <label for="li">Litara</label>
             <div class="unos-sa-sufiksom">
-                <input class="unos" id="li" name="litri" type="number" step="0.01" min="0"
-                       inputmode="decimal" placeholder="0,0" value="<?= h(post('litri')) ?>">
+                <input class="unos" id="li" name="litri" type="text" inputmode="decimal" placeholder="0,0" value="<?= h(post('litri')) ?>">
                 <span class="sufiks">L</span>
             </div>
         </div>
         <div class="polje">
             <label for="ks">Kilometraža</label>
             <div class="unos-sa-sufiksom">
-                <input class="unos" id="ks" name="km_sipanja" type="number" step="1" min="0"
-                       inputmode="numeric" placeholder="<?= broj($t['km_start'], 0) ?>" value="<?= h(post('km_sipanja')) ?>">
+                <input class="unos" id="ks" name="km_sipanja" type="text" inputmode="numeric" placeholder="<?= broj($t['km_start'], 0) ?>" value="<?= h(post('km_sipanja')) ?>">
                 <span class="sufiks">km</span>
             </div>
         </div>

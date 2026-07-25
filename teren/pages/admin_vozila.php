@@ -94,8 +94,7 @@ pocetak_strane('Vozila');
         <div class="polje">
             <label for="pv">Očekivana prosečna potrošnja <span class="opc">(nije obavezno)</span></label>
             <div class="unos-sa-sufiksom">
-                <input class="unos" id="pv" name="ocekivana_potrosnja" type="number" step="0.1" min="0" max="100"
-                       inputmode="decimal" placeholder="npr. 11,5">
+                <input class="unos" id="pv" name="ocekivana_potrosnja" type="text" inputmode="decimal" placeholder="npr. 11,5">
                 <span class="sufiks">L/100</span>
             </div>
         </div>

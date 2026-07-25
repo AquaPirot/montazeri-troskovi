@@ -139,11 +139,38 @@ function post(string $k, string $podrazumevano = ''): string
     return isset($_POST[$k]) && is_scalar($_POST[$k]) ? trim((string)$_POST[$k]) : $podrazumevano;
 }
 
+/**
+ * Broj unet onako kako se kod nas piše.
+ * Prihvata sve ove oblike:
+ *   "62,5"      -> 62.5      (zarez kao decimalni znak)
+ *   "62.5"      -> 62.5      (tačka kao decimalni znak)
+ *   "40.000"    -> 40000     (tačka kao znak za hiljade)
+ *   "12.469,50" -> 12469.50  (i jedno i drugo)
+ *   "1 250"     -> 1250      (razmak kao znak za hiljade)
+ */
 function postBroj(string $k): ?float
 {
     $v = post($k);
     if ($v === '') return null;
-    $v = str_replace([' ', ','], ['', '.'], $v);
+
+    $v = str_replace(["\u{00A0}", ' '], '', $v);
+
+    $imaTacku = str_contains($v, '.');
+    $imaZarez = str_contains($v, ',');
+
+    if ($imaTacku && $imaZarez) {
+        // "12.469,50" – tačka su hiljade, zarez je decimalni znak
+        $v = str_replace('.', '', $v);
+        $v = str_replace(',', '.', $v);
+    } elseif ($imaZarez) {
+        $v = str_replace(',', '.', $v);
+    } elseif ($imaTacku) {
+        // "40.000" je četrdeset hiljada, a "62.5" je šezdeset dva i po
+        if (preg_match('/^-?\d{1,3}(\.\d{3})+$/', $v)) {
+            $v = str_replace('.', '', $v);
+        }
+    }
+
     return is_numeric($v) ? (float)$v : null;
 }
 

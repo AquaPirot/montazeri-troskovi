@@ -102,7 +102,7 @@ pocetak_strane($ispravka ? 'Ispravi izveštaj' : 'Povratak sa terena', ['nazad' 
     <div class="polje">
         <label for="kk">Stanje kilometar-sata <span class="opc">(polazak: <?= broj($t['km_start'], 0) ?>)</span></label>
         <div class="unos-sa-sufiksom">
-            <input class="unos" id="kk" name="km_kraj" type="number" step="1" min="0" required
+            <input class="unos" id="kk" name="km_kraj" type="text" required
                    inputmode="numeric" placeholder="npr. <?= (int)$t['km_start'] + 500 ?>" value="<?= h($vKm) ?>">
             <span class="sufiks">km</span>
         </div>
@@ -133,16 +133,14 @@ pocetak_strane($ispravka ? 'Ispravi izveštaj' : 'Povratak sa terena', ['nazad' 
             <div class="polje">
                 <label for="ve">Vraćam EUR</label>
                 <div class="unos-sa-sufiksom">
-                    <input class="unos" id="ve" name="vraceno_eur" type="number" step="0.01" min="0"
-                           inputmode="decimal" placeholder="<?= broj($o['ocek_eur'], 2) ?>" value="<?= h($vEur) ?>">
+                    <input class="unos" id="ve" name="vraceno_eur" type="text" inputmode="decimal" placeholder="<?= broj($o['ocek_eur'], 2) ?>" value="<?= h($vEur) ?>">
                     <span class="sufiks">EUR</span>
                 </div>
             </div>
             <div class="polje">
                 <label for="vr">Vraćam RSD</label>
                 <div class="unos-sa-sufiksom">
-                    <input class="unos" id="vr" name="vraceno_rsd" type="number" step="1" min="0"
-                           inputmode="numeric" placeholder="<?= broj($o['ocek_rsd'], 0) ?>" value="<?= h($vRsd) ?>">
+                    <input class="unos" id="vr" name="vraceno_rsd" type="text" inputmode="numeric" placeholder="<?= broj($o['ocek_rsd'], 0) ?>" value="<?= h($vRsd) ?>">
                     <span class="sufiks">RSD</span>
                 </div>
             </div>

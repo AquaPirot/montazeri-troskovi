@@ -216,8 +216,7 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
         <label class="nalepnica" for="op">Očekivana prosečna potrošnja</label>
         <div style="display:flex;gap:8px">
             <div class="unos-sa-sufiksom" style="flex:1">
-                <input class="unos" id="op" name="ocekivana_potrosnja" type="number" step="0.1" min="0" max="100"
-                       inputmode="decimal" placeholder="npr. 11,5"
+                <input class="unos" id="op" name="ocekivana_potrosnja" type="text" inputmode="decimal" placeholder="npr. 11,5"
                        value="<?= $v['ocekivana_potrosnja'] !== null ? h(rtrim(rtrim(number_format((float)$v['ocekivana_potrosnja'], 2, '.', ''), '0'), '.')) : '' ?>">
                 <span class="sufiks">L/100</span>
             </div>
@@ -299,8 +298,7 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
             <div class="polje">
                 <label for="kmv">Kilometraža <span class="opc">(nije obavezno)</span></label>
                 <div class="unos-sa-sufiksom">
-                    <input class="unos" id="kmv" name="km" type="number" step="1" min="0"
-                           inputmode="numeric" placeholder="npr. 128450" value="<?= h(post('km')) ?>">
+                    <input class="unos" id="kmv" name="km" type="text" inputmode="numeric" placeholder="npr. 128450" value="<?= h(post('km')) ?>">
                     <span class="sufiks">km</span>
                 </div>
             </div>
@@ -321,8 +319,7 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
         <div class="polje">
             <label for="tr">Trošak <span class="opc">(nije obavezno)</span></label>
             <div class="dva iznos">
-                <input class="unos" id="tr" name="trosak" type="number" step="0.01" min="0"
-                       inputmode="decimal" placeholder="0,00" value="<?= h(post('trosak')) ?>">
+                <input class="unos" id="tr" name="trosak" type="text" inputmode="decimal" placeholder="0,00" value="<?= h(post('trosak')) ?>">
                 <div class="plocice k2" style="gap:6px">
                     <?= plocica('valuta', 'RSD', 'RSD', post('valuta', 'RSD') === 'RSD', '', 'zlato valuta') ?>
                     <?= plocica('valuta', 'EUR', 'EUR', post('valuta') === 'EUR', '', 'zlato valuta') ?>

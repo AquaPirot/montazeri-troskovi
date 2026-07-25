@@ -87,16 +87,14 @@ pocetak_strane('Polazak na teren', ['nazad' => 'index.php?s=pocetna']);
     <div class="polje">
         <label for="de">EUR</label>
         <div class="unos-sa-sufiksom">
-            <input class="unos" id="de" name="depozit_eur" type="number" step="0.01" min="0"
-                   inputmode="decimal" placeholder="0" value="<?= h(post('depozit_eur')) ?>">
+            <input class="unos" id="de" name="depozit_eur" type="text" inputmode="decimal" placeholder="0" value="<?= h(post('depozit_eur')) ?>">
             <span class="sufiks">EUR</span>
         </div>
     </div>
     <div class="polje">
         <label for="dr">RSD</label>
         <div class="unos-sa-sufiksom">
-            <input class="unos" id="dr" name="depozit_rsd" type="number" step="1" min="0"
-                   inputmode="numeric" placeholder="0" value="<?= h(post('depozit_rsd')) ?>">
+            <input class="unos" id="dr" name="depozit_rsd" type="text" inputmode="numeric" placeholder="0" value="<?= h(post('depozit_rsd')) ?>">
             <span class="sufiks">RSD</span>
         </div>
     </div>
@@ -107,7 +105,7 @@ pocetak_strane('Polazak na teren', ['nazad' => 'index.php?s=pocetna']);
     <div class="polje">
         <label for="km">Stanje kilometar-sata</label>
         <div class="unos-sa-sufiksom">
-            <input class="unos" id="km" name="km_start" type="number" step="1" min="0" required
+            <input class="unos" id="km" name="km_start" type="text" required
                    inputmode="numeric" placeholder="npr. 128450" value="<?= h(post('km_start')) ?>">
             <span class="sufiks">km</span>
         </div>
