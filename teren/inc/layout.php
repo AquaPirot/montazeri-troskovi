@@ -42,6 +42,10 @@ function ikona(string $ime, int $v = 22): string
         'kanta'     => '<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>',
         'vrati'     => '<path d="M9.5 5 4 10.5 9.5 16"/><path d="M4 10.5h10a6 6 0 0 1 0 12h-3"/>',
         'kljucic'   => '<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.4"/>',
+        'dokument'  => '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/>',
+        'alat'      => '<path d="M14.5 4.5a3.8 3.8 0 0 0 4.8 4.9l-9 9a2.4 2.4 0 1 1-3.4-3.4z"/><path d="M6.5 4.5 4 7l3 3 2.5-2.5z"/>',
+        'guma'      => '<circle cx="12" cy="12" r="8.6"/><circle cx="12" cy="12" r="3.4"/><path d="M12 3.4v5.2M12 15.4v5.2M3.4 12h5.2M15.4 12h5.2"/>',
+        'kalendar'  => '<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 10h17"/><path d="M8 3v4M16 3v4"/>',
     ];
     $d = $p[$ime] ?? '';
     return '<svg width="' . $v . '" height="' . $v . '" viewBox="0 0 24 24" fill="none" stroke="currentColor"'
@@ -224,8 +228,8 @@ function stavka_terena(array $t, bool $prikaziSefa = false): string
     $h .= '<span class="meta"><span>' . datum($t['vreme_polaska'], false)
         . ($t['vreme_povratka'] ? ' – ' . datum($t['vreme_povratka'], false) : ' – u toku') . '</span></span>';
     $h .= '<span class="dole"><span class="cip">' . $km . '</span>';
-    $h .= '<span class="cip">' . (int)$t['broj_troskova'] . ' troškova</span>';
-    if ((int)$t['broj_prijava'] > 0) $h .= '<span class="cip">' . (int)$t['broj_prijava'] . ' prijava</span>';
+    $h .= '<span class="cip">' . h(mnozina((int)$t['broj_troskova'], 'trošak', 'troška', 'troškova')) . '</span>';
+    if ((int)$t['broj_prijava'] > 0) $h .= '<span class="cip">' . h(mnozina((int)$t['broj_prijava'], 'prijava', 'prijave', 'prijava')) . '</span>';
     $h .= '</span></a>';
     return $h;
 }

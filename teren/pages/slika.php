@@ -20,14 +20,23 @@ $teren_id = vrednost(
       UNION SELECT teren_id FROM prijave  WHERE foto = ?
       LIMIT 1', [$f, $f, $f, $f, $f]);
 
-if (!$teren_id) {
-    http_response_code(404);
-    exit('Fotografija nije pronađena.');
-}
-
-if ($k['uloga'] !== 'admin') {
-    $moj = vrednost('SELECT COUNT(*) FROM tereni WHERE id = ? AND korisnik_id = ?', [$teren_id, $k['id']]);
-    if (!$moj) {
+if ($teren_id) {
+    // Fotografija sa terena: šef vidi samo svoje terene, administrator sve.
+    if ($k['uloga'] !== 'admin') {
+        $moj = vrednost('SELECT COUNT(*) FROM tereni WHERE id = ? AND korisnik_id = ?', [$teren_id, $k['id']]);
+        if (!$moj) {
+            http_response_code(403);
+            exit('Nemaš pristup toj fotografiji.');
+        }
+    }
+} else {
+    // Fotografija iz servisne knjige – samo administrator.
+    $servis = vrednost('SELECT id FROM servis WHERE foto = ? LIMIT 1', [$f]);
+    if (!$servis) {
+        http_response_code(404);
+        exit('Fotografija nije pronađena.');
+    }
+    if ($k['uloga'] !== 'admin') {
         http_response_code(403);
         exit('Nemaš pristup toj fotografiji.');
     }

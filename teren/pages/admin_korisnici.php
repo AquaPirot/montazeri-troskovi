@@ -86,7 +86,7 @@ pocetak_strane('Korisnici');
 
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
             <?php if ($kk['uloga'] === 'sef'): ?>
-                <span class="cip"><?= (int)$kk['broj_terena'] ?> terena</span>
+                <span class="cip"><?= h(mnozina((int)$kk['broj_terena'], 'teren', 'terena', 'terena')) ?></span>
             <?php endif; ?>
             <?php if (!(int)$kk['aktivan']): ?><span class="cip">nalog isključen</span><?php endif; ?>
         </div>

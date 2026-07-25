@@ -52,8 +52,8 @@ pocetak_strane('Zdravo, ' . $ime);
                 </div>
             </div>
             <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-                <span class="cip"><?= $brT ?> troškova</span>
-                <span class="cip"><?= $brP ?> prijava</span>
+                <span class="cip"><?= h(mnozina($brT, 'trošak', 'troška', 'troškova')) ?></span>
+                <span class="cip"><?= h(mnozina($brP, 'prijava', 'prijave', 'prijava')) ?></span>
                 <span class="cip">start <?= broj($t['km_start'], 0) ?> km</span>
             </div>
         </div>

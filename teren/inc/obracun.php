@@ -131,6 +131,91 @@ function dokazi_terena(array $t, array $troskovi, array $prijave): array
     return $d;
 }
 
+/* ============================================================
+   VOZILA – zbirni podaci i istorija
+   ============================================================ */
+
+/**
+ * Zbirna potrošnja jednog vozila kroz sve zatvorene terene.
+ *
+ * Računa se samo iz terena koji imaju završnu kilometražu, da bi
+ * pređeni kilometri i sipani litri pripadali istom periodu.
+ */
+function statistika_vozila(int $vozilo_id): array
+{
+    $t = red('SELECT COUNT(*) AS broj, COALESCE(SUM(km_kraj - km_start), 0) AS km
+                FROM tereni WHERE vozilo_id = ? AND km_kraj IS NOT NULL', [$vozilo_id]);
+
+    $g = red('SELECT COALESCE(SUM(x.litri), 0) AS litri,
+                     COALESCE(SUM(CASE WHEN x.valuta = "EUR" THEN x.iznos ELSE 0 END), 0) AS eur,
+                     COALESCE(SUM(CASE WHEN x.valuta = "RSD" THEN x.iznos ELSE 0 END), 0) AS rsd
+                FROM troskovi x
+                JOIN tereni t ON t.id = x.teren_id
+               WHERE t.vozilo_id = ? AND t.km_kraj IS NOT NULL AND x.vrsta = "gorivo"', [$vozilo_id]);
+
+    $s = [
+        'broj_terena' => (int)$t['broj'],
+        'km'          => (int)$t['km'],
+        'litri'       => (float)$g['litri'],
+        'gorivo_eur'  => (float)$g['eur'],
+        'gorivo_rsd'  => (float)$g['rsd'],
+    ];
+
+    $s['potrosnja'] = ($s['km'] > 0 && $s['litri'] > 0)
+        ? round($s['litri'] / $s['km'] * 100, 2) : null;
+
+    $ocek = vrednost('SELECT ocekivana_potrosnja FROM vozila WHERE id = ?', [$vozilo_id]);
+    $s['ocek_potrosnja'] = $ocek !== null && $ocek !== false ? (float)$ocek : null;
+    $s['odstupanje'] = ($s['potrosnja'] !== null && $s['ocek_potrosnja'])
+        ? round(($s['potrosnja'] - $s['ocek_potrosnja']) / $s['ocek_potrosnja'] * 100, 1) : null;
+
+    $prag = (float)(podesavanja()['prag_potrosnje'] ?? 15);
+    $s['upozorenje'] = $s['odstupanje'] !== null && abs($s['odstupanje']) > $prag;
+    $s['prag'] = $prag;
+
+    return $s;
+}
+
+/** Tereni jednog vozila, sa potrošnjom po svakom terenu. */
+function tereni_vozila(int $vozilo_id, int $koliko = 50): array
+{
+    $lista = redovi(
+        'SELECT t.id, t.projekat, t.status, t.vreme_polaska, t.vreme_povratka,
+                t.km_start, t.km_kraj, k.ime AS sef_ime,
+                (SELECT COALESCE(SUM(x.litri), 0) FROM troskovi x
+                  WHERE x.teren_id = t.id AND x.vrsta = "gorivo") AS litri
+           FROM tereni t
+           JOIN korisnici k ON k.id = t.korisnik_id
+          WHERE t.vozilo_id = ?
+       ORDER BY t.vreme_polaska DESC, t.id DESC
+          LIMIT ' . (int)$koliko, [$vozilo_id]);
+
+    foreach ($lista as &$t) {
+        $t['km'] = ($t['km_kraj'] !== null) ? ((int)$t['km_kraj'] - (int)$t['km_start']) : null;
+        $t['potrosnja'] = ($t['km'] && $t['km'] > 0 && (float)$t['litri'] > 0)
+            ? round((float)$t['litri'] / $t['km'] * 100, 2) : null;
+    }
+    return $lista;
+}
+
+/** Unosi iz servisne knjige, najnoviji prvi. */
+function servis_vozila(int $vozilo_id): array
+{
+    return redovi('SELECT s.*, k.ime AS uneo
+                     FROM servis s
+                LEFT JOIN korisnici k ON k.id = s.kreirao_id
+                    WHERE s.vozilo_id = ?
+                 ORDER BY s.datum DESC, s.id DESC', [$vozilo_id]);
+}
+
+/** Poslednji upis registracije sa datumom važenja (ili null). */
+function registracija_vozila(int $vozilo_id): ?array
+{
+    return red('SELECT datum, vazi_do FROM servis
+                 WHERE vozilo_id = ? AND vrsta = "registracija" AND vazi_do IS NOT NULL
+              ORDER BY vazi_do DESC LIMIT 1', [$vozilo_id]);
+}
+
 /** Brojači za kartice u administratorskom pregledu. */
 function brojaci_statusa(): array
 {

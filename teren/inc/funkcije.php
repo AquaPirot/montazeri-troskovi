@@ -30,6 +30,15 @@ const TIPOVI_PRIJAVE = [
     'ostalo'     => ['n' => 'Ostala napomena',             'ik' => 'ostalo'],
 ];
 
+/** Vrste unosa u servisnoj knjizi vozila. */
+const VRSTE_SERVISA = [
+    'servis'       => ['n' => 'Servis',       'ik' => 'kljuc'],
+    'registracija' => ['n' => 'Registracija', 'ik' => 'dokument'],
+    'popravka'     => ['n' => 'Popravka',     'ik' => 'alat'],
+    'gume'         => ['n' => 'Gume',         'ik' => 'guma'],
+    'ostalo'       => ['n' => 'Ostalo',       'ik' => 'ostalo'],
+];
+
 const STATUSI = [
     'aktivan'  => ['n' => 'Na terenu',          'kl' => 'o-plava'],
     'pregled'  => ['n' => 'Čeka pregled',       'kl' => 'o-narandzasta'],
@@ -71,12 +80,44 @@ function datum(?string $dt, bool $saVremenom = true): string
     return date($saVremenom ? 'd.m.Y. H:i' : 'd.m.Y.', $t);
 }
 
+/** Samo datum: "22.07.2026." */
+function datumDan(?string $d): string
+{
+    if (!$d) return '—';
+    $t = strtotime($d);
+    return $t ? date('d.m.Y.', $t) : '—';
+}
+
+/** Broj dana od danas do datuma (negativno = prošlo). */
+function danaDo(?string $d): ?int
+{
+    if (!$d) return null;
+    $t = strtotime($d);
+    if (!$t) return null;
+    return (int)floor(($t - strtotime('today')) / 86400);
+}
+
 /** "22.07. 06:40" – kraći oblik za liste */
 function datumKratko(?string $dt): string
 {
     if (!$dt) return '—';
     $t = strtotime($dt);
     return $t ? date('d.m. H:i', $t) : '—';
+}
+
+/**
+ * Srpska množina: mnozina(1,'teren','terena','terena') -> "1 teren"
+ *   1, 21, 31…  -> jednina        (ali ne 11)
+ *   2–4, 22–24… -> dvojina        (ali ne 12–14)
+ *   ostalo      -> množina
+ */
+function mnozina(int $n, string $jednina, string $dvojina, string $mnozina): string
+{
+    $j = abs($n) % 10;
+    $d = abs($n) % 100;
+    if ($j === 1 && $d !== 11)                 return $n . ' ' . $jednina;
+    if ($j >= 2 && $j <= 4 && ($d < 12 || $d > 14)) return $n . ' ' . $dvojina;
+    return $n . ' ' . $mnozina;
 }
 
 function inicijali(string $ime): string

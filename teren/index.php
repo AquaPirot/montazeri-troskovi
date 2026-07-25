@@ -35,6 +35,7 @@ $strane = [
     // administrator
     'admin'     => 'admin_tereni.php',
     'vozila'    => 'admin_vozila.php',
+    'vozilo'    => 'vozilo.php',
     'korisnici' => 'admin_korisnici.php',
 ];
 

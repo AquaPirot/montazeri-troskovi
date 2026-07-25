@@ -15,6 +15,7 @@ PHP 8.1+ i MySQL, napravljeno za cPanel hosting i za rad preko telefona.
 | `pages/`             | Ekrani                                                               |
 | `assets/`            | CSS i JavaScript                                                     |
 | `sql/schema.sql`     | MySQL šema                                                           |
+| `sql/nadogradnja-*`  | Dopune šeme za baze napravljene ranijom verzijom                      |
 | `uploads/`           | Fotografije (nisu javno dostupne)                                    |
 | `config.primer.php`  | Predložak podešavanja                                                |
 
@@ -31,6 +32,9 @@ sa svim privilegijama. Zapiši naziv baze, korisnika i lozinku.
 
 cPanel → *phpMyAdmin* → izaberi bazu → kartica **Import** → izaberi
 `sql/schema.sql` → **Go**.
+
+Ako je baza već napravljena ranijom verzijom, uvezi i fajlove
+`sql/nadogradnja-*.sql` istim putem. Nova instalacija ih ne pokreće.
 
 Time se pravi i prvi administratorski nalog:
 
@@ -94,6 +98,25 @@ Početni ekran ima samo četiri funkcije:
 
 Šef može da ima **samo jedan otvoren teren** u isto vreme.
 
+### Vozila
+
+Ekran **Vozila** pokazuje ceo park na jednom mestu: za svako vozilo stvarnu
+prosečnu potrošnju, očekivanu, broj terena i pređene kilometre. Ako registracija
+ističe u narednih 30 dana ili je već istekla, vozilo dobija oznaku.
+
+Dodirom na vozilo otvara se njegov karton:
+
+- **Potrošnja kroz sve terene** – stvarna i očekivana, ukupno pređeno, ukupno
+  sipano i ukupan trošak goriva. Računa se samo iz zatvorenih terena, da bi
+  kilometri i litri pripadali istom periodu.
+- **Servisna knjiga** – ručni unosi: servis, registracija, popravka, gume, ostalo.
+  Za svaki unos: datum, kratak opis šta je urađeno, kilometraža, trošak i
+  fotografija računa. Kod registracije se upisuje i do kada važi, pa aplikacija
+  javlja 30 dana pre isteka.
+- **Istorija terena** – svaki teren sa potrošnjom po tom terenu. Narandžasto je
+  označen teren koji odstupa više od praga, pa se odmah vidi da li potrošnja
+  raste stalno ili je jedan teren izuzetak.
+
 ### Administrator
 
 Pregled terena po statusu: **Čeka pregled**, **Aktivni**, **Na ispravci**, **Odobreni**.
@@ -136,6 +159,10 @@ administratoru u izveštaju.
 Ako odstupanje od očekivane potrošnje vozila pređe **15%**, izveštaj dobija
 narandžasto upozorenje. To je **signal za proveru, a ne dokaz o nepravilnosti** —
 uzrok može biti teret, teren, gužva, način vožnje ili greška u unosu.
+
+Isti obračun postoji na dva nivoa: **po terenu** (u izveštaju) i **zbirno po
+vozilu** (u kartonu vozila). Zbirni prosek je pouzdaniji, jer se greška u jednom
+punjenju rezervoara razlaže na više terena.
 
 Prag se menja u `config.php` (`prag_potrosnje`).
 

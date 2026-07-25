@@ -400,6 +400,10 @@ function I(ime, v){
     olovka:'<path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14.5 5.5 18.5 9.5"/>',
     slika:'<rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.5" cy="10" r="1.8"/><path d="m3.5 18 5-5 3.5 3.5L16 13l4.5 4.5"/>',
     dokument:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/>',
+    alat:'<path d="M14.5 4.5a3.8 3.8 0 0 0 4.8 4.9l-9 9a2.4 2.4 0 1 1-3.4-3.4z"/><path d="M6.5 4.5 4 7l3 3 2.5-2.5z"/>',
+    guma:'<circle cx="12" cy="12" r="8.6"/><circle cx="12" cy="12" r="3.4"/><path d="M12 3.4v5.2M12 15.4v5.2M3.4 12h5.2M15.4 12h5.2"/>',
+    kalendar:'<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 10h17"/><path d="M8 3v4M16 3v4"/>',
+    kanta:'<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>',
     vrati:'<path d="M9.5 5 4 10.5 9.5 16"/><path d="M4 10.5h10a6 6 0 0 1 0 12h-3"/>'
   }[ime] || '';
   return '<svg width="'+v+'" height="'+v+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
@@ -428,6 +432,13 @@ const TIPOVI_PRIJAVE = {
   vozilo:     {n:'Problem sa vozilom',         ik:'kamion'},
   ostalo:     {n:'Ostala napomena',            ik:'ostalo'}
 };
+const VRSTE_SERVISA = {
+  servis:       {n:'Servis',       ik:'kljuc'},
+  registracija: {n:'Registracija', ik:'dokument'},
+  popravka:     {n:'Popravka',     ik:'alat'},
+  gume:         {n:'Gume',         ik:'guma'},
+  ostalo:       {n:'Ostalo',       ik:'ostalo'}
+};
 const STATUSI = {
   aktivan:   {n:'Na terenu',           kl:'o-plava'},
   pregled:   {n:'Čeka pregled',        kl:'o-narandzasta'},
@@ -447,6 +458,28 @@ const DB = {
     {id:2, naziv:'Fiat Ducato',    reg:'BG-268-CD', potrosnja:12.0},
     {id:3, naziv:'VW Crafter',     reg:'NS-451-EF', potrosnja:13.2}
   ],
+  servis:{
+    1:[
+      {vrsta:'servis',       datum:'12.06.2026.', km:127500, trosak:24800, val:'RSD', foto:true,
+       opis:'Veliki servis: ulje, filter ulja, filter goriva i kabinski filter.'},
+      {vrsta:'gume',         datum:'18.04.2026.', km:124300, trosak:9600,  val:'RSD',
+       opis:'Zamenjene zimske gume letnjim, balansiranje sva četiri točka.'},
+      {vrsta:'registracija', datum:'02.08.2025.', km:118900, trosak:31500, val:'RSD', vazi_do:'02.08.2026.',
+       opis:'Produžena registracija, tehnički pregled uredan.'}
+    ],
+    2:[
+      {vrsta:'popravka',     datum:'03.07.2026.', km:96100, trosak:14200, val:'RSD',
+       opis:'Zamenjen ležaj prednjeg desnog točka, čulo se zavijanje pri brzini.'},
+      {vrsta:'registracija', datum:'20.09.2025.', km:88400, trosak:29800, val:'RSD', vazi_do:'20.09.2026.',
+       opis:'Produžena registracija.'}
+    ],
+    3:[
+      {vrsta:'registracija', datum:'10.07.2025.', km:49200, trosak:27400, val:'RSD', vazi_do:'10.07.2026.',
+       opis:'Produžena registracija.'},
+      {vrsta:'servis',       datum:'05.02.2026.', km:52100, trosak:18900, val:'RSD',
+       opis:'Mali servis: ulje i filter ulja.'}
+    ]
+  },
   tereni:[
     {
       id:101, status:'aktivan', sef:1, vozilo:1,
@@ -1314,22 +1347,175 @@ function potvrdiVracanje(){
 /* ============================================================
    15. EKRAN: VOZILA (ADMIN)
    ============================================================ */
+function statVozila(vid){
+  const zatvoreni = DB.tereni.filter(t=>t.vozilo===vid && t.km_kraj!=null);
+  let km=0, litri=0, gRSD=0, gEUR=0;
+  zatvoreni.forEach(t=>{
+    km += t.km_kraj - t.km_start;
+    t.troskovi.forEach(tr=>{ if(tr.vrsta==='gorivo'){ litri += (tr.litri||0); if(tr.val==='RSD') gRSD+=tr.iznos; else gEUR+=tr.iznos; } });
+  });
+  const v = vozilo(vid);
+  const p = (km>0 && litri>0) ? litri/km*100 : null;
+  const odst = (p && v.potrosnja) ? (p - v.potrosnja)/v.potrosnja*100 : null;
+  return {broj:zatvoreni.length, km, litri, gRSD, gEUR, potrosnja:p, ocek:v.potrosnja,
+          odstupanje:odst, upozorenje: odst!=null && Math.abs(odst)>15};
+}
+function danaDo(d){
+  const [dan,mes,god] = d.split('.').map(x=>parseInt(x,10));
+  return Math.round((new Date(god,mes-1,dan) - new Date(2026,6,25)) / 86400000);
+}
+
 function scVozila(){
   let h = '<div class="top"><div class="rast"><div class="marka">Prohoreca AG group</div><div class="naslov">Vozila</div></div>'+
     '<div class="avatar" onclick="odjava()">'+I('stit',18)+'</div></div>';
   h += '<div class="sadrzaj">';
-  h += '<div class="napomena">'+I('grafik',18)+'<div>Očekivana potrošnja se koristi samo kao <b>orijentir za proveru</b> izveštaja.</div></div>';
   DB.vozila.forEach(v=>{
+    const s = statVozila(v.id);
+    const reg = (DB.servis[v.id]||[]).filter(x=>x.vrsta==='registracija' && x.vazi_do)
+                  .sort((a,b)=>danaDo(b.vazi_do)-danaDo(a.vazi_do))[0];
+    const dana = reg ? danaDo(reg.vazi_do) : null;
+    let oznakaReg = '';
+    if(dana!=null && dana<0)       oznakaReg = '<span class="oznaka o-crvena"><span class="tacka"></span>Registracija istekla</span>';
+    else if(dana!=null && dana<=30) oznakaReg = '<span class="oznaka o-narandzasta"><span class="tacka"></span>Reg. za '+dana+' dana</span>';
+
+    h += '<button class="stavka" onclick="idi(\'vozilo\',{otvoren:'+v.id+'})">'+
+      '<div class="gore">'+
+        '<div style="display:flex;align-items:center;gap:11px;min-width:0">'+
+          '<div style="width:40px;height:40px;border-radius:10px;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center;flex:none">'+I('kamion',20)+'</div>'+
+          '<div style="min-width:0"><div class="proj">'+esc(v.naziv)+'</div>'+
+          '<div style="font-size:12.5px;color:var(--tekst-3)">'+esc(v.reg)+'</div></div>'+
+        '</div>'+ oznakaReg +
+      '</div>'+
+      '<div class="dole" style="border-top:none;margin-top:4px;padding-top:0">'+
+        '<span class="cip"'+(s.upozorenje?' style="background:var(--narandzasta-bg);color:var(--narandzasta)"':'')+'>'+
+          (s.potrosnja!=null ? brojF(s.potrosnja,1)+' L/100' : 'nema podataka')+'</span>'+
+        '<span class="cip">očekivano '+brojF(v.potrosnja,1)+'</span>'+
+        '<span class="cip">'+s.broj+' '+(s.broj===1?'teren':'terena')+'</span>'+
+        (s.km>0?'<span class="cip">'+brojF(s.km,0)+' km</span>':'')+
+      '</div>'+
+    '</button>';
+  });
+  h += '<div class="napomena">'+I('lista',18)+'<div>Dodirni vozilo za <b>istoriju terena, potrošnju po terenu i servisnu knjigu</b>.</div></div>';
+  h += '<button class="dugme d-obrub" onclick="poruka(\'Prototip: forma za novo vozilo\',\'plus\')">'+I('plus',20)+' Dodaj vozilo</button>';
+  h += '</div>'+navAdmin('vozila');
+  return h;
+}
+
+/* ============================================================
+   15b. EKRAN: KARTON VOZILA (ADMIN)
+   ============================================================ */
+function scVozilo(){
+  const v = vozilo(S.otvoren);
+  const s = statVozila(v.id);
+  const knjiga = (DB.servis[v.id]||[]).slice().sort((a,b)=>danaDo(b.datum)-danaDo(a.datum));
+  const reg = knjiga.filter(x=>x.vrsta==='registracija' && x.vazi_do)
+                .sort((a,b)=>danaDo(b.vazi_do)-danaDo(a.vazi_do))[0];
+  const dana = reg ? danaDo(reg.vazi_do) : null;
+
+  let h = '<div class="top"><button class="nazad" onclick="idi(\'vozila\')">'+I('nazad',20)+'</button>'+
+    '<div class="rast"><div class="marka">Prohoreca AG group</div><div class="naslov">'+esc(v.naziv)+'</div></div>'+
+    '<div class="avatar" onclick="odjava()">'+I('stit',18)+'</div></div>';
+  h += '<div class="sadrzaj">';
+
+  /* --- osnovno --- */
+  h += '<div class="karta"><div class="karta-telo">'+
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'+
+      '<div style="width:48px;height:48px;border-radius:12px;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center;flex:none">'+I('kamion',24)+'</div>'+
+      '<div><div style="font-size:18px;font-weight:700;letter-spacing:-.3px">'+esc(v.naziv)+'</div>'+
+      '<div style="font-size:12.5px;color:var(--tekst-3)">'+esc(v.reg)+'</div></div>'+
+    '</div>'+
+    (reg?'<div class="red"><span class="k">Registracija važi do</span><span class="v mono">'+esc(reg.vazi_do)+'</span></div>':'')+
+    '<div class="red"><span class="k">Zatvorenih terena</span><span class="v mono">'+s.broj+'</span></div>'+
+  '</div></div>';
+
+  if(dana!=null && dana<0){
+    h += '<div class="napomena greska">'+I('alarm',18)+'<div><b>Registracija je istekla</b> pre '+Math.abs(dana)+' dana ('+esc(reg.vazi_do)+').</div></div>';
+  } else if(dana!=null && dana<=30){
+    h += '<div class="napomena upozorenje">'+I('kalendar',18)+'<div><b>Registracija ističe za '+dana+' dana</b> ('+esc(reg.vazi_do)+').</div></div>';
+  }
+
+  /* --- potrošnja --- */
+  h += '<div class="sekcija-naslov">Potrošnja kroz sve terene</div>';
+  h += '<div class="karta"><div class="karta-telo">'+
+    '<div class="novac-mreza" style="margin-bottom:12px">'+
+      '<div class="novac"><div class="val">Stvarna potrošnja</div><div class="iznos">'+
+        (s.potrosnja!=null?brojF(s.potrosnja,1):'—')+'</div><div class="opis">L/100 km</div></div>'+
+      '<div class="novac"><div class="val">Očekivana</div><div class="iznos">'+brojF(v.potrosnja,1)+'</div><div class="opis">L/100 km</div></div>'+
+    '</div>'+
+    '<div class="red"><span class="k">Ukupno pređeno</span><span class="v mono">'+(s.km>0?km(s.km):'—')+'</span></div>'+
+    '<div class="red"><span class="k">Ukupno sipano</span><span class="v mono">'+brojF(s.litri,1)+' L</span></div>'+
+    '<div class="red"><span class="k">Ukupan trošak goriva</span><span class="v mono">'+
+      ([s.gRSD?novac(s.gRSD,'RSD'):null, s.gEUR?novac(s.gEUR,'EUR'):null].filter(Boolean).join('<br>') || '—')+'</span></div>'+
+  '</div></div>';
+
+  if(s.odstupanje!=null){
+    if(s.upozorenje){
+      h += '<div class="napomena upozorenje">'+I('alarm',18)+'<div><b>Prosek vozila odstupa '+
+        (s.odstupanje>0?'+':'')+brojF(s.odstupanje,1)+'% od očekivanog.</b><br>'+
+        'Signal za proveru – može biti i da je očekivana vrednost postavljena prenisko za način na koji se vozilo koristi.</div></div>';
+    } else {
+      h += '<div class="napomena" style="background:var(--zelena-bg);border-color:#C9E3D6;color:#1F5A3B">'+I('cek',18)+
+        '<div>Prosek vozila je u očekivanom opsegu ('+(s.odstupanje>0?'+':'')+brojF(s.odstupanje,1)+'%).</div></div>';
+    }
+  }
+
+  /* --- servisna knjiga --- */
+  h += '<div class="sekcija-naslov">Servisna knjiga ('+knjiga.length+')</div>';
+  if(!knjiga.length){
+    h += '<div class="karta"><div class="karta-telo" style="font-size:13px;color:var(--tekst-3)">Još nema unosa.</div></div>';
+  }
+  knjiga.forEach(x=>{
+    const vs = VRSTE_SERVISA[x.vrsta];
     h += '<div class="karta"><div class="karta-telo">'+
-      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'+
-        '<div style="width:44px;height:44px;border-radius:10px;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center">'+I('kamion',22)+'</div>'+
-        '<div><div style="font-size:16px;font-weight:700">'+esc(v.naziv)+'</div>'+
-        '<div style="font-size:13px;color:var(--tekst-2)">'+esc(v.reg)+'</div></div></div>'+
-      '<label class="nalepnica">Očekivana prosečna potrošnja</label>'+
-      '<div class="unos-sa-sufiksom"><input class="unos" type="number" step="0.1" value="'+v.potrosnja+'" onchange="DB.vozila.find(x=>x.id==='+v.id+').potrosnja=parseFloat(this.value);poruka(\'Sačuvano\')"><span class="sufiks">L/100</span></div>'+
+      '<div style="display:flex;align-items:flex-start;gap:11px">'+
+        '<div style="width:36px;height:36px;border-radius:8px;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center;flex:none">'+I(vs.ik,18)+'</div>'+
+        '<div style="flex:1;min-width:0">'+
+          '<div style="display:flex;justify-content:space-between;gap:8px;align-items:baseline">'+
+            '<span style="font-size:15px;font-weight:700">'+esc(vs.n)+'</span>'+
+            '<span style="font-size:12.5px;color:var(--tekst-3)" class="mono">'+esc(x.datum)+'</span></div>'+
+          '<div style="font-size:12.5px;color:var(--tekst-3)">'+
+            (x.km?brojF(x.km,0)+' km · ':'')+'uneo Kancelarija</div>'+
+        '</div>'+
+        '<button class="brisi" style="background:none;border:none;color:var(--tekst-3);padding:6px" onclick="poruka(\'Prototip: brisanje unosa\',\'kanta\')">'+I('kanta',18)+'</button>'+
+      '</div>'+
+      '<div style="font-size:15px;line-height:1.5;margin-top:8px">'+esc(x.opis)+'</div>'+
+      ((x.trosak||x.vazi_do)?'<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'+
+        (x.trosak?'<span class="cip">'+novac(x.trosak,x.val)+'</span>':'')+
+        (x.vazi_do?'<span class="cip">važi do '+esc(x.vazi_do)+'</span>':'')+
+        (x.foto?'<span class="cip">fotografija</span>':'')+
+      '</div>':'')+
     '</div></div>';
   });
-  h += '<button class="dugme d-obrub" onclick="poruka(\'Prototip: forma za novo vozilo\',\'plus\')">'+I('plus',20)+' Dodaj vozilo</button>';
+
+  h += '<button class="dugme d-zlato" style="margin-bottom:8px" onclick="poruka(\'Prototip: forma za novi unos\',\'plus\')">'+
+       I('plus',20)+' Upiši u servisnu knjigu</button>';
+
+  /* --- istorija terena --- */
+  const lista = DB.tereni.filter(t=>t.vozilo===v.id);
+  h += '<div class="sekcija-naslov">Istorija terena ('+lista.length+')</div>';
+  if(!lista.length){
+    h += '<div class="karta"><div class="karta-telo" style="font-size:13px;color:var(--tekst-3)">Ovim vozilom još nije išao nijedan teren.</div></div>';
+  } else {
+    h += '<div class="karta"><div class="karta-telo">';
+    lista.forEach(t=>{
+      const o = obracun(t);
+      const odst = (o.potrosnja && v.potrosnja) ? (o.potrosnja - v.potrosnja)/v.potrosnja*100 : null;
+      const lose = odst!=null && Math.abs(odst)>15;
+      h += '<div class="trosak" onclick="idi(\'izvestaj\',{otvoren:'+t.id+'})" style="cursor:pointer">'+
+        '<div class="ik">'+I('kamion',18)+'</div>'+
+        '<div class="sred"><div class="n1">'+esc(t.projekat)+'</div>'+
+          '<div class="n2">'+esc(t.polazak.split(' ')[0])+' · '+esc(korisnik(t.sef).ime)+
+          (o.km!=null?' · '+brojF(o.km,0)+' km':'')+'</div></div>'+
+        '<div class="iz"'+(lose?' style="color:var(--narandzasta)"':'')+'>'+
+          (o.potrosnja?brojF(o.potrosnja,1):'—')+
+          '<small>'+(o.potrosnja?'L/100':(t.km_kraj==null?'u toku':'bez goriva'))+'</small></div>'+
+      '</div>';
+    });
+    h += '</div></div>';
+    h += '<div style="font-size:12.5px;color:var(--tekst-3);margin:-4px 2px 12px">'+
+      'Narandžasto je označen teren koji odstupa više od 15% od očekivanih '+brojF(v.potrosnja,1)+' L/100 km.</div>';
+  }
+
   h += '</div>'+navAdmin('vozila');
   return h;
 }
@@ -1375,6 +1561,7 @@ function crtaj(){
     case 'moji':         h += scMoji(); break;
     case 'admin':        h += scAdmin(); break;
     case 'vozila':       h += scVozila(); break;
+    case 'vozilo':       h += scVozilo(); break;
     case 'korisnici':    h += scKorisnici(); break;
     case 'izvestaj':     h += scIzvestaj(false); break;
     case 'izvestaj_sef': h += scIzvestaj(true); break;
