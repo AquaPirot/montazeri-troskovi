@@ -1,0 +1,29 @@
+# Prohoreca AG group – Teren
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # config.php, SQL i interni folderi nisu dostupni preko interneta
+    RewriteRule ^(config\.php|inc/|sql/|uploads/) - [F,L]
+</IfModule>
+
+<FilesMatch "^(config\.php|config\.primer\.php)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Fotografije sa telefona znaju da budu velike
+<IfModule mod_php.c>
+    php_value upload_max_filesize 16M
+    php_value post_max_size 20M
+</IfModule>

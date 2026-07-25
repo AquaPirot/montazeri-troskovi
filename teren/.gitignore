@@ -1,0 +1,4 @@
+config.php
+uploads/*
+!uploads/.htaccess
+!uploads/index.html

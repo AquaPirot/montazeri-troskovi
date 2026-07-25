@@ -1,0 +1,403 @@
+/* ============================================================
+   PROHORECA AG GROUP – TEREN
+   Mobile-first. Tamna grafitna, diskretno zlatna, svetla pozadina.
+   ============================================================ */
+
+:root{
+  --grafit:#22252A;
+  --grafit-2:#2E323A;
+  --grafit-3:#3C424C;
+  --zlatna:#C0994A;
+  --zlatna-svetla:#DCBB6E;
+  --zlatna-blaga:#F5EEDF;
+
+  --pozadina:#F4F5F6;
+  --karta:#FFFFFF;
+  --linija:#E3E5E8;
+  --linija-jaka:#CFD3D8;
+
+  --tekst:#1B1D21;
+  --tekst-2:#5C636D;
+  --tekst-3:#8A9099;
+
+  --zelena:#2C7A52;
+  --zelena-bg:#E8F3ED;
+  --narandzasta:#9A6414;
+  --narandzasta-bg:#FBF0DE;
+  --crvena:#A8322A;
+  --crvena-bg:#FAEAE8;
+  --plava:#2B5C8A;
+  --plava-bg:#E9F0F7;
+
+  --r-s:8px; --r-m:12px; --r-l:16px;
+  --sen:0 1px 2px rgba(20,22,26,.06), 0 4px 14px rgba(20,22,26,.05);
+  --sen-jaka:0 6px 24px rgba(20,22,26,.14);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--grafit);color:var(--tekst);font-size:16px;line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+
+#app{
+  max-width:480px;margin:0 auto;min-height:100vh;background:var(--pozadina);
+  display:flex;flex-direction:column;box-shadow:0 0 60px rgba(0,0,0,.35);position:relative;
+}
+
+/* ---------- zaglavlje ---------- */
+.top{
+  background:var(--grafit);color:#fff;padding:14px 16px;
+  padding-top:calc(14px + env(safe-area-inset-top));
+  display:flex;align-items:center;gap:12px;
+  border-bottom:2px solid var(--zlatna);position:sticky;top:0;z-index:40;
+}
+.top .marka{font-size:10px;letter-spacing:.16em;color:var(--zlatna);font-weight:700;text-transform:uppercase}
+.top .naslov{font-size:17px;font-weight:700;letter-spacing:-.2px;line-height:1.2}
+.top .rast{flex:1;min-width:0}
+.nazad{
+  width:38px;height:38px;flex:none;border:1px solid var(--grafit-3);background:var(--grafit-2);
+  border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;color:#fff;
+}
+.nazad:active{background:var(--grafit-3)}
+.avatar{
+  width:38px;height:38px;flex:none;border-radius:50%;background:var(--grafit-2);
+  border:1px solid var(--zlatna);color:var(--zlatna-svetla);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;
+}
+
+/* ---------- sadržaj ---------- */
+.sadrzaj{flex:1;padding:16px;padding-bottom:96px}
+.sekcija-naslov{
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--tekst-3);margin:22px 2px 10px;
+}
+.sekcija-naslov:first-child{margin-top:4px}
+
+/* ---------- poruke ---------- */
+.traka-poruka{
+  display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:14.5px;font-weight:600;
+  border-bottom:1px solid transparent;
+}
+.traka-poruka svg{flex:none}
+.p-uspeh {background:var(--zelena-bg);color:#1F5A3B;border-color:#C9E3D6}
+.p-greska{background:var(--crvena-bg);color:#8A241D;border-color:#EFCFCB}
+.p-info  {background:var(--plava-bg); color:#1F4569;border-color:#CBDCEC}
+
+/* ---------- kartice ---------- */
+.karta{
+  background:var(--karta);border:1px solid var(--linija);border-radius:var(--r-l);
+  box-shadow:var(--sen);overflow:hidden;margin-bottom:12px;
+}
+.karta.zlatni-okvir{border-color:var(--zlatna)}
+.karta-telo{padding:16px}
+.karta-zaglavlje{
+  padding:12px 16px;border-bottom:1px solid var(--linija);display:flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tekst-2);
+}
+.karta-zaglavlje svg{flex:none}
+
+/* ---------- velika dugmad ---------- */
+.akcija{
+  width:100%;display:flex;align-items:center;gap:14px;text-align:left;
+  background:var(--karta);border:1px solid var(--linija);border-radius:var(--r-l);
+  padding:16px;margin-bottom:12px;box-shadow:var(--sen);
+}
+.akcija:active{background:#FAFAFB;border-color:var(--linija-jaka)}
+.akcija.iskljucena{opacity:.45}
+.akcija .ikona{
+  width:52px;height:52px;flex:none;border-radius:var(--r-m);
+  background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center;
+}
+.akcija .tekst{flex:1;min-width:0;display:block}
+.akcija .t1{display:block;font-size:17px;font-weight:700;letter-spacing:-.2px}
+.akcija .t2{display:block;font-size:13px;color:var(--tekst-2);margin-top:2px}
+.akcija .str{color:var(--tekst-3);flex:none;display:flex}
+.akcija.istaknuta .ikona{background:var(--zlatna);color:var(--grafit)}
+
+/* ---------- statusne oznake ---------- */
+.oznaka{
+  display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;border-radius:999px;
+  border:1px solid transparent;white-space:nowrap;
+}
+.o-zelena     {background:var(--zelena-bg);color:var(--zelena);border-color:#C9E3D6}
+.o-narandzasta{background:var(--narandzasta-bg);color:var(--narandzasta);border-color:#EBD6AE}
+.o-crvena     {background:var(--crvena-bg);color:var(--crvena);border-color:#EFCFCB}
+.o-plava      {background:var(--plava-bg);color:var(--plava);border-color:#CBDCEC}
+.o-siva       {background:#EEF0F2;color:var(--tekst-2);border-color:var(--linija-jaka)}
+.tacka{width:7px;height:7px;border-radius:50%;background:currentColor}
+
+/* ---------- polja ---------- */
+.polje{margin-bottom:16px}
+.polje:last-child{margin-bottom:0}
+.polje > label,.nalepnica{display:block;font-size:13px;font-weight:600;color:var(--tekst-2);margin-bottom:7px}
+.nalepnica .opc,.polje label .opc{color:var(--tekst-3);font-weight:500}
+.unos{
+  width:100%;background:#fff;border:1.5px solid var(--linija-jaka);border-radius:var(--r-m);
+  padding:14px;font-size:17px;font-weight:500;outline:none;
+}
+.unos:focus{border-color:var(--grafit);box-shadow:0 0 0 3px rgba(34,37,42,.08)}
+.unos::placeholder{color:var(--tekst-3);font-weight:400}
+/* strelice na brojčanim poljima smetaju na telefonu */
+.unos[type=number]{-moz-appearance:textfield;appearance:textfield}
+.unos[type=number]::-webkit-outer-spin-button,
+.unos[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.unos.veliki{font-size:22px;font-weight:700}
+textarea.unos{min-height:88px;resize:vertical;font-size:16px;line-height:1.5}
+.unos-sa-sufiksom{position:relative}
+.unos-sa-sufiksom .sufiks{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-size:14px;font-weight:700;color:var(--tekst-3);pointer-events:none;
+}
+.unos-sa-sufiksom .unos{padding-right:60px}
+.dva{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dva.iznos{grid-template-columns:1.6fr 1fr;gap:10px}
+
+/* ---------- pločice / izbori ---------- */
+.plocice{display:grid;gap:8px}
+.plocice.k2{grid-template-columns:1fr 1fr}
+.plocice.k3{grid-template-columns:repeat(3,1fr)}
+.plocica{
+  background:#fff;border:1.5px solid var(--linija-jaka);border-radius:var(--r-m);
+  padding:13px 8px;font-size:15px;font-weight:600;text-align:center;color:var(--tekst-2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;position:relative;
+}
+.plocica input,.izbor input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.plocica .pn{font-size:12.5px;line-height:1.2}
+.plocica.valuta .pn{font-size:15px}
+.plocica:active{background:#F7F8F9}
+.plocica.izabrana{background:var(--grafit);border-color:var(--grafit);color:#fff}
+.plocica.zlato.izabrana{background:var(--zlatna);border-color:var(--zlatna);color:var(--grafit)}
+.plocica:focus-within{box-shadow:0 0 0 3px rgba(34,37,42,.12)}
+
+.izbor-lista{display:grid;gap:8px}
+.izbor{
+  display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--linija-jaka);
+  border-radius:var(--r-m);padding:14px;width:100%;position:relative;
+}
+.izbor .ik{
+  width:36px;height:36px;flex:none;border-radius:var(--r-s);background:#F0F1F3;color:var(--grafit);
+  display:flex;align-items:center;justify-content:center;
+}
+.izbor .tx{min-width:0}
+.izbor .nas{display:block;font-size:16px;font-weight:600}
+.izbor .pod2{display:block;font-size:12.5px;color:var(--tekst-2)}
+.izbor.izabrana{border-color:var(--grafit);background:#FBFBFC;box-shadow:0 0 0 3px rgba(34,37,42,.06)}
+.izbor.izabrana .ik{background:var(--grafit);color:var(--zlatna)}
+.izbor:focus-within{box-shadow:0 0 0 3px rgba(34,37,42,.12)}
+
+/* ---------- potvrde ---------- */
+.potvrda{
+  display:flex;align-items:center;gap:13px;padding:14px;background:#fff;
+  border:1.5px solid var(--linija-jaka);border-radius:var(--r-m);margin-bottom:8px;position:relative;
+}
+.potvrda input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.potvrda .kvadrat{
+  width:28px;height:28px;flex:none;border-radius:7px;border:2px solid var(--linija-jaka);
+  background:#fff;display:flex;align-items:center;justify-content:center;color:transparent;
+}
+.potvrda .txt{font-size:15px;font-weight:600;line-height:1.3}
+.potvrda.cek{border-color:var(--zelena);background:var(--zelena-bg)}
+.potvrda.cek .kvadrat{background:var(--zelena);border-color:var(--zelena);color:#fff}
+.potvrda.cek .txt{color:#1F5A3B}
+.potvrda:focus-within{box-shadow:0 0 0 3px rgba(44,122,82,.18)}
+
+/* ---------- fotografija ---------- */
+.foto{
+  border:1.5px dashed var(--linija-jaka);border-radius:var(--r-m);background:#FAFAFB;
+  padding:18px;display:flex;align-items:center;gap:12px;position:relative;
+}
+.foto .ik{
+  width:44px;height:44px;flex:none;border-radius:var(--r-s);background:var(--grafit);color:var(--zlatna);
+  display:flex;align-items:center;justify-content:center;
+}
+.foto .tx{flex:1;min-width:0}
+.foto .t1{display:block;font-size:15px;font-weight:600}
+.foto .t2{display:block;font-size:12px;color:var(--tekst-3)}
+.foto .pregled{width:52px;height:52px;object-fit:cover;border-radius:var(--r-s);border:1px solid var(--linija);flex:none}
+.foto input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.foto.ima{border-style:solid;border-color:var(--zelena);background:var(--zelena-bg)}
+.foto.ima .ik{background:var(--zelena);color:#fff}
+.foto.ima .t1{color:#1F5A3B}
+.foto:focus-within{box-shadow:0 0 0 3px rgba(34,37,42,.12)}
+.foto + .foto{margin-top:8px}
+
+/* ---------- dugmad ---------- */
+.dugme{
+  width:100%;padding:17px;border:none;border-radius:var(--r-m);font-size:17px;font-weight:700;
+  cursor:pointer;letter-spacing:-.2px;display:flex;align-items:center;justify-content:center;gap:9px;
+}
+.dugme svg{flex:none}
+.d-glavno{background:var(--grafit);color:#fff}
+.d-glavno:active{background:#15171B}
+.d-zlato{background:var(--zlatna);color:var(--grafit)}
+.d-zlato:active{background:#A9843B}
+.d-obrub{background:#fff;color:var(--tekst);border:1.5px solid var(--linija-jaka)}
+.d-crveno{background:var(--crvena);color:#fff}
+.d-zeleno{background:var(--zelena);color:#fff}
+.d-malo{padding:12px;font-size:15px}
+.dugmad{display:grid;gap:10px;margin-bottom:20px}
+.dno-akcija{
+  position:sticky;bottom:0;margin:20px -16px -16px;padding:14px 16px;
+  padding-bottom:calc(14px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(244,245,246,0) 0%,var(--pozadina) 28%);
+}
+.dugme[disabled]{opacity:.6}
+
+/* ---------- redovi podataka ---------- */
+.red{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 0;border-bottom:1px solid var(--linija)}
+.red:last-child{border-bottom:none}
+.red .k{font-size:14px;color:var(--tekst-2)}
+.red .v{font-size:15px;font-weight:600;text-align:right}
+.red .v.mono{font-variant-numeric:tabular-nums}
+
+.novac-mreza{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.novac{border:1px solid var(--linija);border-radius:var(--r-m);padding:12px;background:#FBFBFC}
+.novac .val{font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--zlatna);text-transform:uppercase}
+.novac .iznos{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.4px;margin-top:2px}
+.novac .opis{font-size:12px;color:var(--tekst-2)}
+.novac.pozitivno .iznos{color:var(--zelena)}
+.novac.negativno .iznos{color:var(--crvena)}
+
+/* ---------- napomene ---------- */
+.napomena{
+  display:flex;gap:11px;padding:13px 14px;border-radius:var(--r-m);font-size:14px;line-height:1.45;
+  background:var(--plava-bg);border:1px solid #CBDCEC;color:#1F4569;margin-bottom:12px;
+}
+.napomena svg{flex:none;margin-top:1px}
+.napomena.upozorenje{background:var(--narandzasta-bg);border-color:#EBD6AE;color:#7A4E0E}
+.napomena.greska{background:var(--crvena-bg);border-color:#EFCFCB;color:#8A241D}
+.napomena.uspeh{background:var(--zelena-bg);border-color:#C9E3D6;color:#1F5A3B}
+.napomena.bez-margine{margin:0}
+.napomena b{font-weight:700}
+
+/* ---------- lista terena ---------- */
+.stavka{
+  display:block;width:100%;background:var(--karta);border:1px solid var(--linija);
+  border-radius:var(--r-l);padding:14px;margin-bottom:10px;box-shadow:var(--sen);
+}
+.stavka:active{background:#FAFAFB}
+.stavka .gore{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+.stavka .proj{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.stavka .meta{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:13px;color:var(--tekst-2)}
+.stavka .meta svg{vertical-align:-2px}
+.stavka .dole{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--linija);flex-wrap:wrap}
+.cip{
+  font-size:12px;font-weight:600;color:var(--tekst-2);background:#F2F3F5;
+  border-radius:6px;padding:4px 8px;font-variant-numeric:tabular-nums;
+}
+.cip.upozorenje{background:var(--narandzasta-bg);color:var(--narandzasta)}
+
+/* ---------- tabovi ---------- */
+.tabovi{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;-ms-overflow-style:none;scrollbar-width:none}
+.tabovi::-webkit-scrollbar{display:none}
+.tab{
+  white-space:nowrap;padding:9px 14px;border-radius:999px;border:1px solid var(--linija-jaka);
+  background:#fff;font-size:14px;font-weight:600;color:var(--tekst-2);
+}
+.tab.aktivan{background:var(--grafit);border-color:var(--grafit);color:#fff}
+.tab .br{opacity:.65;margin-left:5px;font-variant-numeric:tabular-nums}
+
+/* ---------- troškovi ---------- */
+.trosak{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--linija)}
+.trosak:last-child{border-bottom:none}
+.trosak .ik{
+  width:36px;height:36px;flex:none;border-radius:var(--r-s);background:#F0F1F3;color:var(--grafit);
+  display:flex;align-items:center;justify-content:center;
+}
+.trosak .sred{flex:1;min-width:0}
+.trosak .n1{font-size:15px;font-weight:600}
+.trosak .n2{font-size:12px;color:var(--tekst-2)}
+.trosak .n2 .lose{color:var(--crvena);font-weight:600}
+.trosak .iz{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.trosak .iz small{display:block;font-size:11px;font-weight:600;color:var(--tekst-3)}
+.trosak .brisi{color:var(--tekst-3);background:none;border:none;padding:6px;flex:none}
+
+/* ---------- galerija ---------- */
+.galerija{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.dokaz{
+  aspect-ratio:3/4;border-radius:var(--r-s);border:1px solid var(--linija);overflow:hidden;
+  background:#EDEFF1;display:block;position:relative;
+}
+.dokaz img{width:100%;height:100%;object-fit:cover;display:block}
+.dokaz .lab{
+  position:absolute;left:4px;right:4px;bottom:4px;font-size:10px;font-weight:700;color:var(--tekst-2);
+  background:rgba(255,255,255,.92);border-radius:4px;padding:2px 5px;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+/* ---------- donja navigacija ---------- */
+.nav{
+  position:sticky;bottom:0;background:#fff;border-top:1px solid var(--linija);
+  display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:30;
+}
+.nav a{
+  flex:1;padding:9px 4px 11px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--tekst-3);font-size:11px;font-weight:600;
+}
+.nav a.aktivan{color:var(--grafit)}
+.nav a .pod{width:22px;height:3px;border-radius:2px;margin-top:1px;display:block}
+.nav a.aktivan .pod{background:var(--zlatna)}
+
+/* ---------- prazno stanje ---------- */
+.prazno{text-align:center;padding:44px 20px;color:var(--tekst-3)}
+.prazno .ik{margin-bottom:12px;color:var(--linija-jaka)}
+.prazno .t{font-size:15px;font-weight:600;color:var(--tekst-2)}
+.prazno .p{font-size:13px;margin-top:4px}
+
+/* ---------- ekran za prijavu ---------- */
+.prijava-ekran{
+  flex:1;background:var(--grafit);color:#fff;display:flex;flex-direction:column;
+  justify-content:center;padding:28px 22px;padding-top:calc(28px + env(safe-area-inset-top));
+}
+.prijava-ekran .znak{
+  width:64px;height:64px;border-radius:var(--r-m);border:2px solid var(--zlatna);color:var(--zlatna);
+  display:flex;align-items:center;justify-content:center;margin-bottom:22px;
+}
+.prijava-ekran h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.15}
+.prijava-ekran .pod{
+  color:var(--zlatna);font-size:12px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;margin-bottom:26px;
+}
+.prijava-ekran .unos{background:var(--grafit-2);border-color:var(--grafit-3);color:#fff}
+.prijava-ekran .unos:focus{border-color:var(--zlatna);box-shadow:0 0 0 3px rgba(192,153,74,.2)}
+.prijava-ekran .unos::placeholder{color:#79808B}
+.prijava-ekran label{color:#A8AEB7}
+.prijava-ekran .greska-prijava{
+  background:rgba(168,50,42,.18);border:1px solid rgba(168,50,42,.5);color:#FFC9C4;
+  padding:12px 14px;border-radius:var(--r-m);font-size:14.5px;font-weight:600;margin-bottom:16px;
+  display:flex;gap:10px;align-items:center;
+}
+.prijava-ekran .greska-prijava svg{flex:none}
+.podnozje-prijava{margin-top:26px;text-align:center;font-size:12px;color:#6F7681}
+
+/* ---------- modal ---------- */
+.zavesa{position:fixed;inset:0;background:rgba(20,22,26,.55);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.modal{
+  background:#fff;width:100%;max-width:480px;border-radius:var(--r-l) var(--r-l) 0 0;
+  padding:20px 16px;padding-bottom:calc(20px + env(safe-area-inset-bottom));box-shadow:var(--sen-jaka);
+}
+.modal h3{font-size:19px;font-weight:700;margin-bottom:6px;letter-spacing:-.3px}
+.modal p{font-size:14px;color:var(--tekst-2);margin-bottom:16px}
+
+/* ---------- prikaz jedne fotografije ---------- */
+.puna-slika{background:var(--grafit);min-height:100vh;display:flex;flex-direction:column}
+.puna-slika img{width:100%;height:auto;display:block;margin:auto}
+
+/* ---------- sitno ---------- */
+.cek-red{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14.5px}
+.cek-red svg{flex:none}
+.cek-red.da{color:var(--tekst)}
+.cek-red.da .i{color:var(--zelena);display:flex}
+.cek-red.ne{color:var(--crvena);font-weight:600}
+.cek-red.ne .i{color:var(--crvena);display:flex}
+.razdelnik{height:1px;background:var(--linija);margin:12px 0}
+.sitno{font-size:12.5px;color:var(--tekst-3)}
+.desno{text-align:right}
+.mono{font-variant-numeric:tabular-nums}
+[hidden]{display:none !important}

@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="sr-Latn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#22252A">
+<title>Prohoreca AG group – Teren (prototip)</title>
+<style>
+/* ============================================================
+   PROHORECA AG GROUP – TEREN
+   Vizuelni prototip. Samostalan fajl, bez servera.
+   ============================================================ */
+
+:root{
+  --grafit:#22252A;
+  --grafit-2:#2E323A;
+  --grafit-3:#3C424C;
+  --zlatna:#C0994A;
+  --zlatna-svetla:#DCBB6E;
+  --zlatna-blaga:#F5EEDF;
+
+  --pozadina:#F4F5F6;
+  --karta:#FFFFFF;
+  --linija:#E3E5E8;
+  --linija-jaka:#CFD3D8;
+
+  --tekst:#1B1D21;
+  --tekst-2:#5C636D;
+  --tekst-3:#8A9099;
+
+  --zelena:#2C7A52;
+  --zelena-bg:#E8F3ED;
+  --narandzasta:#9A6414;
+  --narandzasta-bg:#FBF0DE;
+  --crvena:#A8322A;
+  --crvena-bg:#FAEAE8;
+  --plava:#2B5C8A;
+  --plava-bg:#E9F0F7;
+
+  --r-s:8px;
+  --r-m:12px;
+  --r-l:16px;
+  --sen:0 1px 2px rgba(20,22,26,.06), 0 4px 14px rgba(20,22,26,.05);
+  --sen-jaka:0 6px 24px rgba(20,22,26,.14);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--grafit);
+  color:var(--tekst);
+  font-size:16px;
+  line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+input,select,textarea,button{font-family:inherit;font-size:inherit;color:inherit}
+
+/* ---------- okvir aplikacije ---------- */
+#app{
+  max-width:480px;margin:0 auto;min-height:100vh;
+  background:var(--pozadina);
+  display:flex;flex-direction:column;
+  box-shadow:0 0 60px rgba(0,0,0,.35);
+  position:relative;
+}
+
+/* ---------- zaglavlje ---------- */
+.top{
+  background:var(--grafit);
+  color:#fff;
+  padding:14px 16px;
+  padding-top:calc(14px + env(safe-area-inset-top));
+  display:flex;align-items:center;gap:12px;
+  border-bottom:2px solid var(--zlatna);
+  position:sticky;top:0;z-index:40;
+}
+.top .marka{font-size:10px;letter-spacing:.16em;color:var(--zlatna);font-weight:700;text-transform:uppercase}
+.top .naslov{font-size:17px;font-weight:700;letter-spacing:-.2px;line-height:1.2}
+.top .rast{flex:1}
+.nazad{
+  width:38px;height:38px;flex:none;border:1px solid var(--grafit-3);background:var(--grafit-2);
+  border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;
+}
+.nazad:active{background:var(--grafit-3)}
+.avatar{
+  width:38px;height:38px;flex:none;border-radius:50%;background:var(--grafit-2);
+  border:1px solid var(--zlatna);color:var(--zlatna-svetla);
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;cursor:pointer;
+}
+
+/* ---------- sadržaj ---------- */
+.sadrzaj{flex:1;padding:16px;padding-bottom:96px}
+.sekcija-naslov{
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--tekst-3);margin:22px 2px 10px;
+}
+.sekcija-naslov:first-child{margin-top:4px}
+
+/* ---------- kartice ---------- */
+.karta{
+  background:var(--karta);border:1px solid var(--linija);border-radius:var(--r-l);
+  box-shadow:var(--sen);overflow:hidden;margin-bottom:12px;
+}
+.karta-telo{padding:16px}
+.karta-zaglavlje{
+  padding:12px 16px;border-bottom:1px solid var(--linija);
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tekst-2);
+}
+
+/* ---------- velika dugmad na početnoj ---------- */
+.akcija{
+  width:100%;display:flex;align-items:center;gap:14px;text-align:left;
+  background:var(--karta);border:1px solid var(--linija);border-radius:var(--r-l);
+  padding:16px;margin-bottom:12px;cursor:pointer;box-shadow:var(--sen);
+}
+.akcija:active{background:#FAFAFB;border-color:var(--linija-jaka)}
+.akcija[disabled]{opacity:.45;cursor:default}
+.akcija .ikona{
+  width:52px;height:52px;flex:none;border-radius:var(--r-m);
+  background:var(--grafit);color:var(--zlatna);
+  display:flex;align-items:center;justify-content:center;
+}
+.akcija .tekst{flex:1;min-width:0}
+.akcija .t1{font-size:17px;font-weight:700;letter-spacing:-.2px}
+.akcija .t2{font-size:13px;color:var(--tekst-2);margin-top:2px}
+.akcija .str{color:var(--tekst-3);flex:none}
+.akcija.istaknuta .ikona{background:var(--zlatna);color:var(--grafit)}
+
+/* ---------- statusne oznake ---------- */
+.oznaka{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  padding:5px 10px;border-radius:999px;border:1px solid transparent;white-space:nowrap;
+}
+.o-zelena{background:var(--zelena-bg);color:var(--zelena);border-color:#C9E3D6}
+.o-narandzasta{background:var(--narandzasta-bg);color:var(--narandzasta);border-color:#EBD6AE}
+.o-crvena{background:var(--crvena-bg);color:var(--crvena);border-color:#EFCFCB}
+.o-plava{background:var(--plava-bg);color:var(--plava);border-color:#CBDCEC}
+.o-siva{background:#EEF0F2;color:var(--tekst-2);border-color:var(--linija-jaka)}
+.tacka{width:7px;height:7px;border-radius:50%;background:currentColor}
+
+/* ---------- polja ---------- */
+.polje{margin-bottom:16px}
+.polje > label,.nalepnica{
+  display:block;font-size:13px;font-weight:600;color:var(--tekst-2);margin-bottom:7px;
+}
+.nalepnica .opc{color:var(--tekst-3);font-weight:500}
+.unos{
+  width:100%;background:#fff;border:1.5px solid var(--linija-jaka);border-radius:var(--r-m);
+  padding:14px 14px;font-size:17px;font-weight:500;outline:none;
+}
+.unos:focus{border-color:var(--grafit);box-shadow:0 0 0 3px rgba(34,37,42,.08)}
+.unos::placeholder{color:var(--tekst-3);font-weight:400}
+textarea.unos{min-height:88px;resize:vertical;font-size:16px;line-height:1.5}
+.unos-sa-sufiksom{position:relative}
+.unos-sa-sufiksom .sufiks{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-size:14px;font-weight:700;color:var(--tekst-3);pointer-events:none;
+}
+.unos-sa-sufiksom .unos{padding-right:56px}
+.dva{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ---------- izbor (segmenti / pločice) ---------- */
+.plocice{display:grid;gap:8px}
+.plocice.k2{grid-template-columns:1fr 1fr}
+.plocice.k3{grid-template-columns:repeat(3,1fr)}
+.plocica{
+  background:#fff;border:1.5px solid var(--linija-jaka);border-radius:var(--r-m);
+  padding:13px 10px;font-size:15px;font-weight:600;cursor:pointer;text-align:center;color:var(--tekst-2);
+}
+.plocica:active{background:#F7F8F9}
+.plocica.izabrana{background:var(--grafit);border-color:var(--grafit);color:#fff}
+.plocica.izabrana.zlato{background:var(--zlatna);border-color:var(--zlatna);color:var(--grafit)}
+.plocica .mala{display:block;font-size:11px;font-weight:500;opacity:.75;margin-top:2px}
+
+/* lista izbora sa ikonom */
+.izbor-lista{display:grid;gap:8px}
+.izbor{
+  display:flex;align-items:center;gap:12px;background:#fff;
+  border:1.5px solid var(--linija-jaka);border-radius:var(--r-m);padding:14px;cursor:pointer;text-align:left;width:100%;
+}
+.izbor .ik{width:34px;height:34px;flex:none;border-radius:var(--r-s);background:#F0F1F3;color:var(--grafit);display:flex;align-items:center;justify-content:center}
+.izbor .nas{font-size:16px;font-weight:600}
+.izbor.izabrana{border-color:var(--grafit);background:#FBFBFC;box-shadow:0 0 0 3px rgba(34,37,42,.06)}
+.izbor.izabrana .ik{background:var(--grafit);color:var(--zlatna)}
+
+/* ---------- potvrde (velike) ---------- */
+.potvrda{
+  display:flex;align-items:center;gap:13px;padding:14px;background:#fff;
+  border:1.5px solid var(--linija-jaka);border-radius:var(--r-m);margin-bottom:8px;cursor:pointer;
+}
+.potvrda .kvadrat{
+  width:28px;height:28px;flex:none;border-radius:7px;border:2px solid var(--linija-jaka);
+  background:#fff;display:flex;align-items:center;justify-content:center;color:#fff;
+}
+.potvrda .txt{font-size:15px;font-weight:600;line-height:1.3}
+.potvrda.cek{border-color:var(--zelena);background:var(--zelena-bg)}
+.potvrda.cek .kvadrat{background:var(--zelena);border-color:var(--zelena)}
+.potvrda.cek .txt{color:#1F5A3B}
+
+/* ---------- foto ---------- */
+.foto{
+  border:1.5px dashed var(--linija-jaka);border-radius:var(--r-m);background:#FAFAFB;
+  padding:18px;display:flex;align-items:center;gap:12px;cursor:pointer;
+}
+.foto .ik{width:44px;height:44px;flex:none;border-radius:var(--r-s);background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center}
+.foto .t1{font-size:15px;font-weight:600}
+.foto .t2{font-size:12px;color:var(--tekst-3)}
+.foto.ima{border-style:solid;border-color:var(--zelena);background:var(--zelena-bg)}
+.foto.ima .ik{background:var(--zelena);color:#fff}
+.foto.ima .t1{color:#1F5A3B}
+.foto img{width:52px;height:52px;object-fit:cover;border-radius:var(--r-s);border:1px solid var(--linija)}
+.foto input{display:none}
+
+/* ---------- dugmad ---------- */
+.dugme{
+  width:100%;padding:17px;border:none;border-radius:var(--r-m);
+  font-size:17px;font-weight:700;cursor:pointer;letter-spacing:-.2px;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+}
+.d-glavno{background:var(--grafit);color:#fff}
+.d-glavno:active{background:#15171B}
+.d-zlato{background:var(--zlatna);color:var(--grafit)}
+.d-zlato:active{background:#A9843B}
+.d-obrub{background:#fff;color:var(--tekst);border:1.5px solid var(--linija-jaka)}
+.d-crveno{background:var(--crvena);color:#fff}
+.d-zeleno{background:var(--zelena);color:#fff}
+.d-malo{padding:12px;font-size:15px}
+.dno-akcija{
+  position:sticky;bottom:0;margin:20px -16px -16px;padding:14px 16px;
+  padding-bottom:calc(14px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(244,245,246,0) 0%,var(--pozadina) 28%);
+}
+
+/* ---------- info red / pregled ---------- */
+.red{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:11px 0;border-bottom:1px solid var(--linija)}
+.red:last-child{border-bottom:none}
+.red .k{font-size:14px;color:var(--tekst-2)}
+.red .v{font-size:15px;font-weight:600;text-align:right}
+.red .v.mono{font-variant-numeric:tabular-nums}
+
+.novac-mreza{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.novac{border:1px solid var(--linija);border-radius:var(--r-m);padding:12px;background:#FBFBFC}
+.novac .val{font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--zlatna);text-transform:uppercase}
+.novac .iznos{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.4px;margin-top:2px}
+.novac .opis{font-size:12px;color:var(--tekst-2)}
+.novac.pozitivno .iznos{color:var(--zelena)}
+.novac.negativno .iznos{color:var(--crvena)}
+
+/* ---------- upozorenje ---------- */
+.napomena{
+  display:flex;gap:11px;padding:13px 14px;border-radius:var(--r-m);font-size:14px;line-height:1.45;
+  background:var(--plava-bg);border:1px solid #CBDCEC;color:#1F4569;margin-bottom:12px;
+}
+.napomena.upozorenje{background:var(--narandzasta-bg);border-color:#EBD6AE;color:#7A4E0E}
+.napomena.greska{background:var(--crvena-bg);border-color:#EFCFCB;color:#8A241D}
+.napomena .ik{flex:none;margin-top:1px}
+.napomena b{font-weight:700}
+
+/* ---------- lista terena ---------- */
+.stavka{
+  display:block;width:100%;text-align:left;background:var(--karta);border:1px solid var(--linija);
+  border-radius:var(--r-l);padding:14px;margin-bottom:10px;cursor:pointer;box-shadow:var(--sen);
+}
+.stavka:active{background:#FAFAFB}
+.stavka .gore{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+.stavka .proj{font-size:16px;font-weight:700;letter-spacing:-.2px}
+.stavka .meta{font-size:13px;color:var(--tekst-2);display:flex;flex-wrap:wrap;gap:4px 12px}
+.stavka .dole{display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--linija);flex-wrap:wrap}
+.cip{font-size:12px;font-weight:600;color:var(--tekst-2);background:#F2F3F5;border-radius:6px;padding:4px 8px;font-variant-numeric:tabular-nums}
+
+/* ---------- tabovi ---------- */
+.tabovi{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px;-ms-overflow-style:none;scrollbar-width:none}
+.tabovi::-webkit-scrollbar{display:none}
+.tab{
+  white-space:nowrap;padding:9px 14px;border-radius:999px;border:1px solid var(--linija-jaka);
+  background:#fff;font-size:14px;font-weight:600;color:var(--tekst-2);cursor:pointer;
+}
+.tab.aktivan{background:var(--grafit);border-color:var(--grafit);color:#fff}
+.tab .br{opacity:.65;margin-left:5px;font-variant-numeric:tabular-nums}
+
+/* ---------- trošak red ---------- */
+.trosak{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--linija)}
+.trosak:last-child{border-bottom:none}
+.trosak .ik{width:36px;height:36px;flex:none;border-radius:var(--r-s);background:#F0F1F3;color:var(--grafit);display:flex;align-items:center;justify-content:center}
+.trosak .sred{flex:1;min-width:0}
+.trosak .n1{font-size:15px;font-weight:600}
+.trosak .n2{font-size:12px;color:var(--tekst-2)}
+.trosak .iz{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.trosak .iz small{display:block;font-size:11px;font-weight:600;color:var(--tekst-3)}
+
+/* ---------- galerija dokaza ---------- */
+.galerija{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dokaz{
+  aspect-ratio:3/4;border-radius:var(--r-s);border:1px solid var(--linija);overflow:hidden;
+  background:linear-gradient(150deg,#E9EBEE 0%,#F6F7F8 55%,#DDE0E4 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;padding:6px;cursor:pointer;position:relative;
+}
+.dokaz .lab{font-size:10px;font-weight:700;color:var(--tekst-2);background:rgba(255,255,255,.9);border-radius:4px;padding:2px 5px;text-align:center}
+.dokaz .sim{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#B7BCC3}
+
+/* ---------- donja navigacija ---------- */
+.nav{
+  position:sticky;bottom:0;background:#fff;border-top:1px solid var(--linija);
+  display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:30;
+}
+.nav button{
+  flex:1;background:none;border:none;padding:9px 4px 11px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--tekst-3);font-size:11px;font-weight:600;
+}
+.nav button.aktivan{color:var(--grafit)}
+.nav button.aktivan .pod{width:22px;height:3px;border-radius:2px;background:var(--zlatna);margin-top:1px}
+.nav button .pod{width:22px;height:3px;margin-top:1px}
+
+/* ---------- modal / toast ---------- */
+.zavesa{position:fixed;inset:0;background:rgba(20,22,26,.55);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.modal{
+  background:#fff;width:100%;max-width:480px;border-radius:var(--r-l) var(--r-l) 0 0;
+  padding:20px 16px;padding-bottom:calc(20px + env(safe-area-inset-bottom));box-shadow:var(--sen-jaka);
+}
+.modal h3{font-size:19px;font-weight:700;margin-bottom:6px;letter-spacing:-.3px}
+.modal p{font-size:14px;color:var(--tekst-2);margin-bottom:16px}
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:88px;z-index:70;
+  background:var(--grafit);color:#fff;padding:13px 18px;border-radius:var(--r-m);
+  font-size:14px;font-weight:600;box-shadow:var(--sen-jaka);display:flex;align-items:center;gap:9px;
+  max-width:88%;border-left:3px solid var(--zlatna);
+}
+
+/* ---------- ekran za prijavu ---------- */
+.prijava-ekran{
+  flex:1;background:var(--grafit);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:28px 22px;
+}
+.prijava-ekran .znak{width:64px;height:64px;border-radius:var(--r-m);border:2px solid var(--zlatna);color:var(--zlatna);display:flex;align-items:center;justify-content:center;margin-bottom:22px}
+.prijava-ekran h1{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.15}
+.prijava-ekran .pod{color:var(--zlatna);font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-bottom:26px}
+.prijava-ekran .unos{background:var(--grafit-2);border-color:var(--grafit-3);color:#fff}
+.prijava-ekran .unos::placeholder{color:#79808B}
+.prijava-ekran label{color:#A8AEB7}
+.brzi{margin-top:22px;border-top:1px solid var(--grafit-3);padding-top:16px}
+.brzi .nas{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#79808B;font-weight:700;margin-bottom:10px}
+.brzi button{
+  width:100%;text-align:left;background:var(--grafit-2);border:1px solid var(--grafit-3);color:#fff;
+  border-radius:var(--r-m);padding:13px 14px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px;
+}
+.brzi button .kr{width:34px;height:34px;border-radius:50%;background:var(--grafit-3);color:var(--zlatna);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
+.brzi button .u{font-size:15px;font-weight:600}
+.brzi button .r{font-size:12px;color:#8E959F}
+
+.prazno{text-align:center;padding:44px 20px;color:var(--tekst-3)}
+.prazno .ik{margin-bottom:12px;color:var(--linija-jaka)}
+.prazno .t{font-size:15px;font-weight:600;color:var(--tekst-2)}
+.prazno .p{font-size:13px;margin-top:4px}
+
+.demo-traka{
+  background:var(--zlatna-blaga);border-bottom:1px solid #E8DCC2;color:#6B5320;
+  font-size:11px;font-weight:600;text-align:center;padding:6px 12px;letter-spacing:.02em;
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============================================================
+   1. IKONE
+   ============================================================ */
+function I(ime, v){
+  v = v || 22;
+  const p = {
+    kamion:'<path d="M3 7h11v9H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/>',
+    racun:'<path d="M6 3h12v18l-2.5-1.6L13 21l-2.5-1.6L8 21l-2-1.5z"/><path d="M9.5 8h5M9.5 12h5"/>',
+    alarm:'<path d="M12 3l9.5 17H2.5z"/><path d="M12 9.5v4.5M12 17h.01"/>',
+    povratak:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5.5h4V20"/>',
+    strelica:'<path d="M9 5l7 7-7 7"/>',
+    nazad:'<path d="M15 5l-7 7 7 7"/>',
+    kamera:'<path d="M3 8h4l1.5-2h7L17 8h4v12H3z"/><circle cx="12" cy="13.5" r="3.6"/>',
+    cek:'<path d="M4.5 12.5l5 5 10-11"/>',
+    plus:'<path d="M12 5v14M5 12h14"/>',
+    gorivo:'<path d="M4 21V4.5A1.5 1.5 0 0 1 5.5 3h6A1.5 1.5 0 0 1 13 4.5V21"/><path d="M3 21h11"/><path d="M4 10h9"/><path d="M16 8l3 3v7a1.6 1.6 0 0 1-3.2 0V14H13"/>',
+    put:'<path d="M9 3v4M9 11v4M9 19v2M15 3v2M15 9v4M15 17v4"/><path d="M4 21 7 3M20 21 17 3"/>',
+    krevet:'<path d="M3 19v-9h11a5 5 0 0 1 5 5v4"/><path d="M3 14h16"/><circle cx="7" cy="12.5" r="1.6"/><path d="M3 19v2M21 19v2"/>',
+    hrana:'<path d="M5 3v8a2.5 2.5 0 0 0 5 0V3"/><path d="M7.5 3v18"/><path d="M17 3c-1.5 2-2 3.5-2 6s.8 3.5 2 3.5V21"/>',
+    materijal:'<path d="M3.5 8 12 3.5 20.5 8v8L12 20.5 3.5 16z"/><path d="M3.5 8 12 12.5 20.5 8M12 12.5V20.5"/>',
+    ostalo:'<circle cx="12" cy="12" r="8.5"/><path d="M9.8 9.6a2.3 2.3 0 1 1 3.3 2.1c-.7.4-1.1.9-1.1 1.7"/><path d="M12 16.6h.01"/>',
+    lom:'<path d="m13.5 3-7 9.5H12l-1.5 8.5 7-10H12z"/>',
+    kljuc:'<path d="M14.5 6.5a4.5 4.5 0 1 0 3 4.2l3.5 3.5-2 2-1.6-1.6-1.6 1.6-1.6-1.6"/><circle cx="10.5" cy="10.5" r="1.6"/>',
+    posao:'<path d="M4 7h16v13H4z"/><path d="M9 7V4h6v3"/><path d="M4 12h16"/>',
+    novac:'<rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/>',
+    kartica:'<rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M2.5 10h19"/><path d="M6 14.5h4"/>',
+    novcanik:'<path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H19v3"/><path d="M3 7.5V18a2 2 0 0 0 2 2h15V8H5.5"/><circle cx="16.5" cy="14" r="1.2"/>',
+    korisnik:'<circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5c1.2-3.6 4-5.4 7.5-5.4s6.3 1.8 7.5 5.4"/>',
+    lista:'<path d="M8 6h13M8 12h13M8 18h13"/><path d="M3.5 6h.01M3.5 12h.01M3.5 18h.01"/>',
+    grafik:'<path d="M4 20V9M10 20V4M16 20v-7M22 20H2"/>',
+    sat:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+    izlaz:'<path d="M15 4h4v16h-4"/><path d="M11 8l-4 4 4 4M7 12h9"/>',
+    stit:'<path d="M12 3l7.5 3v6c0 4.4-3 7.6-7.5 9-4.5-1.4-7.5-4.6-7.5-9V6z"/><path d="M9 12l2 2 4-4"/>',
+    olovka:'<path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14.5 5.5 18.5 9.5"/>',
+    slika:'<rect x="3" y="4.5" width="18" height="15" rx="2"/><circle cx="8.5" cy="10" r="1.8"/><path d="m3.5 18 5-5 3.5 3.5L16 13l4.5 4.5"/>',
+    dokument:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/>',
+    vrati:'<path d="M9.5 5 4 10.5 9.5 16"/><path d="M4 10.5h10a6 6 0 0 1 0 12h-3"/>'
+  }[ime] || '';
+  return '<svg width="'+v+'" height="'+v+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+p+'</svg>';
+}
+
+/* ============================================================
+   2. IZMIŠLJENI PODACI
+   ============================================================ */
+const VRSTE = {
+  gorivo:    {n:'Gorivo',            ik:'gorivo'},
+  put:       {n:'Put i putarina',    ik:'put'},
+  smestaj:   {n:'Smeštaj',           ik:'krevet'},
+  hrana:     {n:'Hrana',             ik:'hrana'},
+  materijal: {n:'Materijal',         ik:'materijal'},
+  ostalo:    {n:'Ostalo',            ik:'ostalo'}
+};
+const PLACANJA = {
+  gotovina: {n:'Gotovina iz depozita', k:'Gotovina',  ik:'novac'},
+  kartica:  {n:'Službena kartica',     k:'Kartica',   ik:'kartica'},
+  licni:    {n:'Lični novac zaposlenog',k:'Lični novac', ik:'novcanik'}
+};
+const TIPOVI_PRIJAVE = {
+  lom:        {n:'Nešto je polomljeno',        ik:'lom'},
+  materijal:  {n:'Treba materijal ili alat',   ik:'kljuc'},
+  nezavrseno: {n:'Ostalo je nešto da se završi',ik:'posao'},
+  vozilo:     {n:'Problem sa vozilom',         ik:'kamion'},
+  ostalo:     {n:'Ostala napomena',            ik:'ostalo'}
+};
+const STATUSI = {
+  aktivan:   {n:'Na terenu',           kl:'o-plava'},
+  pregled:   {n:'Čeka pregled',        kl:'o-narandzasta'},
+  ispravka:  {n:'Vraćen na ispravku',  kl:'o-crvena'},
+  odobren:   {n:'Odobren',             kl:'o-zelena'}
+};
+
+const DB = {
+  korisnici:[
+    {id:1, ime:'Marko Ilić',    kime:'marko',  uloga:'sef',   tel:'063 111 222'},
+    {id:2, ime:'Nenad Perić',   kime:'nenad',  uloga:'sef',   tel:'063 333 444'},
+    {id:3, ime:'Dragan Simić',  kime:'dragan', uloga:'sef',   tel:'064 555 666'},
+    {id:9, ime:'Kancelarija',   kime:'admin',  uloga:'admin', tel:'011 000 000'}
+  ],
+  vozila:[
+    {id:1, naziv:'Renault Master', reg:'BG-114-ŽŠ', potrosnja:11.5},
+    {id:2, naziv:'Fiat Ducato',    reg:'BG-268-CD', potrosnja:12.0},
+    {id:3, naziv:'VW Crafter',     reg:'NS-451-EF', potrosnja:13.2}
+  ],
+  tereni:[
+    {
+      id:101, status:'aktivan', sef:1, vozilo:1,
+      projekat:'Hotel Zlatibor – montaža kuhinje',
+      polazak:'22.07.2026. 06:40', povratak:null,
+      depozit_eur:300, depozit_rsd:40000,
+      km_start:128450, km_kraj:null,
+      vraceno_eur:null, vraceno_rsd:null,
+      pp:{vozilo:true, gorivo:true, teret:true}, nap_polazak:'',
+      pk:null, nap_povratak:'',
+      troskovi:[
+        {id:1, vrsta:'gorivo', iznos:9800, val:'RSD', nacin:'gotovina', vreme:'22.07. 07:10', litri:62.5, km:128455, racun:true, slip:false},
+        {id:2, vrsta:'put',    iznos:1420, val:'RSD', nacin:'kartica',  vreme:'22.07. 09:25', racun:true, slip:true},
+        {id:3, vrsta:'hrana',  iznos:2600, val:'RSD', nacin:'gotovina', vreme:'22.07. 13:05', racun:true, slip:false},
+        {id:4, vrsta:'materijal', iznos:45, val:'EUR', nacin:'licni',   vreme:'23.07. 10:40', racun:true, slip:false},
+        {id:5, vrsta:'smestaj',iznos:70,   val:'EUR', nacin:'gotovina', vreme:'23.07. 20:15', racun:true, slip:false}
+      ],
+      prijave:[
+        {id:1, tip:'materijal', opis:'Nedostaje 6 komada inox vijaka M8, ne mogu da završim gornji nosač.', vreme:'23.07. 11:02', foto:true},
+        {id:2, tip:'vozilo',    opis:'Levi retrovizor klima, labav je nosač.', vreme:'23.07. 17:40', foto:false}
+      ]
+    },
+    {
+      id:102, status:'pregled', sef:2, vozilo:2,
+      projekat:'Restoran Dunav – Novi Sad',
+      polazak:'18.07.2026. 05:50', povratak:'20.07.2026. 19:20',
+      depozit_eur:250, depozit_rsd:35000,
+      km_start:96320, km_kraj:97182,
+      vraceno_eur:110, vraceno_rsd:9400,
+      pp:{vozilo:true, gorivo:true, teret:true}, nap_polazak:'',
+      pk:{vozilo:true, kabina:true, alat:true, racuni:true}, nap_povratak:'',
+      troskovi:[
+        {id:1, vrsta:'gorivo', iznos:11250, val:'RSD', nacin:'gotovina', vreme:'18.07. 06:20', litri:71.8, km:96325, racun:true, slip:false},
+        {id:2, vrsta:'gorivo', iznos:8400,  val:'RSD', nacin:'gotovina', vreme:'20.07. 16:10', litri:53.5, km:97120, racun:true, slip:false},
+        {id:3, vrsta:'put',    iznos:2380,  val:'RSD', nacin:'kartica',  vreme:'18.07. 08:05', racun:true, slip:true},
+        {id:4, vrsta:'smestaj',iznos:120,   val:'EUR', nacin:'gotovina', vreme:'18.07. 21:00', racun:true, slip:false},
+        {id:5, vrsta:'hrana',  iznos:3570,  val:'RSD', nacin:'gotovina', vreme:'19.07. 13:40', racun:true, slip:false},
+        {id:6, vrsta:'materijal',iznos:20,  val:'EUR', nacin:'licni',    vreme:'19.07. 15:20', racun:true, slip:false},
+        {id:7, vrsta:'ostalo', iznos:5300,  val:'RSD', nacin:'kartica',  vreme:'20.07. 12:15', racun:true, slip:false}
+      ],
+      prijave:[
+        {id:1, tip:'lom',        opis:'Polomljena je jedna staklena polica prilikom istovara.', vreme:'19.07. 09:15', foto:true},
+        {id:2, tip:'nezavrseno', opis:'Nije postavljena zadnja maska ispod šanka, čeka se lim.', vreme:'20.07. 17:50', foto:true}
+      ]
+    },
+    {
+      id:103, status:'ispravka', sef:1, vozilo:3,
+      projekat:'Kafić Terasa – Kragujevac',
+      polazak:'14.07.2026. 07:10', povratak:'15.07.2026. 18:05',
+      depozit_eur:150, depozit_rsd:20000,
+      km_start:54100, km_kraj:54388,
+      vraceno_eur:150, vraceno_rsd:6200,
+      pp:{vozilo:true, gorivo:true, teret:true}, nap_polazak:'Zadnja guma slabije naduvana, dopumpano na pumpi.',
+      pk:{vozilo:true, kabina:true, alat:true, racuni:false}, nap_povratak:'Nemam račun za jedan sitan trošak.',
+      komentar_admina:'Fali račun za gorivo od 15.07. Molim da se doda fotografija računa i ispravi vraćeni iznos u RSD.',
+      troskovi:[
+        {id:1, vrsta:'gorivo', iznos:7300, val:'RSD', nacin:'gotovina', vreme:'14.07. 07:45', litri:46.2, km:54105, racun:true, slip:false},
+        {id:2, vrsta:'hrana',  iznos:2100, val:'RSD', nacin:'gotovina', vreme:'14.07. 13:20', racun:true, slip:false},
+        {id:3, vrsta:'put',    iznos:1200, val:'RSD', nacin:'gotovina', vreme:'15.07. 17:00', racun:false, slip:false}
+      ],
+      prijave:[]
+    },
+    {
+      id:104, status:'odobren', sef:2, vozilo:1,
+      projekat:'Pekara Sunce – Niš',
+      polazak:'07.07.2026. 06:00', povratak:'09.07.2026. 20:30',
+      depozit_eur:200, depozit_rsd:30000,
+      km_start:126890, km_kraj:128450,
+      vraceno_eur:80, vraceno_rsd:4150,
+      pp:{vozilo:true, gorivo:true, teret:true}, nap_polazak:'',
+      pk:{vozilo:true, kabina:true, alat:true, racuni:true}, nap_povratak:'',
+      odobrio:'Kancelarija · 10.07.2026.',
+      troskovi:[
+        {id:1, vrsta:'gorivo', iznos:13900, val:'RSD', nacin:'gotovina', vreme:'07.07. 06:35', litri:88.5, km:126895, racun:true, slip:false},
+        {id:2, vrsta:'gorivo', iznos:9650,  val:'RSD', nacin:'gotovina', vreme:'09.07. 18:00', litri:61.4, km:128390, racun:true, slip:false},
+        {id:3, vrsta:'put',    iznos:2300,  val:'RSD', nacin:'kartica',  vreme:'07.07. 09:10', racun:true, slip:true},
+        {id:4, vrsta:'smestaj',iznos:120,   val:'EUR', nacin:'gotovina', vreme:'07.07. 21:30', racun:true, slip:false}
+      ],
+      prijave:[
+        {id:1, tip:'ostalo', opis:'Investitor traži ponudu za još jedan radni sto.', vreme:'08.07. 12:00', foto:false}
+      ]
+    }
+  ]
+};
+
+/* ============================================================
+   3. POMOĆNE FUNKCIJE
+   ============================================================ */
+function brojF(n, dec){
+  dec = (dec===undefined) ? 2 : dec;
+  const neg = n<0; n = Math.abs(n);
+  let s = n.toFixed(dec);
+  let [c,d] = s.split('.');
+  c = c.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return (neg?'-':'') + c + (d ? ','+d : '');
+}
+function novac(n, val){ return brojF(n, val==='RSD'?0:2) + ' ' + val; }
+function km(n){ return brojF(n,0) + ' km'; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function po(id, niz){ return niz.find(x=>x.id===id) || {}; }
+function korisnik(id){ return po(id, DB.korisnici); }
+function vozilo(id){ return po(id, DB.vozila); }
+function teren(id){ return po(id, DB.tereni); }
+
+/* obračun jednog terena */
+function obracun(t){
+  const o = {
+    gotEUR:0, gotRSD:0, karEUR:0, karRSD:0, licEUR:0, licRSD:0,
+    litri:0, gorivoEUR:0, gorivoRSD:0, brojRacuna:0, bezRacuna:0
+  };
+  t.troskovi.forEach(tr=>{
+    const kljuc = (tr.nacin==='gotovina'?'got':tr.nacin==='kartica'?'kar':'lic') + tr.val;
+    o[kljuc] += tr.iznos;
+    if(tr.vrsta==='gorivo'){
+      o.litri += (tr.litri||0);
+      o['gorivo'+tr.val] += tr.iznos;
+    }
+    if(tr.racun) o.brojRacuna++; else o.bezRacuna++;
+  });
+  o.ocekEUR = t.depozit_eur - o.gotEUR;
+  o.ocekRSD = t.depozit_rsd - o.gotRSD;
+  o.km = (t.km_kraj!=null) ? (t.km_kraj - t.km_start) : null;
+  o.potrosnja = (o.km && o.litri) ? (o.litri / o.km * 100) : null;
+  const v = vozilo(t.vozilo);
+  o.ocekPotrosnja = v.potrosnja || null;
+  o.odstupanje = (o.potrosnja && o.ocekPotrosnja) ? ((o.potrosnja - o.ocekPotrosnja)/o.ocekPotrosnja*100) : null;
+  o.upozorenje = (o.odstupanje!=null && Math.abs(o.odstupanje) > 15);
+  if(t.status==='odobren' || t.status==='pregled' || t.status==='ispravka'){
+    o.razEUR = (t.vraceno_eur!=null) ? (t.vraceno_eur - o.ocekEUR) : null;
+    o.razRSD = (t.vraceno_rsd!=null) ? (t.vraceno_rsd - o.ocekRSD) : null;
+  }
+  return o;
+}
+
+/* ============================================================
+   4. STANJE PROTOTIPA
+   ============================================================ */
+const S = {
+  ekran:'prijava',
+  ja:null,
+  tab:'aktivan',
+  otvoren:null,
+  n:{}   // privremeni podaci formulara
+};
+
+function idi(ekran, opcije){
+  Object.assign(S, opcije||{});
+  S.ekran = ekran;
+  crtaj();
+  window.scrollTo(0,0);
+}
+function poruka(txt, ik){
+  const st = document.createElement('div');
+  st.className='toast';
+  st.innerHTML = I(ik||'cek',18) + '<span>'+esc(txt)+'</span>';
+  document.body.appendChild(st);
+  setTimeout(()=>st.remove(), 2400);
+}
+function mojAktivan(){
+  return DB.tereni.find(t=>t.sef===S.ja && t.status==='aktivan');
+}
+
+/* ============================================================
+   5. ZAJEDNIČKI DELOVI
+   ============================================================ */
+function zaglavlje(naslov, nazadNa){
+  const k = korisnik(S.ja);
+  const inicijali = k.ime ? k.ime.split(' ').map(x=>x[0]).join('') : '';
+  return '<div class="top">'+
+    (nazadNa ? '<button class="nazad" onclick="idi(\''+nazadNa+'\')">'+I('nazad',20)+'</button>' : '')+
+    '<div class="rast"><div class="marka">Prohoreca AG group</div><div class="naslov">'+esc(naslov)+'</div></div>'+
+    '<div class="avatar" onclick="odjava()">'+esc(inicijali)+'</div>'+
+  '</div>';
+}
+function odjava(){
+  if(confirm('Odjaviti se?')) idi('prijava', {ja:null});
+}
+function oznaka(status){
+  const s = STATUSI[status];
+  return '<span class="oznaka '+s.kl+'"><span class="tacka"></span>'+s.n+'</span>';
+}
+function fotoPolje(kljuc, naslov, opis){
+  const im = S.n[kljuc];
+  return '<label class="foto '+(im?'ima':'')+'">'+
+    (im ? '<img src="'+im+'" alt="">' : '<div class="ik">'+I('kamera',22)+'</div>')+
+    '<div class="rast" style="flex:1">'+
+      '<div class="t1">'+(im?'Fotografija dodata':esc(naslov))+'</div>'+
+      '<div class="t2">'+(im?'Dodirni da promeniš':esc(opis||'Dodirni i slikaj telefonom'))+'</div>'+
+    '</div>'+
+    (im?'<div style="color:var(--zelena)">'+I('cek',20)+'</div>':'')+
+    '<input type="file" accept="image/*" capture="environment" onchange="uzmiFoto(event,\''+kljuc+'\')">'+
+  '</label>';
+}
+function uzmiFoto(e, kljuc){
+  const f = e.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = ()=>{ S.n[kljuc] = r.result; crtaj(); };
+  r.readAsDataURL(f);
+}
+function potvrdaRed(kljuc, tekst){
+  const c = !!S.n[kljuc];
+  return '<div class="potvrda '+(c?'cek':'')+'" onclick="prekidac(\''+kljuc+'\')">'+
+    '<div class="kvadrat">'+(c?I('cek',16):'')+'</div>'+
+    '<div class="txt">'+esc(tekst)+'</div>'+
+  '</div>';
+}
+function prekidac(k){ S.n[k] = !S.n[k]; crtaj(); }
+function postavi(k, v){ S.n[k] = v; crtaj(); }
+function upisi(k, v){ S.n[k] = v; }
+
+/* ============================================================
+   6. EKRAN: PRIJAVA
+   ============================================================ */
+function scPrijava(){
+  return '<div class="prijava-ekran">'+
+    '<div class="znak">'+I('kamion',30)+'</div>'+
+    '<h1>Teren</h1>'+
+    '<div class="pod">Prohoreca AG group</div>'+
+    '<div class="polje"><label>Korisničko ime</label><input class="unos" placeholder="npr. marko"></div>'+
+    '<div class="polje"><label>Lozinka</label><input class="unos" type="password" placeholder="••••••••"></div>'+
+    '<button class="dugme d-zlato" onclick="idi(\'pocetna\',{ja:1})">Prijavi se</button>'+
+    '<div class="brzi">'+
+      '<div class="nas">Prototip – brzi ulaz</div>'+
+      DB.korisnici.filter(k=>k.uloga==='sef').map(k=>
+        '<button onclick="idi(\'pocetna\',{ja:'+k.id+'})"><div class="kr">'+esc(k.ime.split(' ').map(x=>x[0]).join(''))+'</div>'+
+        '<div><div class="u">'+esc(k.ime)+'</div><div class="r">Šef monterske ekipe</div></div></button>').join('')+
+      '<button onclick="idi(\'admin\',{ja:9,tab:\'pregled\'})"><div class="kr">'+I('stit',18)+'</div>'+
+      '<div><div class="u">Kancelarija</div><div class="r">Administrator</div></div></button>'+
+    '</div>'+
+  '</div>';
+}
+
+/* ============================================================
+   7. EKRAN: POČETNA (ŠEF EKIPE)
+   ============================================================ */
+function scPocetna(){
+  const t = mojAktivan();
+  const k = korisnik(S.ja);
+  let h = zaglavlje('Zdravo, '+k.ime.split(' ')[0]);
+  h += '<div class="sadrzaj">';
+
+  if(t){
+    const o = obracun(t);
+    const v = vozilo(t.vozilo);
+    h += '<div class="karta"><div class="karta-telo">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">'+
+        '<div><div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tekst-3);margin-bottom:3px">Tekući teren</div>'+
+        '<div style="font-size:17px;font-weight:700;letter-spacing:-.3px">'+esc(t.projekat)+'</div></div>'+
+        oznaka(t.status)+
+      '</div>'+
+      '<div class="stavka-meta" style="font-size:13px;color:var(--tekst-2);margin-bottom:14px">'+esc(v.naziv)+' · '+esc(v.reg)+' · od '+esc(t.polazak)+'</div>'+
+      '<div class="novac-mreza">'+
+        '<div class="novac"><div class="val">Gotovina EUR</div><div class="iznos">'+brojF(o.ocekEUR,2)+'</div><div class="opis">preostalo od '+brojF(t.depozit_eur,0)+'</div></div>'+
+        '<div class="novac"><div class="val">Gotovina RSD</div><div class="iznos">'+brojF(o.ocekRSD,0)+'</div><div class="opis">preostalo od '+brojF(t.depozit_rsd,0)+'</div></div>'+
+      '</div>'+
+      '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">'+
+        '<span class="cip">'+t.troskovi.length+' troškova</span>'+
+        '<span class="cip">'+t.prijave.length+' prijava</span>'+
+        '<span class="cip">start '+brojF(t.km_start,0)+' km</span>'+
+      '</div>'+
+    '</div></div>';
+  }
+
+  h += '<div class="sekcija-naslov">Šta radiš sada?</div>';
+
+  if(!t){
+    h += akcijaDug('kamion','Polazak na teren','Otvori novi teren','polazak',true);
+    h += akcijaDug('racun','Dodaj trošak','Prvo otvori teren','',false,true);
+    h += akcijaDug('alarm','Prijavi sa terena','Prvo otvori teren','',false,true);
+    h += akcijaDug('povratak','Povratak i izveštaj','Prvo otvori teren','',false,true);
+    h += '<div class="napomena" style="margin-top:14px">'+I('ostalo',18)+'<div>Nemaš otvoren teren. Kada kreneš, dodirni <b>Polazak na teren</b>.</div></div>';
+  } else {
+    h += akcijaDug('racun','Dodaj trošak','Račun, gorivo, putarina, hrana','trosak',true);
+    h += akcijaDug('alarm','Prijavi sa terena','Lom, materijal, nezavršeno','prijava_ter');
+    h += akcijaDug('povratak','Povratak i izveštaj','Zatvori teren i pošalji izveštaj','povratak');
+    h += akcijaDug('kamion','Polazak na teren','Teren je već otvoren','',false,true);
+  }
+  h += '</div>';
+  h += navSef('pocetna');
+  return h;
+}
+function akcijaDug(ik, t1, t2, ekran, istaknuta, iskljuceno){
+  return '<button class="akcija '+(istaknuta?'istaknuta':'')+'" '+(iskljuceno?'disabled':'onclick="otvoriEkran(\''+ekran+'\')"')+'>'+
+    '<div class="ikona">'+I(ik,26)+'</div>'+
+    '<div class="tekst"><div class="t1">'+esc(t1)+'</div><div class="t2">'+esc(t2)+'</div></div>'+
+    '<div class="str">'+I('strelica',20)+'</div>'+
+  '</button>';
+}
+function otvoriEkran(e){ S.n = {}; idi(e); }
+
+function navSef(a){
+  return '<div class="nav">'+
+    '<button class="'+(a==='pocetna'?'aktivan':'')+'" onclick="idi(\'pocetna\')">'+I('kamion',22)+'<span>Početna</span><div class="pod"></div></button>'+
+    '<button class="'+(a==='moji'?'aktivan':'')+'" onclick="idi(\'moji\')">'+I('lista',22)+'<span>Moji tereni</span><div class="pod"></div></button>'+
+  '</div>';
+}
+
+/* ============================================================
+   8. EKRAN: POLAZAK NA TEREN
+   ============================================================ */
+function scPolazak(){
+  let h = zaglavlje('Polazak na teren','pocetna');
+  h += '<div class="sadrzaj">';
+  h += '<div class="napomena">'+I('sat',18)+'<div>Unos traje oko <b>30 sekundi</b>. Sve što treba je projekat, vozilo, novac i kilometraža.</div></div>';
+
+  h += '<div class="karta"><div class="karta-telo">';
+  h += '<div class="polje"><label>Projekat ili mesto montaže</label>'+
+       '<input class="unos" placeholder="npr. Hotel Zlatibor – kuhinja" value="'+esc(S.n.projekat||'')+'" oninput="upisi(\'projekat\',this.value)"></div>';
+  h += '<div class="polje"><label>Vozilo</label><div class="izbor-lista">'+
+       DB.vozila.map(v=>'<button class="izbor '+(S.n.vozilo===v.id?'izabrana':'')+'" onclick="postavi(\'vozilo\','+v.id+')">'+
+         '<div class="ik">'+I('kamion',20)+'</div><div><div class="nas">'+esc(v.naziv)+'</div>'+
+         '<div style="font-size:12px;color:var(--tekst-2)">'+esc(v.reg)+'</div></div></button>').join('')+
+       '</div></div>';
+  h += '</div></div>';
+
+  h += '<div class="sekcija-naslov">Primljeni depozit</div>';
+  h += '<div class="karta"><div class="karta-telo"><div class="dva">'+
+    '<div class="polje" style="margin:0"><label>EUR</label><div class="unos-sa-sufiksom">'+
+      '<input class="unos" type="number" inputmode="decimal" placeholder="0" value="'+(S.n.dep_eur||'')+'" oninput="upisi(\'dep_eur\',this.value)"><span class="sufiks">EUR</span></div></div>'+
+    '<div class="polje" style="margin:0"><label>RSD</label><div class="unos-sa-sufiksom">'+
+      '<input class="unos" type="number" inputmode="numeric" placeholder="0" value="'+(S.n.dep_rsd||'')+'" oninput="upisi(\'dep_rsd\',this.value)"><span class="sufiks">RSD</span></div></div>'+
+  '</div></div></div>';
+
+  h += '<div class="sekcija-naslov">Kilometraža na polasku</div>';
+  h += '<div class="karta"><div class="karta-telo">'+
+    '<div class="polje"><label>Stanje kilometar-sata</label><div class="unos-sa-sufiksom">'+
+      '<input class="unos" type="number" inputmode="numeric" placeholder="npr. 128450" value="'+(S.n.km||'')+'" oninput="upisi(\'km\',this.value)"><span class="sufiks">km</span></div></div>'+
+    fotoPolje('foto_km','Slikaj instrument tablu','Mora da se vidi kilometraža')+
+  '</div></div>';
+
+  h += '<div class="sekcija-naslov">Kratka provera pre polaska</div>';
+  h += potvrdaRed('p_vozilo','Stanje vozila je provereno');
+  h += potvrdaRed('p_gorivo','Gorivo je provereno');
+  h += potvrdaRed('p_teret','Tovarni prostor uredan i teret obezbeđen');
+
+  const svePotvrde = S.n.p_vozilo && S.n.p_gorivo && S.n.p_teret;
+  if(!svePotvrde){
+    h += '<div class="polje" style="margin-top:12px"><label class="nalepnica">Ako nešto nije u redu, ukratko opiši <span class="opc">(nije obavezno)</span></label>'+
+      '<textarea class="unos" placeholder="npr. Zadnja desna guma slabije naduvana." oninput="upisi(\'nap\',this.value)">'+esc(S.n.nap||'')+'</textarea></div>';
+  }
+
+  h += '<div class="dno-akcija"><button class="dugme d-zlato" onclick="sacuvajPolazak()">'+I('cek',20)+' Kreni na teren</button></div>';
+  h += '</div>';
+  return h;
+}
+function sacuvajPolazak(){
+  if(!S.n.projekat || !S.n.vozilo || !S.n.km){
+    poruka('Popuni projekat, vozilo i kilometražu','alarm'); return;
+  }
+  const t = {
+    id: 200 + DB.tereni.length, status:'aktivan', sef:S.ja, vozilo:S.n.vozilo,
+    projekat:S.n.projekat, polazak:'25.07.2026. 07:15', povratak:null,
+    depozit_eur:parseFloat(S.n.dep_eur||0), depozit_rsd:parseFloat(S.n.dep_rsd||0),
+    km_start:parseInt(S.n.km,10), km_kraj:null, vraceno_eur:null, vraceno_rsd:null,
+    pp:{vozilo:!!S.n.p_vozilo, gorivo:!!S.n.p_gorivo, teret:!!S.n.p_teret},
+    nap_polazak:S.n.nap||'', pk:null, nap_povratak:'',
+    troskovi:[], prijave:[]
+  };
+  DB.tereni.unshift(t);
+  S.n = {};
+  poruka('Teren je otvoren. Srećan put!');
+  idi('pocetna');
+}
+
+/* ============================================================
+   9. EKRAN: DODAJ TROŠAK
+   ============================================================ */
+function scTrosak(){
+  const t = mojAktivan();
+  let h = zaglavlje('Dodaj trošak','pocetna');
+  h += '<div class="sadrzaj">';
+
+  h += '<div class="karta"><div class="karta-telo">';
+  h += '<div class="polje"><label>Iznos</label><div class="dva" style="grid-template-columns:1.6fr 1fr">'+
+      '<input class="unos" type="number" inputmode="decimal" placeholder="0,00" style="font-size:22px;font-weight:700" value="'+(S.n.iznos||'')+'" oninput="upisi(\'iznos\',this.value)">'+
+      '<div class="plocice k2" style="gap:6px">'+
+        '<button class="plocica '+(S.n.val==='EUR'?'izabrana zlato':'')+'" onclick="postavi(\'val\',\'EUR\')">EUR</button>'+
+        '<button class="plocica '+(S.n.val==='RSD'?'izabrana zlato':'')+'" onclick="postavi(\'val\',\'RSD\')">RSD</button>'+
+      '</div></div></div>';
+  h += '</div></div>';
+
+  h += '<div class="sekcija-naslov">Vrsta troška</div>';
+  h += '<div class="karta"><div class="karta-telo"><div class="plocice k3">'+
+    Object.keys(VRSTE).map(k=>'<button class="plocica '+(S.n.vrsta===k?'izabrana':'')+'" onclick="postavi(\'vrsta\',\''+k+'\')" style="display:flex;flex-direction:column;align-items:center;gap:5px;padding:14px 6px">'+
+      I(VRSTE[k].ik,22)+'<span style="font-size:12px;line-height:1.2">'+esc(VRSTE[k].n)+'</span></button>').join('')+
+  '</div></div></div>';
+
+  if(S.n.vrsta==='gorivo'){
+    h += '<div class="karta" style="border-color:var(--zlatna)"><div class="karta-zaglavlje" style="color:var(--zlatna);border-color:#EFE2C8">'+I('gorivo',16)+' Podaci o sipanju</div><div class="karta-telo">'+
+      '<div class="dva">'+
+        '<div class="polje" style="margin:0"><label>Litara</label><div class="unos-sa-sufiksom">'+
+          '<input class="unos" type="number" inputmode="decimal" placeholder="0,0" value="'+(S.n.litri||'')+'" oninput="upisi(\'litri\',this.value)"><span class="sufiks">L</span></div></div>'+
+        '<div class="polje" style="margin:0"><label>Kilometraža</label><div class="unos-sa-sufiksom">'+
+          '<input class="unos" type="number" inputmode="numeric" placeholder="'+(t?brojF(t.km_start,0):'0')+'" value="'+(S.n.km_sip||'')+'" oninput="upisi(\'km_sip\',this.value)"><span class="sufiks">km</span></div></div>'+
+      '</div>'+
+    '</div></div>';
+  }
+
+  h += '<div class="sekcija-naslov">Način plaćanja</div>';
+  h += '<div class="izbor-lista" style="margin-bottom:12px">'+
+    Object.keys(PLACANJA).map(k=>'<button class="izbor '+(S.n.nacin===k?'izabrana':'')+'" onclick="postavi(\'nacin\',\''+k+'\')">'+
+      '<div class="ik">'+I(PLACANJA[k].ik,20)+'</div><div class="nas">'+esc(PLACANJA[k].n)+'</div></button>').join('')+
+  '</div>';
+
+  if(S.n.nacin==='licni'){
+    h += '<div class="napomena">'+I('novcanik',18)+'<div>Ovaj iznos se vodi kao <b>dug firme prema tebi</b> i biće ti vraćen.</div></div>';
+  }
+  if(S.n.nacin==='kartica'){
+    h += '<div class="napomena">'+I('kartica',18)+'<div>Kartično plaćanje se <b>ne oduzima</b> od tvog gotovinskog depozita.</div></div>';
+  }
+
+  h += '<div class="sekcija-naslov">Dokaz</div>';
+  h += '<div style="display:grid;gap:8px">'+fotoPolje('foto_racun','Slikaj račun','Fiskalni ili gotovinski račun');
+  if(S.n.nacin==='kartica'){
+    h += fotoPolje('foto_slip','Slikaj slip (ako je odvojen)','Nije obavezno ako je slip na računu');
+  }
+  h += '</div>';
+
+  h += '<div class="dno-akcija"><button class="dugme d-zlato" onclick="sacuvajTrosak()">'+I('plus',20)+' Sačuvaj trošak</button></div>';
+  h += '</div>';
+  return h;
+}
+function sacuvajTrosak(){
+  const t = mojAktivan();
+  if(!S.n.iznos || !S.n.val || !S.n.vrsta || !S.n.nacin){
+    poruka('Unesi iznos, valutu, vrstu i plaćanje','alarm'); return;
+  }
+  t.troskovi.push({
+    id:t.troskovi.length+1, vrsta:S.n.vrsta, iznos:parseFloat(S.n.iznos), val:S.n.val,
+    nacin:S.n.nacin, vreme:'25.07. '+new Date().toTimeString().slice(0,5),
+    litri:S.n.litri?parseFloat(S.n.litri):undefined, km:S.n.km_sip?parseInt(S.n.km_sip,10):undefined,
+    racun:!!S.n.foto_racun, slip:!!S.n.foto_slip
+  });
+  S.n = {};
+  poruka('Trošak je sačuvan');
+  idi('pocetna');
+}
+
+/* ============================================================
+   10. EKRAN: PRIJAVA SA TERENA
+   ============================================================ */
+function scPrijavaTeren(){
+  let h = zaglavlje('Prijavi sa terena','pocetna');
+  h += '<div class="sadrzaj">';
+  h += '<div class="sekcija-naslov">Šta prijavljuješ?</div>';
+  h += '<div class="izbor-lista" style="margin-bottom:16px">'+
+    Object.keys(TIPOVI_PRIJAVE).map(k=>'<button class="izbor '+(S.n.tip===k?'izabrana':'')+'" onclick="postavi(\'tip\',\''+k+'\')" style="padding:16px">'+
+      '<div class="ik" style="width:40px;height:40px">'+I(TIPOVI_PRIJAVE[k].ik,22)+'</div>'+
+      '<div class="nas" style="font-size:16px">'+esc(TIPOVI_PRIJAVE[k].n)+'</div></button>').join('')+
+  '</div>';
+
+  if(S.n.tip){
+    h += '<div class="karta"><div class="karta-telo">'+
+      '<div class="polje"><label>Kratko objašnjenje</label>'+
+        '<textarea class="unos" placeholder="Napiši u jednoj ili dve rečenice šta je problem." oninput="upisi(\'opis\',this.value)">'+esc(S.n.opis||'')+'</textarea></div>'+
+      fotoPolje('foto','Dodaj fotografiju','Nije obavezno')+
+    '</div></div>';
+    h += '<div class="napomena">'+I('stit',18)+'<div>Kancelarija dobija prijavu odmah. Ti ne moraš ništa dalje da popunjavaš.</div></div>';
+    h += '<div class="dno-akcija"><button class="dugme d-glavno" onclick="sacuvajPrijavu()">'+I('alarm',20)+' Pošalji prijavu</button></div>';
+  }
+  h += '</div>';
+  return h;
+}
+function sacuvajPrijavu(){
+  if(!S.n.opis || S.n.opis.trim().length<3){ poruka('Napiši kratko objašnjenje','alarm'); return; }
+  const t = mojAktivan();
+  t.prijave.push({id:t.prijave.length+1, tip:S.n.tip, opis:S.n.opis, vreme:'25.07. '+new Date().toTimeString().slice(0,5), foto:!!S.n.foto});
+  S.n = {};
+  poruka('Prijava je poslata kancelariji');
+  idi('pocetna');
+}
+
+/* ============================================================
+   11. EKRAN: POVRATAK SA TERENA
+   ============================================================ */
+function scPovratak(){
+  const t = mojAktivan();
+  const o = obracun(t);
+  let h = zaglavlje('Povratak sa terena','pocetna');
+  h += '<div class="sadrzaj">';
+
+  h += '<div class="sekcija-naslov">Kilometraža na povratku</div>';
+  h += '<div class="karta"><div class="karta-telo">'+
+    '<div class="polje"><label>Stanje kilometar-sata <span style="color:var(--tekst-3);font-weight:500">(polazak: '+brojF(t.km_start,0)+')</span></label>'+
+    '<div class="unos-sa-sufiksom"><input class="unos" type="number" inputmode="numeric" placeholder="npr. '+(t.km_start+500)+'" value="'+(S.n.km_kraj||'')+'" oninput="upisi(\'km_kraj\',this.value);osveziKm()"><span class="sufiks">km</span></div>'+
+    '<div id="km-rezultat" style="font-size:13px;color:var(--tekst-2);margin-top:7px">'+kmRezultat(t)+'</div></div>'+
+    fotoPolje('foto_km_kraj','Slikaj instrument tablu','Mora da se vidi kilometraža')+
+  '</div></div>';
+
+  h += '<div class="sekcija-naslov">Vraćanje novca</div>';
+  h += '<div class="karta"><div class="karta-zaglavlje">'+I('novac',16)+' Obračun gotovine</div><div class="karta-telo">'+
+    '<div class="novac-mreza" style="margin-bottom:14px">'+
+      '<div class="novac"><div class="val">Treba vratiti EUR</div><div class="iznos">'+brojF(o.ocekEUR,2)+'</div>'+
+        '<div class="opis">'+brojF(t.depozit_eur,0)+' – '+brojF(o.gotEUR,2)+' potrošeno</div></div>'+
+      '<div class="novac"><div class="val">Treba vratiti RSD</div><div class="iznos">'+brojF(o.ocekRSD,0)+'</div>'+
+        '<div class="opis">'+brojF(t.depozit_rsd,0)+' – '+brojF(o.gotRSD,0)+' potrošeno</div></div>'+
+    '</div>'+
+    '<div class="dva">'+
+      '<div class="polje" style="margin:0"><label>Vraćam EUR</label><div class="unos-sa-sufiksom">'+
+        '<input class="unos" type="number" inputmode="decimal" placeholder="'+brojF(o.ocekEUR,2)+'" value="'+(S.n.vr_eur||'')+'" oninput="upisi(\'vr_eur\',this.value);osveziRazliku()"><span class="sufiks">EUR</span></div></div>'+
+      '<div class="polje" style="margin:0"><label>Vraćam RSD</label><div class="unos-sa-sufiksom">'+
+        '<input class="unos" type="number" inputmode="numeric" placeholder="'+brojF(o.ocekRSD,0)+'" value="'+(S.n.vr_rsd||'')+'" oninput="upisi(\'vr_rsd\',this.value);osveziRazliku()"><span class="sufiks">RSD</span></div></div>'+
+    '</div>'+
+    '<div id="razlika" style="margin-top:12px">'+razlikaHTML(o)+'</div>'+
+  '</div></div>';
+
+  if(o.licEUR>0 || o.licRSD>0){
+    h += '<div class="napomena">'+I('novcanik',18)+'<div>Firma ti duguje za troškove plaćene ličnim novcem: <b>'+
+      [o.licEUR?novac(o.licEUR,'EUR'):null, o.licRSD?novac(o.licRSD,'RSD'):null].filter(Boolean).join(' i ')+'</b>.</div></div>';
+  }
+
+  h += '<div class="sekcija-naslov">Potvrda pre zatvaranja</div>';
+  h += potvrdaRed('k_vozilo','Stanje vozila provereno i problem prijavljen');
+  h += potvrdaRed('k_kabina','Kabina i tovarni prostor su uredni');
+  h += potvrdaRed('k_alat','Alat i preostali materijal su vraćeni');
+  h += potvrdaRed('k_racuni','Svi računi su uneti');
+
+  const sve = S.n.k_vozilo && S.n.k_kabina && S.n.k_alat && S.n.k_racuni;
+  if(!sve){
+    h += '<div class="polje" style="margin-top:12px"><label class="nalepnica">Ako nešto nije u redu, ukratko opiši <span class="opc">(nije obavezno)</span></label>'+
+      '<textarea class="unos" placeholder="npr. Fali mi jedan račun za parking." oninput="upisi(\'nap_k\',this.value)">'+esc(S.n.nap_k||'')+'</textarea></div>';
+  }
+
+  h += '<div class="dno-akcija"><button class="dugme d-glavno" onclick="sacuvajPovratak()">'+I('povratak',20)+' Zatvori teren i pošalji izveštaj</button></div>';
+  h += '</div>';
+  return h;
+}
+function kmRezultat(t){
+  const v = parseInt(S.n.km_kraj,10);
+  if(!v) return 'Ukupno pređeno: —';
+  if(v < t.km_start) return '<span style="color:var(--crvena);font-weight:600">Manje od polazne kilometraže.</span>';
+  return 'Ukupno pređeno: <b>'+brojF(v - t.km_start,0)+' km</b>';
+}
+function osveziKm(){
+  const t = mojAktivan();
+  const el = document.getElementById('km-rezultat');
+  if(el) el.innerHTML = kmRezultat(t);
+}
+function razlikaHTML(o){
+  const e = S.n.vr_eur==null||S.n.vr_eur==='' ? null : parseFloat(S.n.vr_eur);
+  const r = S.n.vr_rsd==null||S.n.vr_rsd==='' ? null : parseFloat(S.n.vr_rsd);
+  if(e===null && r===null) return '';
+  const de = (e===null)?0:(e - o.ocekEUR);
+  const dr = (r===null)?0:(r - o.ocekRSD);
+  if(Math.abs(de)<0.01 && Math.abs(dr)<1){
+    return '<div class="napomena" style="margin:0;background:var(--zelena-bg);border-color:#C9E3D6;color:#1F5A3B">'+I('cek',18)+'<div>Iznosi se slažu sa obračunom.</div></div>';
+  }
+  const delovi = [];
+  if(Math.abs(de)>=0.01) delovi.push((de>0?'višak ':'manjak ')+brojF(Math.abs(de),2)+' EUR');
+  if(Math.abs(dr)>=1)    delovi.push((dr>0?'višak ':'manjak ')+brojF(Math.abs(dr),0)+' RSD');
+  return '<div class="napomena upozorenje" style="margin:0">'+I('alarm',18)+'<div>Razlika u odnosu na obračun: <b>'+delovi.join(', ')+'</b>. Ako je to tačno, dodaj kratko objašnjenje ispod.</div></div>';
+}
+function osveziRazliku(){
+  const t = mojAktivan();
+  const el = document.getElementById('razlika');
+  if(el) el.innerHTML = razlikaHTML(obracun(t));
+}
+function sacuvajPovratak(){
+  const t = mojAktivan();
+  if(!S.n.km_kraj){ poruka('Unesi završnu kilometražu','alarm'); return; }
+  if(parseInt(S.n.km_kraj,10) < t.km_start){ poruka('Kilometraža je manja od polazne','alarm'); return; }
+  const o = obracun(t);
+  t.km_kraj = parseInt(S.n.km_kraj,10);
+  t.vraceno_eur = (S.n.vr_eur==null||S.n.vr_eur==='') ? o.ocekEUR : parseFloat(S.n.vr_eur);
+  t.vraceno_rsd = (S.n.vr_rsd==null||S.n.vr_rsd==='') ? o.ocekRSD : parseFloat(S.n.vr_rsd);
+  t.povratak = '25.07.2026. '+new Date().toTimeString().slice(0,5);
+  t.pk = {vozilo:!!S.n.k_vozilo, kabina:!!S.n.k_kabina, alat:!!S.n.k_alat, racuni:!!S.n.k_racuni};
+  t.nap_povratak = S.n.nap_k || '';
+  t.status = 'pregled';
+  S.n = {};
+  poruka('Izveštaj je poslat kancelariji');
+  idi('moji');
+}
+
+/* ============================================================
+   12. EKRAN: MOJI TERENI (ŠEF)
+   ============================================================ */
+function scMoji(){
+  let h = zaglavlje('Moji tereni');
+  h += '<div class="sadrzaj">';
+  const moji = DB.tereni.filter(t=>t.sef===S.ja);
+  const ispravke = moji.filter(t=>t.status==='ispravka');
+  if(ispravke.length){
+    h += '<div class="napomena greska">'+I('alarm',18)+'<div><b>'+ispravke.length+' izveštaj vraćen na ispravku.</b> Pogledaj komentar kancelarije.</div></div>';
+  }
+  if(!moji.length){
+    h += prazno('lista','Nema terena','Tvoji tereni će se pojaviti ovde.');
+  } else {
+    h += moji.map(t=>stavkaTerena(t,'sef')).join('');
+  }
+  h += '</div>'+navSef('moji');
+  return h;
+}
+function prazno(ik,t,p){
+  return '<div class="prazno"><div class="ik">'+I(ik,44)+'</div><div class="t">'+esc(t)+'</div><div class="p">'+esc(p)+'</div></div>';
+}
+function stavkaTerena(t, ko){
+  const o = obracun(t);
+  const v = vozilo(t.vozilo);
+  const k = korisnik(t.sef);
+  return '<button class="stavka" onclick="idi(\''+(ko==='sef'?'izvestaj_sef':'izvestaj')+'\',{otvoren:'+t.id+'})">'+
+    '<div class="gore"><div class="proj">'+esc(t.projekat)+'</div>'+oznaka(t.status)+'</div>'+
+    '<div class="meta">'+
+      (ko==='admin' ? '<span>'+I('korisnik',13)+' '+esc(k.ime)+'</span>' : '')+
+      '<span>'+esc(v.naziv)+' · '+esc(v.reg)+'</span>'+
+    '</div>'+
+    '<div class="meta" style="margin-top:2px"><span>'+esc(t.polazak.split(' ')[0])+(t.povratak?' – '+esc(t.povratak.split(' ')[0]):' – u toku')+'</span></div>'+
+    '<div class="dole">'+
+      '<span class="cip">'+(o.km!=null?brojF(o.km,0)+' km':'u toku')+'</span>'+
+      '<span class="cip">'+t.troskovi.length+' troškova</span>'+
+      (t.prijave.length?'<span class="cip">'+t.prijave.length+' prijava</span>':'')+
+      (o.upozorenje?'<span class="cip" style="background:var(--narandzasta-bg);color:var(--narandzasta)">potrošnja</span>':'')+
+    '</div>'+
+  '</button>';
+}
+
+/* ============================================================
+   13. EKRAN: ADMIN – LISTA
+   ============================================================ */
+function scAdmin(){
+  let h = '<div class="top"><div class="rast"><div class="marka">Prohoreca AG group</div><div class="naslov">Pregled terena</div></div>'+
+    '<div class="avatar" onclick="odjava()">'+I('stit',18)+'</div></div>';
+  h += '<div class="sadrzaj">';
+
+  const grupe = {
+    aktivan: DB.tereni.filter(t=>t.status==='aktivan'),
+    pregled: DB.tereni.filter(t=>t.status==='pregled'),
+    ispravka:DB.tereni.filter(t=>t.status==='ispravka'),
+    odobren: DB.tereni.filter(t=>t.status==='odobren')
+  };
+  h += '<div class="tabovi">'+
+    tabDug('aktivan','Aktivni',grupe.aktivan.length)+
+    tabDug('pregled','Čeka pregled',grupe.pregled.length)+
+    tabDug('ispravka','Na ispravci',grupe.ispravka.length)+
+    tabDug('odobren','Odobreni',grupe.odobren.length)+
+  '</div>';
+
+  const lista = grupe[S.tab] || [];
+  if(!lista.length) h += prazno('lista','Nema terena u ovoj grupi','Promeni karticu iznad.');
+  else h += lista.map(t=>stavkaTerena(t,'admin')).join('');
+
+  h += '</div>'+navAdmin('tereni');
+  return h;
+}
+function tabDug(k,n,br){
+  return '<button class="tab '+(S.tab===k?'aktivan':'')+'" onclick="idi(\'admin\',{tab:\''+k+'\'})">'+esc(n)+'<span class="br">'+br+'</span></button>';
+}
+function navAdmin(a){
+  return '<div class="nav">'+
+    '<button class="'+(a==='tereni'?'aktivan':'')+'" onclick="idi(\'admin\')">'+I('lista',22)+'<span>Tereni</span><div class="pod"></div></button>'+
+    '<button class="'+(a==='vozila'?'aktivan':'')+'" onclick="idi(\'vozila\')">'+I('kamion',22)+'<span>Vozila</span><div class="pod"></div></button>'+
+    '<button class="'+(a==='korisnici'?'aktivan':'')+'" onclick="idi(\'korisnici\')">'+I('korisnik',22)+'<span>Korisnici</span><div class="pod"></div></button>'+
+  '</div>';
+}
+
+/* ============================================================
+   14. EKRAN: DETALJAN IZVEŠTAJ
+   ============================================================ */
+function scIzvestaj(zaSefa){
+  const t = teren(S.otvoren);
+  const o = obracun(t);
+  const v = vozilo(t.vozilo);
+  const k = korisnik(t.sef);
+  let h = zaglavlje('Izveštaj sa terena', zaSefa?'moji':'admin');
+  h += '<div class="sadrzaj">';
+
+  /* --- osnovno --- */
+  h += '<div class="karta"><div class="karta-telo">'+
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px">'+
+      '<div style="font-size:19px;font-weight:700;letter-spacing:-.3px;line-height:1.25">'+esc(t.projekat)+'</div>'+oznaka(t.status)+'</div>'+
+    '<div class="red"><span class="k">Šef ekipe</span><span class="v">'+esc(k.ime)+'</span></div>'+
+    '<div class="red"><span class="k">Vozilo</span><span class="v">'+esc(v.naziv)+' · '+esc(v.reg)+'</span></div>'+
+    '<div class="red"><span class="k">Polazak</span><span class="v mono">'+esc(t.polazak)+'</span></div>'+
+    '<div class="red"><span class="k">Povratak</span><span class="v mono">'+(t.povratak?esc(t.povratak):'u toku')+'</span></div>'+
+    (t.odobrio?'<div class="red"><span class="k">Odobrio</span><span class="v">'+esc(t.odobrio)+'</span></div>':'')+
+  '</div></div>';
+
+  if(t.status==='ispravka' && t.komentar_admina){
+    h += '<div class="napomena greska">'+I('vrati',18)+'<div><b>Vraćeno na ispravku:</b><br>'+esc(t.komentar_admina)+'</div></div>';
+  }
+
+  /* --- novac --- */
+  h += '<div class="sekcija-naslov">Novac – EUR i RSD odvojeno</div>';
+  h += '<div class="karta"><div class="karta-zaglavlje">'+I('novac',16)+' Gotovina iz depozita</div><div class="karta-telo">'+
+    novacTabela([
+      ['Primljen depozit', t.depozit_eur, t.depozit_rsd],
+      ['Potrošeno gotovinom', -o.gotEUR, -o.gotRSD],
+      ['Očekivano za vraćanje', o.ocekEUR, o.ocekRSD],
+      ['Stvarno vraćeno', t.vraceno_eur, t.vraceno_rsd]
+    ])+
+    (t.vraceno_eur!=null ? razlikaRed(t.vraceno_eur - o.ocekEUR, t.vraceno_rsd - o.ocekRSD) : '')+
+  '</div></div>';
+
+  h += '<div class="karta"><div class="karta-zaglavlje">'+I('kartica',16)+' Službena kartica</div><div class="karta-telo">'+
+    '<div class="novac-mreza">'+
+      '<div class="novac"><div class="val">EUR</div><div class="iznos">'+brojF(o.karEUR,2)+'</div><div class="opis">ne dira depozit</div></div>'+
+      '<div class="novac"><div class="val">RSD</div><div class="iznos">'+brojF(o.karRSD,0)+'</div><div class="opis">ne dira depozit</div></div>'+
+    '</div></div></div>';
+
+  h += '<div class="karta" style="'+((o.licEUR||o.licRSD)?'border-color:var(--zlatna)':'')+'"><div class="karta-zaglavlje">'+I('novcanik',16)+' Lični novac zaposlenog</div><div class="karta-telo">'+
+    '<div class="novac-mreza">'+
+      '<div class="novac '+(o.licEUR?'negativno':'')+'"><div class="val">EUR</div><div class="iznos">'+brojF(o.licEUR,2)+'</div><div class="opis">dug firme prema zaposlenom</div></div>'+
+      '<div class="novac '+(o.licRSD?'negativno':'')+'"><div class="val">RSD</div><div class="iznos">'+brojF(o.licRSD,0)+'</div><div class="opis">dug firme prema zaposlenom</div></div>'+
+    '</div></div></div>';
+
+  /* --- kilometraža i gorivo --- */
+  h += '<div class="sekcija-naslov">Kilometraža i gorivo</div>';
+  h += '<div class="karta"><div class="karta-telo">'+
+    '<div class="red"><span class="k">Početna kilometraža</span><span class="v mono">'+km(t.km_start)+'</span></div>'+
+    '<div class="red"><span class="k">Završna kilometraža</span><span class="v mono">'+(t.km_kraj!=null?km(t.km_kraj):'—')+'</span></div>'+
+    '<div class="red"><span class="k">Ukupno pređeno</span><span class="v mono">'+(o.km!=null?km(o.km):'—')+'</span></div>'+
+    '<div class="red"><span class="k">Ukupno sipano</span><span class="v mono">'+brojF(o.litri,1)+' L</span></div>'+
+    '<div class="red"><span class="k">Trošak goriva</span><span class="v mono">'+
+      ([o.gorivoRSD?novac(o.gorivoRSD,'RSD'):null, o.gorivoEUR?novac(o.gorivoEUR,'EUR'):null].filter(Boolean).join('<br>') || '—')+
+    '</span></div>'+
+    '<div class="red"><span class="k">Prosečna potrošnja</span><span class="v mono">'+(o.potrosnja?brojF(o.potrosnja,1)+' L/100 km':'—')+'</span></div>'+
+    '<div class="red"><span class="k">Očekivano za vozilo</span><span class="v mono">'+(o.ocekPotrosnja?brojF(o.ocekPotrosnja,1)+' L/100 km':'—')+'</span></div>'+
+  '</div></div>';
+
+  if(o.odstupanje!=null){
+    if(o.upozorenje){
+      h += '<div class="napomena upozorenje">'+I('alarm',18)+'<div><b>Odstupanje '+(o.odstupanje>0?'+':'')+brojF(o.odstupanje,1)+'% u odnosu na očekivanu potrošnju.</b><br>'+
+        'Ovo je samo signal za proveru – uzrok može biti teret, teren, gužva ili greška u unosu.</div></div>';
+    } else {
+      h += '<div class="napomena" style="background:var(--zelena-bg);border-color:#C9E3D6;color:#1F5A3B">'+I('cek',18)+
+        '<div>Potrošnja je u očekivanom opsegu ('+(o.odstupanje>0?'+':'')+brojF(o.odstupanje,1)+'%).</div></div>';
+    }
+  }
+
+  /* --- troškovi --- */
+  h += '<div class="sekcija-naslov">Troškovi ('+t.troskovi.length+')</div>';
+  h += '<div class="karta"><div class="karta-telo">';
+  if(!t.troskovi.length) h += '<div style="color:var(--tekst-3);font-size:14px">Nema unetih troškova.</div>';
+  t.troskovi.forEach(tr=>{
+    h += '<div class="trosak">'+
+      '<div class="ik">'+I(VRSTE[tr.vrsta].ik,18)+'</div>'+
+      '<div class="sred"><div class="n1">'+esc(VRSTE[tr.vrsta].n)+'</div>'+
+        '<div class="n2">'+esc(tr.vreme)+' · '+esc(PLACANJA[tr.nacin].k)+
+        (tr.vrsta==='gorivo'&&tr.litri?' · '+brojF(tr.litri,1)+' L na '+brojF(tr.km,0)+' km':'')+
+        (tr.racun?'':' · <span style="color:var(--crvena)">bez računa</span>')+'</div></div>'+
+      '<div class="iz">'+brojF(tr.iznos, tr.val==='RSD'?0:2)+'<small>'+tr.val+'</small></div>'+
+    '</div>';
+  });
+  h += '</div></div>';
+
+  /* --- dokazi --- */
+  const dokazi = [];
+  dokazi.push({l:'Km polazak', ik:'slika'});
+  if(t.km_kraj!=null) dokazi.push({l:'Km povratak', ik:'slika'});
+  t.troskovi.forEach(tr=>{
+    if(tr.racun) dokazi.push({l:'Račun · '+VRSTE[tr.vrsta].n.split(' ')[0], ik:'racun'});
+    if(tr.slip)  dokazi.push({l:'Slip', ik:'kartica'});
+  });
+  t.prijave.forEach(p=>{ if(p.foto) dokazi.push({l:'Prijava', ik:'alarm'}); });
+
+  h += '<div class="sekcija-naslov">Računi, slipovi i fotografije ('+dokazi.length+')</div>';
+  h += '<div class="galerija" style="margin-bottom:12px">'+
+    dokazi.map(d=>'<div class="dokaz" onclick="poruka(\'Otvara se fotografija: '+esc(d.l)+'\',\'slika\')">'+
+      '<div class="sim">'+I(d.ik,26)+'</div><div class="lab">'+esc(d.l)+'</div></div>').join('')+
+  '</div>';
+
+  /* --- prijave --- */
+  h += '<div class="sekcija-naslov">Prijave sa terena ('+t.prijave.length+')</div>';
+  if(!t.prijave.length){
+    h += '<div class="karta"><div class="karta-telo" style="color:var(--tekst-3);font-size:14px">Nema prijava.</div></div>';
+  } else {
+    t.prijave.forEach(p=>{
+      h += '<div class="karta"><div class="karta-telo">'+
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
+          '<div style="width:32px;height:32px;border-radius:8px;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center">'+I(TIPOVI_PRIJAVE[p.tip].ik,17)+'</div>'+
+          '<div><div style="font-size:15px;font-weight:700">'+esc(TIPOVI_PRIJAVE[p.tip].n)+'</div>'+
+          '<div style="font-size:12px;color:var(--tekst-3)">'+esc(p.vreme)+(p.foto?' · sa fotografijom':'')+'</div></div>'+
+        '</div>'+
+        '<div style="font-size:15px;line-height:1.5">'+esc(p.opis)+'</div>'+
+      '</div></div>';
+    });
+  }
+
+  /* --- kontrolne liste --- */
+  h += '<div class="sekcija-naslov">Potvrde šefa ekipe</div>';
+  h += '<div class="karta"><div class="karta-telo">'+
+    cekRed('Vozilo provereno na polasku', t.pp.vozilo)+
+    cekRed('Gorivo provereno', t.pp.gorivo)+
+    cekRed('Teret obezbeđen', t.pp.teret)+
+    (t.nap_polazak?'<div class="napomena upozorenje" style="margin:10px 0 0">'+I('olovka',18)+'<div>'+esc(t.nap_polazak)+'</div></div>':'')+
+    (t.pk ? '<div style="height:1px;background:var(--linija);margin:12px 0"></div>'+
+      cekRed('Vozilo provereno na povratku', t.pk.vozilo)+
+      cekRed('Kabina i tovarni prostor uredni', t.pk.kabina)+
+      cekRed('Alat i materijal vraćeni', t.pk.alat)+
+      cekRed('Svi računi uneti', t.pk.racuni)+
+      (t.nap_povratak?'<div class="napomena upozorenje" style="margin:10px 0 0">'+I('olovka',18)+'<div>'+esc(t.nap_povratak)+'</div></div>':'')
+    : '')+
+  '</div></div>';
+
+  /* --- admin akcije --- */
+  if(!zaSefa && (t.status==='pregled' || t.status==='ispravka')){
+    h += '<div class="sekcija-naslov">Odluka</div>';
+    h += '<div style="display:grid;gap:10px;margin-bottom:20px">'+
+      '<button class="dugme d-zeleno" onclick="odobri('+t.id+')">'+I('cek',20)+' Odobri izveštaj</button>'+
+      '<button class="dugme d-obrub" onclick="otvoriVracanje('+t.id+')">'+I('vrati',20)+' Vrati na ispravku</button>'+
+    '</div>';
+  }
+  if(zaSefa && t.status==='ispravka'){
+    h += '<div class="dno-akcija"><button class="dugme d-zlato" onclick="poruka(\'Prototip: ovde se otvara ispravka unosa\',\'olovka\')">'+I('olovka',20)+' Ispravi izveštaj</button></div>';
+  }
+
+  h += '</div>';
+  return h;
+}
+function cekRed(t, ok){
+  return '<div style="display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14.5px">'+
+    '<span style="color:'+(ok?'var(--zelena)':'var(--crvena)')+';display:flex">'+I(ok?'cek':'alarm',17)+'</span>'+
+    '<span style="'+(ok?'':'color:var(--crvena);font-weight:600')+'">'+esc(t)+'</span></div>';
+}
+function novacTabela(redovi){
+  return redovi.map(r=>{
+    const [n, e, rs] = r;
+    const fe = (e==null)?'—':brojF(e,2)+' EUR';
+    const fr = (rs==null)?'—':brojF(rs,0)+' RSD';
+    return '<div class="red"><span class="k">'+esc(n)+'</span><span class="v mono">'+fe+'<br>'+fr+'</span></div>';
+  }).join('');
+}
+function razlikaRed(de, dr){
+  if(Math.abs(de)<0.01 && Math.abs(dr)<1){
+    return '<div class="napomena" style="margin:12px 0 0;background:var(--zelena-bg);border-color:#C9E3D6;color:#1F5A3B">'+I('cek',18)+'<div>Vraćeni iznosi se slažu sa obračunom.</div></div>';
+  }
+  const d = [];
+  if(Math.abs(de)>=0.01) d.push((de>0?'višak ':'manjak ')+brojF(Math.abs(de),2)+' EUR');
+  if(Math.abs(dr)>=1)    d.push((dr>0?'višak ':'manjak ')+brojF(Math.abs(dr),0)+' RSD');
+  return '<div class="napomena upozorenje" style="margin:12px 0 0">'+I('alarm',18)+'<div>Razlika: <b>'+d.join(', ')+'</b> – proveriti sa šefom ekipe.</div></div>';
+}
+function odobri(id){
+  const t = teren(id);
+  t.status = 'odobren';
+  t.odobrio = 'Kancelarija · 25.07.2026.';
+  poruka('Izveštaj je odobren');
+  idi('admin',{tab:'odobren'});
+}
+function otvoriVracanje(id){
+  S.n.vracanje = id; S.n.komentar='';
+  crtaj();
+}
+function modalVracanje(){
+  return '<div class="zavesa" onclick="if(event.target===this){S.n.vracanje=null;crtaj()}">'+
+    '<div class="modal">'+
+      '<h3>Vrati na ispravku</h3>'+
+      '<p>Šef ekipe će videti tvoj komentar i ispraviti izveštaj.</p>'+
+      '<textarea class="unos" placeholder="npr. Fali račun za gorivo od 15.07." oninput="upisi(\'komentar\',this.value)">'+esc(S.n.komentar||'')+'</textarea>'+
+      '<div style="display:grid;gap:9px;margin-top:14px">'+
+        '<button class="dugme d-glavno" onclick="potvrdiVracanje()">Pošalji na ispravku</button>'+
+        '<button class="dugme d-obrub d-malo" onclick="S.n.vracanje=null;crtaj()">Odustani</button>'+
+      '</div>'+
+    '</div></div>';
+}
+function potvrdiVracanje(){
+  if(!S.n.komentar || S.n.komentar.trim().length<3){ poruka('Napiši komentar','alarm'); return; }
+  const t = teren(S.n.vracanje);
+  t.status='ispravka'; t.komentar_admina = S.n.komentar;
+  S.n = {};
+  poruka('Izveštaj je vraćen na ispravku');
+  idi('admin',{tab:'ispravka'});
+}
+
+/* ============================================================
+   15. EKRAN: VOZILA (ADMIN)
+   ============================================================ */
+function scVozila(){
+  let h = '<div class="top"><div class="rast"><div class="marka">Prohoreca AG group</div><div class="naslov">Vozila</div></div>'+
+    '<div class="avatar" onclick="odjava()">'+I('stit',18)+'</div></div>';
+  h += '<div class="sadrzaj">';
+  h += '<div class="napomena">'+I('grafik',18)+'<div>Očekivana potrošnja se koristi samo kao <b>orijentir za proveru</b> izveštaja.</div></div>';
+  DB.vozila.forEach(v=>{
+    h += '<div class="karta"><div class="karta-telo">'+
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'+
+        '<div style="width:44px;height:44px;border-radius:10px;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center">'+I('kamion',22)+'</div>'+
+        '<div><div style="font-size:16px;font-weight:700">'+esc(v.naziv)+'</div>'+
+        '<div style="font-size:13px;color:var(--tekst-2)">'+esc(v.reg)+'</div></div></div>'+
+      '<label class="nalepnica">Očekivana prosečna potrošnja</label>'+
+      '<div class="unos-sa-sufiksom"><input class="unos" type="number" step="0.1" value="'+v.potrosnja+'" onchange="DB.vozila.find(x=>x.id==='+v.id+').potrosnja=parseFloat(this.value);poruka(\'Sačuvano\')"><span class="sufiks">L/100</span></div>'+
+    '</div></div>';
+  });
+  h += '<button class="dugme d-obrub" onclick="poruka(\'Prototip: forma za novo vozilo\',\'plus\')">'+I('plus',20)+' Dodaj vozilo</button>';
+  h += '</div>'+navAdmin('vozila');
+  return h;
+}
+
+/* ============================================================
+   16. EKRAN: KORISNICI (ADMIN)
+   ============================================================ */
+function scKorisnici(){
+  let h = '<div class="top"><div class="rast"><div class="marka">Prohoreca AG group</div><div class="naslov">Korisnici</div></div>'+
+    '<div class="avatar" onclick="odjava()">'+I('stit',18)+'</div></div>';
+  h += '<div class="sadrzaj">';
+  DB.korisnici.forEach(k=>{
+    const br = DB.tereni.filter(t=>t.sef===k.id).length;
+    h += '<div class="karta"><div class="karta-telo" style="display:flex;align-items:center;gap:12px">'+
+      '<div style="width:44px;height:44px;border-radius:50%;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center;font-weight:700;flex:none">'+
+        esc(k.ime.split(' ').map(x=>x[0]).join(''))+'</div>'+
+      '<div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:700">'+esc(k.ime)+'</div>'+
+        '<div style="font-size:13px;color:var(--tekst-2)">'+esc(k.kime)+' · '+esc(k.tel)+'</div></div>'+
+      '<span class="oznaka '+(k.uloga==='admin'?'o-siva':'o-plava')+'">'+(k.uloga==='admin'?'Administrator':'Šef ekipe')+'</span>'+
+    '</div>'+(k.uloga==='sef'?'<div style="padding:0 16px 14px"><span class="cip">'+br+' terena</span></div>':'')+'</div>';
+  });
+  h += '<button class="dugme d-obrub" onclick="poruka(\'Prototip: forma za novog korisnika\',\'plus\')">'+I('plus',20)+' Dodaj korisnika</button>';
+  h += '</div>'+navAdmin('korisnici');
+  return h;
+}
+
+/* ============================================================
+   17. RUTER
+   ============================================================ */
+function crtaj(){
+  const app = document.getElementById('app');
+  let h = '';
+  if(S.ekran !== 'prijava'){
+    h += '<div class="demo-traka">PROTOTIP – prikazani podaci su izmišljeni</div>';
+  }
+  switch(S.ekran){
+    case 'prijava':      h += scPrijava(); break;
+    case 'pocetna':      h += scPocetna(); break;
+    case 'polazak':      h += scPolazak(); break;
+    case 'trosak':       h += scTrosak(); break;
+    case 'prijava_ter':  h += scPrijavaTeren(); break;
+    case 'povratak':     h += scPovratak(); break;
+    case 'moji':         h += scMoji(); break;
+    case 'admin':        h += scAdmin(); break;
+    case 'vozila':       h += scVozila(); break;
+    case 'korisnici':    h += scKorisnici(); break;
+    case 'izvestaj':     h += scIzvestaj(false); break;
+    case 'izvestaj_sef': h += scIzvestaj(true); break;
+    default:             h += scPrijava();
+  }
+  if(S.n.vracanje) h += modalVracanje();
+  app.innerHTML = h;
+}
+
+crtaj();
+</script>
+</body>
+</html>
