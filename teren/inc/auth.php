@@ -50,6 +50,12 @@ function trazi_admina(): array
     return $k;
 }
 
+/** Koliko ima uključenih administratorskih naloga. */
+function broj_aktivnih_admina(): int
+{
+    return (int)vrednost('SELECT COUNT(*) FROM korisnici WHERE uloga = "admin" AND aktivan = 1');
+}
+
 function prijavi(string $korisnicko, string $lozinka): bool
 {
     $k = red('SELECT * FROM korisnici WHERE korisnicko_ime = ? AND aktivan = 1', [$korisnicko]);

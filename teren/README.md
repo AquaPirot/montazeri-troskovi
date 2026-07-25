@@ -78,6 +78,57 @@ u Chrome-u na Androidu otvoriti adresu → meni ⋮ → *Dodaj na početni ekran
 
 ---
 
+## Prijava
+
+Svi se prijavljuju **na istoj adresi** — nema odvojenog ulaza za administratore.
+Unosi se korisničko ime i lozinka, a aplikacija po ulozi vodi na odgovarajući ekran:
+
+| Uloga            | Šta vidi posle prijave                                     |
+|------------------|------------------------------------------------------------|
+| Šef ekipe        | Početni ekran sa četiri dugmeta                             |
+| Administrator    | Pregled terena, sa donjom navigacijom Tereni / Vozila / Korisnici |
+
+Sesija traje dok se pregledač ne zatvori. Odjava i promena sopstvene lozinke su
+iza kruga sa inicijalima gore desno.
+
+Zaboravljenu lozinku ne resetuje sam korisnik — administrator je postavlja
+u ekranu **Korisnici**.
+
+---
+
+## Izmena podataka
+
+### Šefovi ekipa i administratori
+
+**Korisnici** → dodirni *Izmeni podatke, lozinku ili stanje naloga* ispod korisnika.
+
+- **Ime i prezime** – menja se svuda u aplikaciji, i na starim izveštajima
+- **Korisničko ime** – važi odmah; sa starim se više ne može prijaviti
+- **Telefon**
+- **Uloga** – Šef ekipe ili Administrator
+- **Nova lozinka** – administrator je postavlja bez znanja stare
+- **Isključi nalog** – korisnik se više ne može prijaviti, ali njegovi
+  izveštaji ostaju sačuvani
+
+Tri zaštite od zaključavanja i gubitka podataka:
+
+- sopstvenu ulogu administrator ne može da promeni, niti sam sebe da isključi
+- poslednji uključeni administrator ne može da bude degradiran ni isključen
+- korisnik koji je trenutno na terenu ne može da bude isključen ni prebačen
+  u administratora dok se teren ne zatvori
+
+Korisnici se **ne brišu** — nalog se isključuje, da izveštaji ne bi ostali
+bez vlasnika.
+
+### Vozila
+
+**Vozila** → dodirni vozilo → *Izmeni naziv i registraciju*.
+
+Na istom ekranu su i očekivana prosečna potrošnja i dugme *Isključi iz upotrebe*,
+koje sklanja vozilo iz izbora pri polasku, a čuva svu istoriju i servisnu knjigu.
+
+---
+
 ## Kako radi
 
 ### Šef monterske ekipe

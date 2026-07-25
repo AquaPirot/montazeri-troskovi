@@ -19,6 +19,23 @@ if (je_post()) {
     proveri_csrf();
     $akcija = post('akcija');
 
+    /* --- naziv i registracija --- */
+    if ($akcija === 'izmeni') {
+        $naziv = post('naziv');
+        $reg   = post('registracija');
+
+        if ($naziv === '')            $greske[] = 'Unesi naziv vozila.';
+        if (mb_strlen($naziv) > 100)  $greske[] = 'Naziv vozila je predugačak.';
+        if ($reg === '')              $greske[] = 'Unesi registraciju.';
+        if (mb_strlen($reg) > 30)     $greske[] = 'Registarska oznaka je predugačka.';
+
+        if (!$greske) {
+            upit('UPDATE vozila SET naziv = ?, registracija = ? WHERE id = ?', [$naziv, $reg, $v['id']]);
+            postavi_poruku('Podaci o vozilu su sačuvani.');
+            idi('vozilo', ['id' => (int)$v['id']]);
+        }
+    }
+
     /* --- očekivana potrošnja --- */
     if ($akcija === 'potrosnja') {
         $pot = postBroj('ocekivana_potrosnja');
@@ -125,6 +142,23 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
         </div>
     <?php endif; ?>
     <div class="red"><span class="k">Zatvorenih terena</span><span class="v mono"><?= (int)$st['broj_terena'] ?></span></div>
+
+    <details style="margin-top:12px">
+        <summary class="sitno" style="cursor:pointer;font-weight:600;color:var(--tekst-2)">Izmeni naziv i registraciju</summary>
+        <form method="post" style="margin-top:10px">
+            <?= csrf_polje() ?>
+            <input type="hidden" name="akcija" value="izmeni">
+            <div class="polje">
+                <label for="nz">Naziv</label>
+                <input class="unos" id="nz" name="naziv" maxlength="100" required value="<?= h($v['naziv']) ?>">
+            </div>
+            <div class="polje">
+                <label for="rg">Registracija</label>
+                <input class="unos" id="rg" name="registracija" maxlength="30" required value="<?= h($v['registracija']) ?>">
+            </div>
+            <button class="dugme d-glavno d-malo" type="submit"><?= ikona('cek', 18) ?> Sačuvaj podatke</button>
+        </form>
+    </details>
 </div></div>
 
 <?php if ($danaReg !== null): ?>

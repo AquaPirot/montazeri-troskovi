@@ -30,6 +30,44 @@ if (je_post()) {
         }
     }
 
+    if ($akcija === 'izmeni') {
+        $id   = postCeo('korisnik_id');
+        $k    = $id ? red('SELECT * FROM korisnici WHERE id = ?', [$id]) : null;
+        $ime  = post('ime');
+        $kime = mb_strtolower(post('korisnicko_ime'));
+        $tel  = post('telefon');
+        $ulog = post('uloga') === 'admin' ? 'admin' : 'sef';
+
+        if (!$k) {
+            $greske[] = 'Korisnik nije pronađen.';
+        } else {
+            // Svoju ulogu administrator ne menja – da ne bi ostao bez pristupa.
+            if ($id === (int)$ja['id']) $ulog = $k['uloga'];
+
+            if ($ime === '')                                 $greske[] = 'Unesi ime i prezime.';
+            if (!preg_match('/^[a-z0-9._-]{3,50}$/', $kime))  $greske[] = 'Korisničko ime: 3–50 znakova, mala slova, brojevi, tačka, crta ili donja crta.';
+            if (!$greske && vrednost('SELECT COUNT(*) FROM korisnici WHERE korisnicko_ime = ? AND id <> ?', [$kime, $id]))
+                                                             $greske[] = 'To korisničko ime već koristi neko drugi.';
+
+            // Poslednji uključeni administrator mora da ostane administrator.
+            if (!$greske && $k['uloga'] === 'admin' && (int)$k['aktivan'] === 1
+                && $ulog !== 'admin' && broj_aktivnih_admina() <= 1)
+                $greske[] = 'Ovo je jedini administrator. Prvo dodaj drugog pa onda promeni ulogu.';
+
+            // Šef koji je na terenu ne može da postane administrator (teren bi ostao bez vlasnika ekrana).
+            if (!$greske && $k['uloga'] === 'sef' && $ulog === 'admin'
+                && vrednost('SELECT COUNT(*) FROM tereni WHERE korisnik_id = ? AND status = "aktivan"', [$id]))
+                $greske[] = 'Taj korisnik je trenutno na terenu. Prvo se teren mora zatvoriti.';
+        }
+
+        if (!$greske) {
+            upit('UPDATE korisnici SET ime = ?, korisnicko_ime = ?, telefon = ?, uloga = ? WHERE id = ?',
+                 [$ime, $kime, $tel !== '' ? $tel : null, $ulog, $id]);
+            postavi_poruku('Podaci su sačuvani.');
+            idi('korisnici');
+        }
+    }
+
     if ($akcija === 'lozinka') {
         $id  = postCeo('korisnik_id');
         $loz = (string)($_POST['lozinka'] ?? '');
@@ -44,12 +82,15 @@ if (je_post()) {
 
     if ($akcija === 'stanje') {
         $id = postCeo('korisnik_id');
+        $k  = $id ? red('SELECT * FROM korisnici WHERE id = ?', [$id]) : null;
         if ($id === (int)$ja['id']) {
             postavi_poruku('Ne možeš da isključiš sopstveni nalog.', 'greska');
-        } elseif ($id) {
+        } elseif ($k) {
             $aktivnih = (int)vrednost('SELECT COUNT(*) FROM tereni WHERE korisnik_id = ? AND status = "aktivan"', [$id]);
             if ($aktivnih > 0) {
                 postavi_poruku('Taj korisnik ima otvoren teren. Prvo se teren mora zatvoriti.', 'greska');
+            } elseif ($k['uloga'] === 'admin' && (int)$k['aktivan'] === 1 && broj_aktivnih_admina() <= 1) {
+                postavi_poruku('Ovo je jedini administrator. Nalog ne može da se isključi.', 'greska');
             } else {
                 upit('UPDATE korisnici SET aktivan = 1 - aktivan WHERE id = ?', [$id]);
                 postavi_poruku('Sačuvano.');
@@ -92,14 +133,52 @@ pocetak_strane('Korisnici');
         </div>
 
         <details style="margin-top:12px">
-            <summary class="sitno" style="cursor:pointer;font-weight:600;color:var(--tekst-2)">Promeni lozinku ili stanje naloga</summary>
-            <form method="post" style="margin-top:10px">
+            <summary class="sitno" style="cursor:pointer;font-weight:600;color:var(--tekst-2)">Izmeni podatke, lozinku ili stanje naloga</summary>
+
+            <div class="razdelnik"></div>
+            <form method="post">
+                <?= csrf_polje() ?>
+                <input type="hidden" name="akcija" value="izmeni">
+                <input type="hidden" name="korisnik_id" value="<?= (int)$kk['id'] ?>">
+                <div class="polje">
+                    <label for="i<?= (int)$kk['id'] ?>">Ime i prezime</label>
+                    <input class="unos" id="i<?= (int)$kk['id'] ?>" name="ime" maxlength="100" required
+                           value="<?= h($kk['ime']) ?>">
+                </div>
+                <div class="polje">
+                    <label for="u<?= (int)$kk['id'] ?>">Korisničko ime <span class="opc">(za prijavu)</span></label>
+                    <input class="unos" id="u<?= (int)$kk['id'] ?>" name="korisnicko_ime" maxlength="50" required
+                           autocapitalize="none" value="<?= h($kk['korisnicko_ime']) ?>">
+                </div>
+                <div class="polje">
+                    <label for="t<?= (int)$kk['id'] ?>">Telefon <span class="opc">(nije obavezno)</span></label>
+                    <input class="unos" id="t<?= (int)$kk['id'] ?>" name="telefon" maxlength="30"
+                           value="<?= h($kk['telefon']) ?>">
+                </div>
+                <div class="polje">
+                    <label for="r<?= (int)$kk['id'] ?>">Uloga</label>
+                    <?php if ((int)$kk['id'] === (int)$ja['id']): ?>
+                        <input class="unos" value="Administrator (sopstveni nalog)" disabled>
+                        <div class="sitno" style="margin-top:6px">Sopstvenu ulogu ne možeš da promeniš.</div>
+                    <?php else: ?>
+                        <select class="unos" id="r<?= (int)$kk['id'] ?>" name="uloga">
+                            <option value="sef"   <?= $kk['uloga'] === 'sef'   ? 'selected' : '' ?>>Šef ekipe</option>
+                            <option value="admin" <?= $kk['uloga'] === 'admin' ? 'selected' : '' ?>>Administrator</option>
+                        </select>
+                    <?php endif; ?>
+                </div>
+                <button class="dugme d-glavno d-malo" type="submit"><?= ikona('cek', 18) ?> Sačuvaj podatke</button>
+            </form>
+
+            <div class="razdelnik"></div>
+            <form method="post">
                 <?= csrf_polje() ?>
                 <input type="hidden" name="akcija" value="lozinka">
                 <input type="hidden" name="korisnik_id" value="<?= (int)$kk['id'] ?>">
+                <label class="nalepnica" for="l<?= (int)$kk['id'] ?>">Nova lozinka</label>
                 <div style="display:flex;gap:8px">
-                    <input class="unos" name="lozinka" type="text" minlength="6" required
-                           autocomplete="new-password" placeholder="nova lozinka" style="flex:1">
+                    <input class="unos" id="l<?= (int)$kk['id'] ?>" name="lozinka" type="text" minlength="6" required
+                           autocomplete="new-password" placeholder="najmanje 6 znakova" style="flex:1">
                     <button class="dugme d-glavno d-malo" type="submit" style="width:auto;padding-left:18px;padding-right:18px">Sačuvaj</button>
                 </div>
             </form>

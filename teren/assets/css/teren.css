@@ -147,6 +147,16 @@ a{color:inherit;text-decoration:none}
 .unos[type=number]{-moz-appearance:textfield;appearance:textfield}
 .unos[type=number]::-webkit-outer-spin-button,
 .unos[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+select.unos{
+  appearance:none;-webkit-appearance:none;padding-right:44px;cursor:pointer;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235C636D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;
+}
+.unos:disabled{background:#F4F5F6;color:var(--tekst-3)}
+details > summary{list-style:none}
+details > summary::-webkit-details-marker{display:none}
+details > summary::before{content:'▸ ';color:var(--zlatna)}
+details[open] > summary::before{content:'▾ '}
 .unos.veliki{font-size:22px;font-weight:700}
 textarea.unos{min-height:88px;resize:vertical;font-size:16px;line-height:1.5}
 .unos-sa-sufiksom{position:relative}
