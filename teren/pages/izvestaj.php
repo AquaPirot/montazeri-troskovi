@@ -209,7 +209,7 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
     </div></div>
 </div>
 
-<div class="karta <?= ($o['lic_eur'] > 0 || $o['lic_rsd'] > 0) ? 'zlatni-okvir' : '' ?>">
+<div class="karta <?= ($o['lic_eur'] > 0 || $o['lic_rsd'] > 0) ? 'istaknut-okvir' : '' ?>">
     <div class="karta-zaglavlje"><?= ikona('novcanik', 16) ?> Lični novac zaposlenog</div>
     <div class="karta-telo"><div class="novac-mreza">
         <div class="novac <?= $o['lic_eur'] > 0 ? 'negativno' : '' ?>">
@@ -318,7 +318,7 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
 <?php else: foreach ($prijave as $p): ?>
     <div class="karta"><div class="karta-telo">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            <span style="width:32px;height:32px;border-radius:8px;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center;flex:none">
+            <span style="width:32px;height:32px;border-radius:8px;background:var(--tamna);color:var(--akcenat);display:flex;align-items:center;justify-content:center;flex:none">
                 <?= ikona(TIPOVI_PRIJAVE[$p['tip']]['ik'], 17) ?>
             </span>
             <span>
@@ -356,7 +356,7 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
 <?php if ($jeAdmin && in_array($t['status'], ['aktivan', 'pregled', 'ispravka'], true)): ?>
     <div class="sekcija-naslov">Unos kancelarije</div>
     <div class="dugmad">
-        <a class="dugme d-zlato" href="index.php?s=admin_gorivo&teren=<?= (int)$t['id'] ?>">
+        <a class="dugme d-akcenat" href="index.php?s=admin_gorivo&teren=<?= (int)$t['id'] ?>">
             <?= ikona('gorivo', 20) ?> Dodaj sipanje goriva
         </a>
     </div>
@@ -395,7 +395,7 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
         <a class="dugme d-obrub" href="index.php?s=doplata&teren=<?= (int)$t['id'] ?>"><?= ikona('novac', 20) ?> Dodaj primljeni novac</a>
         <a class="dugme d-obrub" href="index.php?s=trosak&teren=<?= (int)$t['id'] ?>"><?= ikona('plus', 20) ?> Dodaj trošak koji fali</a>
         <a class="dugme d-obrub" href="index.php?s=prijavi&teren=<?= (int)$t['id'] ?>"><?= ikona('alarm', 20) ?> Dodaj prijavu</a>
-        <a class="dugme d-zlato" href="index.php?s=povratak&teren=<?= (int)$t['id'] ?>"><?= ikona('olovka', 20) ?> Ispravi i pošalji ponovo</a>
+        <a class="dugme d-akcenat" href="index.php?s=povratak&teren=<?= (int)$t['id'] ?>"><?= ikona('olovka', 20) ?> Ispravi i pošalji ponovo</a>
     </div>
 <?php endif; ?>
 

@@ -125,7 +125,7 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
 <!-- ================= OSNOVNO ================= -->
 <div class="karta"><div class="karta-telo">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-        <span style="width:48px;height:48px;border-radius:12px;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center;flex:none">
+        <span style="width:48px;height:48px;border-radius:12px;background:var(--tamna);color:var(--akcenat);display:flex;align-items:center;justify-content:center;flex:none">
             <?= ikona('kamion', 24) ?>
         </span>
         <span style="flex:1;min-width:0">
@@ -233,7 +233,7 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
 <?php else: foreach ($knjiga as $s): ?>
     <div class="karta"><div class="karta-telo">
         <div style="display:flex;align-items:flex-start;gap:11px">
-            <span style="width:36px;height:36px;border-radius:8px;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center;flex:none">
+            <span style="width:36px;height:36px;border-radius:8px;background:var(--tamna);color:var(--akcenat);display:flex;align-items:center;justify-content:center;flex:none">
                 <?= ikona(VRSTE_SERVISA[$s['vrsta']]['ik'], 18) ?>
             </span>
             <span style="flex:1;min-width:0">
@@ -321,8 +321,8 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
             <div class="dva iznos">
                 <input class="unos" id="tr" name="trosak" type="text" inputmode="decimal" placeholder="0,00" value="<?= h(post('trosak')) ?>">
                 <div class="plocice k2" style="gap:6px">
-                    <?= plocica('valuta', 'RSD', 'RSD', post('valuta', 'RSD') === 'RSD', '', 'zlato valuta') ?>
-                    <?= plocica('valuta', 'EUR', 'EUR', post('valuta') === 'EUR', '', 'zlato valuta') ?>
+                    <?= plocica('valuta', 'RSD', 'RSD', post('valuta', 'RSD') === 'RSD', '', 'akcenat valuta') ?>
+                    <?= plocica('valuta', 'EUR', 'EUR', post('valuta') === 'EUR', '', 'akcenat valuta') ?>
                 </div>
             </div>
         </div>
@@ -331,7 +331,7 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
             <?= foto_polje('foto', 'Dodaj fotografiju računa', 'Nije obavezno') ?>
         </div>
 
-        <button class="dugme d-zlato" type="submit"><?= ikona('plus', 20) ?> Upiši u servisnu knjigu</button>
+        <button class="dugme d-akcenat" type="submit"><?= ikona('plus', 20) ?> Upiši u servisnu knjigu</button>
     </form>
 </div></div>
 

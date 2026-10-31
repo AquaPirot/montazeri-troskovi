@@ -350,3 +350,20 @@ function obrisi_foto(?string $naziv): void
     $p = folder_uploada() . '/' . $naziv;
     if (is_file($p)) @unlink($p);
 }
+
+/** "Đorđe Čolić" -> "djordje.colic", uz broj na kraju ako je već zauzeto. */
+function slobodno_korisnicko_ime(string $ime): string
+{
+    $mapa = ['č'=>'c','ć'=>'c','š'=>'s','ž'=>'z','đ'=>'dj','Č'=>'c','Ć'=>'c','Š'=>'s','Ž'=>'z','Đ'=>'dj'];
+    $osnova = mb_strtolower(strtr(trim($ime), $mapa), 'UTF-8');
+    $osnova = preg_replace('/[^a-z0-9]+/', '.', $osnova);
+    $osnova = trim($osnova, '.');
+    if (strlen($osnova) < 3) $osnova = 'korisnik';
+    $osnova = substr($osnova, 0, 44);
+
+    $kime = $osnova;
+    for ($i = 2; vrednost('SELECT COUNT(*) FROM korisnici WHERE korisnicko_ime = ?', [$kime]); $i++) {
+        $kime = $osnova . $i;
+    }
+    return $kime;
+}

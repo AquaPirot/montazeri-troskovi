@@ -75,8 +75,8 @@ pocetak_strane('Dodaj primljeni novac', ['nazad' => $nazad]);
             <input class="unos veliki" id="di" name="iznos" type="text" required
                    inputmode="decimal" placeholder="0" value="<?= h(post('iznos')) ?>">
             <div class="plocice k2" style="gap:6px">
-                <?= plocica('valuta', 'EUR', 'EUR', $izValuta === 'EUR', '', 'zlato valuta') ?>
-                <?= plocica('valuta', 'RSD', 'RSD', $izValuta === 'RSD', '', 'zlato valuta') ?>
+                <?= plocica('valuta', 'EUR', 'EUR', $izValuta === 'EUR', '', 'akcenat valuta') ?>
+                <?= plocica('valuta', 'RSD', 'RSD', $izValuta === 'RSD', '', 'akcenat valuta') ?>
             </div>
         </div>
     </div>
@@ -93,7 +93,7 @@ pocetak_strane('Dodaj primljeni novac', ['nazad' => $nazad]);
 </div></div>
 
 <div class="dno-akcija">
-    <button class="dugme d-zlato" type="submit"><?= ikona('plus', 20) ?> Sačuvaj primljeni novac</button>
+    <button class="dugme d-akcenat" type="submit"><?= ikona('plus', 20) ?> Sačuvaj primljeni novac</button>
 </div>
 </form>
 <?php kraj_strane(); ?>

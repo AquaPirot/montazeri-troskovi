@@ -88,8 +88,8 @@ pocetak_strane('Dodaj trošak', ['nazad' => $nazad]);
             <input class="unos veliki" id="iz" name="iznos" type="text" required
                    inputmode="decimal" placeholder="0,00" value="<?= h(post('iznos')) ?>">
             <div class="plocice k2" style="gap:6px">
-                <?= plocica('valuta', 'EUR', 'EUR', $izVal === 'EUR', '', 'zlato valuta') ?>
-                <?= plocica('valuta', 'RSD', 'RSD', $izVal === 'RSD', '', 'zlato valuta') ?>
+                <?= plocica('valuta', 'EUR', 'EUR', $izVal === 'EUR', '', 'akcenat valuta') ?>
+                <?= plocica('valuta', 'RSD', 'RSD', $izVal === 'RSD', '', 'akcenat valuta') ?>
             </div>
         </div>
         <div class="sitno" style="margin-top:7px">Za 1.650 dinara možeš uneti: <b>1650</b>, <b>1.650</b> ili <b>1,650</b>.</div>
@@ -105,8 +105,8 @@ pocetak_strane('Dodaj trošak', ['nazad' => $nazad]);
     </div>
 </div></div>
 
-<div class="karta zlatni-okvir" data-prikazi-ako="vrsta=gorivo" <?= $izVrsta === 'gorivo' ? '' : 'hidden' ?>>
-    <div class="karta-zaglavlje" style="color:var(--zlatna);border-color:#EFE2C8">
+<div class="karta istaknut-okvir" data-prikazi-ako="vrsta=gorivo" <?= $izVrsta === 'gorivo' ? '' : 'hidden' ?>>
+    <div class="karta-zaglavlje" style="color:var(--akcenat);border-color:#DBE7FB">
         <?= ikona('gorivo', 16) ?> Podaci o sipanju
     </div>
     <div class="karta-telo"><div class="dva">
@@ -148,7 +148,7 @@ pocetak_strane('Dodaj trošak', ['nazad' => $nazad]);
 </div>
 
 <div class="dno-akcija">
-    <button class="dugme d-zlato" type="submit"><?= ikona('plus', 20) ?> Sačuvaj trošak</button>
+    <button class="dugme d-akcenat" type="submit"><?= ikona('plus', 20) ?> Sačuvaj trošak</button>
 </div>
 </form>
 <?php kraj_strane(); ?>

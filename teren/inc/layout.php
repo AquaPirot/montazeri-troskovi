@@ -64,28 +64,62 @@ function pocetak_strane(string $naslov, array $o = []): void
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#22252A">
+<meta name="theme-color" content="#0F172A">
 <meta name="robots" content="noindex, nofollow">
-<title><?= h($naslov) ?> · <?= h($p['naziv']) ?></title>
-<link rel="stylesheet" href="assets/css/teren.css?v=2">
+<title><?= h($naslov) ?> · AG GROUP Teren</title>
+<link rel="stylesheet" href="assets/css/teren.css?v=3">
 </head>
-<body>
+<?php
+    $jeAdmin = $k && $k['uloga'] === 'admin';
+    $klase = [];
+    if (!empty($o['bez_zaglavlja'])) $klase[] = 'ulaz';
+    elseif ($jeAdmin) {
+        $klase[] = ($o['sirina'] ?? '') === 'siroka' ? 'siroka' : 'srednja';
+        $klase[] = 'ima-top-nav';
+    }
+?>
+<body class="<?= h(implode(' ', $klase)) ?>">
 <div id="app">
 <?php if (!empty($o['bez_zaglavlja'])) { return; } ?>
-<div class="top">
+<header class="top">
     <?php if (!empty($o['nazad'])): ?>
         <a class="nazad" href="<?= h($o['nazad']) ?>" aria-label="Nazad"><?= ikona('nazad', 20) ?></a>
+    <?php else: ?>
+        <span class="logo"><?= ikona('kamion', 20) ?></span>
     <?php endif; ?>
     <div class="rast">
-        <div class="marka">Prohoreca AG group</div>
         <div class="naslov"><?= h($o['naslov_gore'] ?? $naslov) ?></div>
+        <div class="marka">AG GROUP · Teren</div>
     </div>
+    <?php if ($jeAdmin) echo meni_admin_gore(); ?>
     <?php if ($k): ?>
-        <a class="avatar" href="index.php?s=nalog" aria-label="Nalog"><?= h(inicijali($k['ime'])) ?></a>
+        <a class="korisnik-pil" href="index.php?s=nalog" aria-label="Moj nalog">
+            <i class="tacka"></i><span><?= h(explode(' ', trim($k['ime']))[0]) ?></span>
+        </a>
+        <form method="post" action="index.php?s=odjava" style="margin:0">
+            <?= csrf_polje() ?>
+            <button class="odjava-dugme" type="submit">Odjava</button>
+        </form>
     <?php endif; ?>
-</div>
+</header>
 <?php
     poruka_html();
+}
+
+/** Kartice Tereni / Vozila / Korisnici u zaglavlju – samo na širem ekranu. */
+function meni_admin_gore(): string
+{
+    $s = get('s', 'admin');
+    $aktivna = [
+        'admin' => 'admin', 'izvestaj' => 'admin', 'admin_gorivo' => 'admin',
+        'vozila' => 'vozila', 'vozilo' => 'vozila', 'korisnici' => 'korisnici',
+    ][$s] ?? '';
+    $h = '<nav class="top-nav" aria-label="Glavni meni">';
+    foreach (['admin' => 'Tereni', 'vozila' => 'Vozila', 'korisnici' => 'Korisnici'] as $kljuc => $naziv) {
+        $h .= '<a href="index.php?s=' . $kljuc . '"' . ($kljuc === $aktivna ? ' class="aktivan"' : '') . '>'
+            . h($naziv) . '</a>';
+    }
+    return $h . '</nav>';
 }
 
 function poruka_html(): void
@@ -102,7 +136,7 @@ function kraj_strane(string $nav = ''): void
     echo $nav;
     ?>
 </div>
-<script src="assets/js/teren.js?v=2"></script>
+<script src="assets/js/teren.js?v=3"></script>
 </body>
 </html>
 <?php
@@ -220,14 +254,14 @@ function prazno_stanje(string $ik, string $naslov, string $opis): string
 function stavka_terena(array $t, bool $prikaziSefa = false): string
 {
     $km = ($t['km_kraj'] !== null) ? broj((int)$t['km_kraj'] - (int)$t['km_start'], 0) . ' km' : 'u toku';
-    $h  = '<a class="stavka" href="index.php?s=izvestaj&id=' . (int)$t['id'] . '">';
+    $h  = '<a class="stavka s-' . h($t['status']) . '" href="index.php?s=izvestaj&id=' . (int)$t['id'] . '">';
     $h .= '<span class="gore"><span class="proj">' . h($t['projekat']) . '</span>' . oznaka_statusa($t['status']) . '</span>';
     $h .= '<span class="meta">';
     if ($prikaziSefa) $h .= '<span>' . ikona('korisnik', 13) . ' ' . h($t['sef_ime']) . '</span>';
     $h .= '<span>' . h($t['vozilo_naziv']) . ' · ' . h($t['vozilo_reg']) . '</span></span>';
     $h .= '<span class="meta"><span>' . datum($t['vreme_polaska'], false)
         . ($t['vreme_povratka'] ? ' – ' . datum($t['vreme_povratka'], false) : ' – u toku') . '</span></span>';
-    $h .= '<span class="dole"><span class="cip">' . $km . '</span>';
+    $h .= '<span class="dole"><span class="cip siva">' . $km . '</span>';
     $h .= '<span class="cip">' . h(mnozina((int)$t['broj_troskova'], 'trošak', 'troška', 'troškova')) . '</span>';
     if ((int)$t['broj_prijava'] > 0) $h .= '<span class="cip">' . h(mnozina((int)$t['broj_prijava'], 'prijava', 'prijave', 'prijava')) . '</span>';
     $h .= '</span></a>';

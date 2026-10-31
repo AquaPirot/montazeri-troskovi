@@ -74,42 +74,72 @@ pocetak_strane('Zdravo, ' . $ime);
 <?php endif; ?>
 
 <?php if ($t):
-    $brT = (int)vrednost('SELECT COUNT(*) FROM troskovi WHERE teren_id = ?', [$t['id']]);
-    $brP = (int)vrednost('SELECT COUNT(*) FROM prijave  WHERE teren_id = ?', [$t['id']]);
+    $brT = count($troskovi);
+    $brP = (int)vrednost('SELECT COUNT(*) FROM prijave WHERE teren_id = ?', [$t['id']]);
 ?>
-    <div class="karta">
-        <div class="karta-telo">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px">
-                <div>
-                    <div class="sitno" style="font-weight:700;letter-spacing:.1em;text-transform:uppercase">Tekući teren</div>
-                    <div style="font-size:17px;font-weight:700;letter-spacing:-.3px"><?= h($t['projekat']) ?></div>
-                </div>
-                <?= oznaka_statusa($t['status']) ?>
+    <section class="hero" aria-label="Tekući teren">
+        <div class="hero-gore">
+            <div style="min-width:0">
+                <div class="h-lab">Tekući teren</div>
+                <div class="h-proj"><?= h($t['projekat']) ?></div>
+                <div class="h-meta"><?= h($t['vozilo_naziv']) ?> · <?= h($t['vozilo_reg']) ?> · od <?= h(datum($t['vreme_polaska'])) ?></div>
             </div>
-            <div class="sitno" style="color:var(--tekst-2);margin-bottom:14px">
-                <?= h($t['vozilo_naziv']) ?> · <?= h($t['vozilo_reg']) ?> · od <?= h(datum($t['vreme_polaska'])) ?>
+            <?= oznaka_statusa($t['status']) ?>
+        </div>
+        <div class="hero-iznosi">
+            <div>
+                <div class="h-lab">Gotovina · EUR</div>
+                <div class="h-iznos"><?= broj($o['ocek_eur'], 2) ?><small>€</small></div>
+                <div class="h-sitno">od <?= broj($o['uk_depozit_eur'], 2) ?> primljeno</div>
             </div>
-            <div class="novac-mreza">
-                <div class="novac">
-                    <div class="val">Gotovina EUR</div>
-                    <div class="iznos"><?= broj($o['ocek_eur'], 2) ?></div>
-                    <div class="opis">preostalo od <?= broj($o['uk_depozit_eur'], 2) ?> ukupno primljeno</div>
-                </div>
-                <div class="novac">
-                    <div class="val">Gotovina RSD</div>
-                    <div class="iznos"><?= broj($o['ocek_rsd'], 0) ?></div>
-                    <div class="opis">preostalo od <?= broj($o['uk_depozit_rsd'], 0) ?> ukupno primljeno</div>
-                </div>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-                <span class="cip"><?= h(mnozina($brT, 'trošak', 'troška', 'troškova')) ?></span>
-                <span class="cip"><?= h(mnozina($brP, 'prijava', 'prijave', 'prijava')) ?></span>
-                <?php if ($doplate): ?><span class="cip"><?= h(mnozina(count($doplate), 'doplata', 'doplate', 'doplata')) ?></span><?php endif; ?>
-                <span class="cip">start <?= broj($t['km_start'], 0) ?> km</span>
+            <div>
+                <div class="h-lab">Gotovina · RSD</div>
+                <div class="h-iznos"><?= broj($o['ocek_rsd'], 0) ?><small>RSD</small></div>
+                <div class="h-sitno">od <?= broj($o['uk_depozit_rsd'], 0) ?> primljeno</div>
             </div>
         </div>
-    </div>
+        <div class="h-crta"></div>
+        <div class="h-red">
+            <?php if ($o['lic_eur'] > 0 || $o['lic_rsd'] > 0): ?>
+            <div>
+                <div class="h-lab">Firma ti duguje (lični novac)</div>
+                <div class="h-iznos"><?php
+                    $d = [];
+                    if ($o['lic_eur'] > 0) $d[] = broj($o['lic_eur'], 2) . '<small>€</small>';
+                    if ($o['lic_rsd'] > 0) $d[] = broj($o['lic_rsd'], 0) . '<small>RSD</small>';
+                    echo implode(' &nbsp;·&nbsp; ', $d);
+                ?></div>
+            </div>
+            <?php endif; ?>
+            <div class="h-sitno" style="align-self:flex-end">
+                <?= h(mnozina($brT, 'trošak', 'troška', 'troškova')) ?> · <?= h(mnozina($brP, 'prijava', 'prijave', 'prijava')) ?>
+                <?php if ($doplate): ?> · <?= h(mnozina(count($doplate), 'doplata', 'doplate', 'doplata')) ?><?php endif; ?>
+                · start <?= broj($t['km_start'], 0) ?> km
+            </div>
+        </div>
+    </section>
+<?php endif; ?>
 
+    <div class="sekcija-naslov">Šta radiš sada?</div>
+
+<?php if ($t): ?>
+    <?= veliko_dugme('racun',    'Dodaj trošak',        'Račun, gorivo, putarina, hrana',  'index.php?s=trosak', true) ?>
+    <?= veliko_dugme('alarm',    'Prijavi sa terena',   'Lom, materijal, nezavršeno',      'index.php?s=prijavi') ?>
+    <?= veliko_dugme('novac',    'Dodaj primljeni novac','Naknadna doplata EUR ili RSD',     'index.php?s=doplata') ?>
+    <?= veliko_dugme('povratak', 'Povratak i izveštaj', 'Zatvori teren i pošalji izveštaj','index.php?s=povratak') ?>
+    <?= veliko_dugme('kamion',   'Polazak na teren',    'Teren je već otvoren',            null) ?>
+<?php else: ?>
+    <?= veliko_dugme('kamion',   'Polazak na teren',    'Otvori novi teren',               'index.php?s=polazak', true) ?>
+    <?= veliko_dugme('racun',    'Dodaj trošak',        'Prvo otvori teren',               null) ?>
+    <?= veliko_dugme('alarm',    'Prijavi sa terena',   'Prvo otvori teren',               null) ?>
+    <?= veliko_dugme('povratak', 'Povratak i izveštaj', 'Prvo otvori teren',               null) ?>
+    <div style="margin-top:14px">
+        <?= napomena_box('Nemaš otvoren teren. Kada kreneš, dodirni <b>Polazak na teren</b>.', 'info', 'ostalo') ?>
+    </div>
+<?php endif; ?>
+
+
+<?php if ($t): ?>
     <?php if ($doplate): ?>
     <div class="sekcija-naslov">Naknadno primljeni novac (<?= count($doplate) ?>)</div>
     <div class="karta"><div class="karta-telo">
@@ -169,24 +199,6 @@ pocetak_strane('Zdravo, ' . $ime);
         </div>
     <?php endforeach; endif; ?>
     </div></div>
-<?php endif; ?>
-
-    <div class="sekcija-naslov">Šta radiš sada?</div>
-
-<?php if ($t): ?>
-    <?= veliko_dugme('novac',    'Dodaj primljeni novac','Naknadna doplata EUR ili RSD',     'index.php?s=doplata') ?>
-    <?= veliko_dugme('racun',    'Dodaj trošak',        'Račun, gorivo, putarina, hrana',  'index.php?s=trosak', true) ?>
-    <?= veliko_dugme('alarm',    'Prijavi sa terena',   'Lom, materijal, nezavršeno',      'index.php?s=prijavi') ?>
-    <?= veliko_dugme('povratak', 'Povratak i izveštaj', 'Zatvori teren i pošalji izveštaj','index.php?s=povratak') ?>
-    <?= veliko_dugme('kamion',   'Polazak na teren',    'Teren je već otvoren',            null) ?>
-<?php else: ?>
-    <?= veliko_dugme('kamion',   'Polazak na teren',    'Otvori novi teren',               'index.php?s=polazak', true) ?>
-    <?= veliko_dugme('racun',    'Dodaj trošak',        'Prvo otvori teren',               null) ?>
-    <?= veliko_dugme('alarm',    'Prijavi sa terena',   'Prvo otvori teren',               null) ?>
-    <?= veliko_dugme('povratak', 'Povratak i izveštaj', 'Prvo otvori teren',               null) ?>
-    <div style="margin-top:14px">
-        <?= napomena_box('Nemaš otvoren teren. Kada kreneš, dodirni <b>Polazak na teren</b>.', 'info', 'ostalo') ?>
-    </div>
 <?php endif; ?>
 
 </div>

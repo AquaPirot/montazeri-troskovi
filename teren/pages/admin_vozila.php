@@ -28,7 +28,7 @@ if (je_post()) {
 
 $vozila = redovi('SELECT * FROM vozila ORDER BY aktivno DESC, naziv');
 
-pocetak_strane('Vozila');
+pocetak_strane('Vozila', ['sirina' => 'siroka']);
 ?>
 <div class="sadrzaj">
 
@@ -36,7 +36,7 @@ pocetak_strane('Vozila');
 
 <?php if (!$vozila): ?>
     <?= prazno_stanje('kamion', 'Nema vozila', 'Dodaj prvo vozilo ispod.') ?>
-<?php else: foreach ($vozila as $v):
+<?php else: ?><div class="mreza-stavki"><?php foreach ($vozila as $v):
     $st      = statistika_vozila((int)$v['id']);
     $reg     = registracija_vozila((int)$v['id']);
     $danaReg = $reg ? danaDo($reg['vazi_do']) : null;
@@ -44,7 +44,7 @@ pocetak_strane('Vozila');
     <a class="stavka" href="index.php?s=vozilo&id=<?= (int)$v['id'] ?>">
         <span class="gore">
             <span style="display:flex;align-items:center;gap:11px;min-width:0">
-                <span style="width:40px;height:40px;border-radius:10px;background:var(--grafit);color:var(--zlatna);display:flex;align-items:center;justify-content:center;flex:none">
+                <span style="width:40px;height:40px;border-radius:10px;background:var(--tamna);color:var(--akcenat);display:flex;align-items:center;justify-content:center;flex:none">
                     <?= ikona('kamion', 20) ?>
                 </span>
                 <span style="min-width:0">
@@ -74,12 +74,13 @@ pocetak_strane('Vozila');
             <?php endif; ?>
         </span>
     </a>
-<?php endforeach; endif; ?>
+<?php endforeach; ?></div><?php endif; ?>
 
+<div style="height:12px"></div>
 <?= napomena_box('Dodirni vozilo za <b>istoriju terena, potrošnju po terenu i servisnu knjigu</b>.', 'info', 'lista') ?>
 
 <div class="sekcija-naslov">Novo vozilo</div>
-<div class="karta"><div class="karta-telo">
+<div class="karta" style="max-width:560px"><div class="karta-telo">
     <form method="post">
         <?= csrf_polje() ?>
         <input type="hidden" name="akcija" value="dodaj">
@@ -98,7 +99,7 @@ pocetak_strane('Vozila');
                 <span class="sufiks">L/100</span>
             </div>
         </div>
-        <button class="dugme d-zlato" type="submit"><?= ikona('plus', 20) ?> Dodaj vozilo</button>
+        <button class="dugme d-akcenat" type="submit"><?= ikona('plus', 20) ?> Dodaj vozilo</button>
     </form>
 </div></div>
 

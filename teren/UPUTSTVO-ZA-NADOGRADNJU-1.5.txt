@@ -1,0 +1,74 @@
+PROHORECA TEREN - NADOGRADNJA 1.5
+=================================
+
+Nadogradnja se postavlja preko verzije 1.4.
+
+NOVO U 1.5
+----------
+
+1. Prijava PIN-om od 4 broja
+   - Svi ulaze PIN-om; prijava se šalje sama posle četvrtog broja.
+   - PIN-ove dodeljuje samo kancelarija (Korisnici > Dodeli PIN).
+   - Posle 8 pogrešnih pokušaja ulaz se blokira na 15 minuta.
+   - Prijava korisničkim imenom i lozinkom ostaje kao rezervni ulaz.
+
+2. Novi izgled, usklađen sa aplikacijom Transakcije
+   - Tamnoplavo zaglavlje, bele kartice, svetla pozadina.
+   - Šef ekipe: gotovina kod njega na vrhu, dugmad odmah ispod
+     (više se ne gube ispod spiska troškova).
+   - Kancelarija: gotovina kod ekipa, dug radnicima i četiri kartice
+     po statusu; na računaru širok raspored i meni u zaglavlju.
+
+3. Ispravljeno
+   - schema.sql sada sadrži i tabelu doplate iz verzije 1.4
+     (nova instalacija bez toga ne bi radila).
+
+
+OBAVEZAN REDOSLED POSTAVLJANJA
+------------------------------
+
+1. Napravi rezervnu kopiju baze i fajlova.
+   (cPanel > Backup, ili phpMyAdmin > Export za bazu)
+
+2. U cPanel-u otvori phpMyAdmin i izaberi bazu aplikacije.
+
+3. Importuj fajl:
+      sql/nadogradnja-03-pin.sql
+   Ovaj SQL pokreće se samo jednom.
+
+4. Tek kada SQL import prođe uspešno, u File Manager-u otvori folder
+   teren.aggroup.rs (u kome je index.php).
+
+5. Otpremi ZIP verzije 1.5, klikni Extract / Izdvoji i potvrdi
+   zamenu fajlova.
+
+6. Obriši ZIP sa servera.
+
+
+POSLE POSTAVLJANJA - VAŽNO
+--------------------------
+
+Posle nadogradnje NIKO JOŠ NEMA PIN, pa radnici ne mogu da uđu dok
+im ga ne dodeliš. Zato postavljaj van radnog vremena ekipa.
+
+1. Otvori teren.aggroup.rs
+2. Klikni "Prijava korisničkim imenom i lozinkom" i uđi svojim
+   dosadašnjim administratorskim nalogom.
+3. Korisnici > kod svakog korisnika "Dodeli PIN" > Sačuvaj.
+   Aplikacija predlaže slobodan PIN; možeš upisati i svoj.
+   PIN se prikaže samo jednom - zapiši ga ili odmah saopšti radniku.
+4. Dodeli PIN i sebi, pa se odjavi i probaj ulaz PIN-om.
+
+Ko je već bio prijavljen pre nadogradnje ostaje prijavljen dok ne
+zatvori pregledač ili se ne odjavi.
+
+
+VAŽNO
+-----
+
+- Ako PHP fajlove postaviš pre SQL nadogradnje, aplikacija će
+  prikazati poruku da baza nije nadograđena. Tada samo pokreni SQL.
+- Paket NE sadrži config.php ni fotografije i ne menja postojeće
+  terene, troškove, korisnike ni lozinke.
+- SQL dodaje kolonu za PIN i dve male tabele (podesavanja i
+  pokusaji_prijave).

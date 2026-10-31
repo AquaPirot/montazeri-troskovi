@@ -68,9 +68,119 @@ function prijavi(string $korisnicko, string $lozinka): bool
         upit('UPDATE korisnici SET lozinka_hash = ? WHERE id = ?',
              [password_hash($lozinka, PASSWORD_DEFAULT), $k['id']]);
     }
+    uloguj($k);
+    return true;
+}
+
+function uloguj(array $k): void
+{
     session_regenerate_id(true);
     $_SESSION['korisnik_id'] = (int)$k['id'];
+}
+
+/* ============================================================
+   PIN OD 4 BROJA
+   PIN je ujedno i identitet: svaki aktivan korisnik ima drugačiji.
+   Zato PIN dodeljuje samo administrator – kada bi korisnik sam
+   birao, poruka "taj PIN je zauzet" bi mu otkrila tuđi PIN.
+   ============================================================ */
+const PIN_POKUSAJA = 8;     // dozvoljeno pogrešnih pokušaja ...
+const PIN_MINUTA   = 15;    // ... u ovoliko minuta, po IP adresi
+
+function pin_tajna(): string
+{
+    static $t = null;
+    if ($t !== null) return $t;
+    try {
+        $t = (string)vrednost('SELECT vrednost FROM podesavanja WHERE kljuc = "pin_tajna"');
+    } catch (PDOException $e) {
+        $t = '';
+    }
+    if ($t === '') {
+        http_response_code(500);
+        exit('Baza nije nadograđena za prijavu PIN-om. Pokreni sql/nadogradnja-03-pin.sql u phpMyAdmin-u.');
+    }
+    return $t;
+}
+
+function pin_hash(string $pin): string
+{
+    return hash('sha256', pin_tajna() . '|' . $pin);
+}
+
+function pin_ispravan_oblik(string $pin): bool
+{
+    return (bool)preg_match('/^\d{4}$/', $pin);
+}
+
+/** 1111, 1234, 4321 i slični se lako pogode. */
+function pin_slab(string $pin): bool
+{
+    if (preg_match('/^(\d)\1{3}$/', $pin)) return true;
+    return str_contains('0123456789', $pin) || str_contains('9876543210', $pin);
+}
+
+function pin_zauzet(string $pin, int $osimKorisnika = 0): bool
+{
+    return (bool)vrednost('SELECT COUNT(*) FROM korisnici WHERE pin_hash = ? AND id <> ?',
+                          [pin_hash($pin), $osimKorisnika]);
+}
+
+/** Vraća poruku o grešci ili null ako je PIN prihvatljiv. */
+function proveri_novi_pin(string $pin, int $korisnikId = 0): ?string
+{
+    if (!pin_ispravan_oblik($pin)) return 'PIN mora da ima tačno 4 broja.';
+    if (pin_slab($pin))            return 'Taj PIN se lako pogodi (npr. 1111 ili 1234). Izaberi drugi.';
+    if (pin_zauzet($pin, $korisnikId)) return 'Taj PIN već koristi drugi korisnik. Izaberi drugi.';
+    return null;
+}
+
+/** Slobodan, ne-slab PIN – predlog administratoru. */
+function predlozi_pin(): string
+{
+    for ($i = 0; $i < 200; $i++) {
+        $pin = str_pad((string)random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        if (!pin_slab($pin) && !pin_zauzet($pin)) return $pin;
+    }
+    return '';
+}
+
+function prijavi_pinom(string $pin): bool
+{
+    if (!pin_ispravan_oblik($pin)) return false;
+    $k = red('SELECT * FROM korisnici WHERE pin_hash = ? AND aktivan = 1', [pin_hash($pin)]);
+    if (!$k) return false;
+    uloguj($k);
     return true;
+}
+
+/* ---------------- zaštita od pogađanja ---------------- */
+function ip_klijenta(): string
+{
+    return substr((string)($_SERVER['REMOTE_ADDR'] ?? '0.0.0.0'), 0, 45);
+}
+
+/** Koliko minuta je još blokiran ovaj IP (null = nije blokiran). */
+function blokada_minuta(): ?int
+{
+    $od = date('Y-m-d H:i:s', time() - PIN_MINUTA * 60);
+    $r = red('SELECT COUNT(*) AS br, MIN(vreme) AS prvi FROM pokusaji_prijave WHERE ip = ? AND vreme > ?',
+             [ip_klijenta(), $od]);
+    if (!$r || (int)$r['br'] < PIN_POKUSAJA) return null;
+    $kraj = strtotime($r['prvi']) + PIN_MINUTA * 60;
+    return max(1, (int)ceil(($kraj - time()) / 60));
+}
+
+function zabelezi_neuspeh(): void
+{
+    upit('INSERT INTO pokusaji_prijave (ip, vreme) VALUES (?, ?)', [ip_klijenta(), date('Y-m-d H:i:s')]);
+    // stari zapisi ne trebaju
+    upit('DELETE FROM pokusaji_prijave WHERE vreme < ?', [date('Y-m-d H:i:s', time() - 86400)]);
+}
+
+function ocisti_neuspehe(): void
+{
+    upit('DELETE FROM pokusaji_prijave WHERE ip = ?', [ip_klijenta()]);
 }
 
 function odjavi(): void

@@ -159,6 +159,17 @@
     if (d && !window.confirm(d.getAttribute('data-pitaj'))) e.preventDefault();
   });
 
+  /* ---------- 9. PIN: samo brojevi, šalje se čim se ukuca četvrti ---------- */
+  document.addEventListener('input', function (e) {
+    if (!e.target.matches('[data-pin]')) return;
+    var p = e.target;
+    var cist = p.value.replace(/\D/g, '').slice(0, 4);
+    if (cist !== p.value) p.value = cist;
+    if (cist.length === 4 && p.form && p.form.hasAttribute('data-pin-forma')) {
+      p.form.requestSubmit ? p.form.requestSubmit() : p.form.submit();
+    }
+  });
+
   /* ---------- pokretanje ---------- */
   function sve() {
     osveziIzbore();

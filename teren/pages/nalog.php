@@ -7,7 +7,7 @@ $greske = [];
 
 if (je_post()) {
     proveri_csrf();
-    if (post('akcija') === 'lozinka') {
+    if ($k['uloga'] === 'admin' && post('akcija') === 'lozinka') {
         $stara = (string)($_POST['stara'] ?? '');
         $nova  = (string)($_POST['nova'] ?? '');
 
@@ -31,11 +31,16 @@ pocetak_strane('Moj nalog', ['nazad' => 'index.php?s=' . ($k['uloga'] === 'admin
 
 <div class="karta"><div class="karta-telo">
     <div class="red"><span class="k">Ime</span><span class="v"><?= h($k['ime']) ?></span></div>
-    <div class="red"><span class="k">Korisničko ime</span><span class="v"><?= h($k['korisnicko_ime']) ?></span></div>
     <div class="red"><span class="k">Uloga</span><span class="v"><?= $k['uloga'] === 'admin' ? 'Administrator' : 'Šef ekipe' ?></span></div>
+    <?php if ($k['uloga'] === 'admin'): ?>
+    <div class="red"><span class="k">Korisničko ime</span><span class="v"><?= h($k['korisnicko_ime']) ?></span></div>
+    <?php endif; ?>
 </div></div>
 
-<div class="sekcija-naslov">Promena lozinke</div>
+<?= napomena_box('Ako zaboraviš PIN ili misliš da ga neko zna, javi se kancelariji – dobićeš novi odmah.', 'info', 'kljucic') ?>
+
+<?php if ($k['uloga'] === 'admin'): ?>
+<div class="sekcija-naslov">Lozinka za rezervnu prijavu</div>
 <div class="karta"><div class="karta-telo">
     <form method="post">
         <?= csrf_polje() ?>
@@ -51,6 +56,7 @@ pocetak_strane('Moj nalog', ['nazad' => 'index.php?s=' . ($k['uloga'] === 'admin
         <button class="dugme d-glavno" type="submit"><?= ikona('kljucic', 20) ?> Sačuvaj novu lozinku</button>
     </form>
 </div></div>
+<?php endif; ?>
 
 <div class="sekcija-naslov">Odjava</div>
 <form method="post" action="index.php?s=odjava">

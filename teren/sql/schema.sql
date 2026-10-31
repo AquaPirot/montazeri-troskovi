@@ -19,12 +19,14 @@ CREATE TABLE IF NOT EXISTS korisnici (
   ime             VARCHAR(100)  NOT NULL,
   korisnicko_ime  VARCHAR(50)   NOT NULL,
   lozinka_hash    VARCHAR(255)  NOT NULL,
+  pin_hash        CHAR(64)          NULL,
   telefon         VARCHAR(30)       NULL,
   uloga           ENUM('sef','admin') NOT NULL DEFAULT 'sef',
   aktivan         TINYINT(1)    NOT NULL DEFAULT 1,
   kreiran         DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   UNIQUE KEY uq_korisnicko_ime (korisnicko_ime),
+  UNIQUE KEY uq_pin_hash (pin_hash),
   KEY ix_uloga (uloga, aktivan)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -110,6 +112,8 @@ CREATE TABLE IF NOT EXISTS tereni (
 CREATE TABLE IF NOT EXISTS troskovi (
   id             INT UNSIGNED NOT NULL AUTO_INCREMENT,
   teren_id       INT UNSIGNED NOT NULL,
+  uneo_id        INT UNSIGNED     NULL,
+  izvor          ENUM('radnik','admin') NOT NULL DEFAULT 'radnik',
   iznos          DECIMAL(12,2) NOT NULL,
   valuta         ENUM('EUR','RSD') NOT NULL,
   vrsta          ENUM('gorivo','put','smestaj','hrana','materijal','ostalo') NOT NULL,
@@ -121,7 +125,9 @@ CREATE TABLE IF NOT EXISTS troskovi (
   kreiran        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
   KEY ix_teren (teren_id, kreiran),
-  CONSTRAINT fk_trosak_teren FOREIGN KEY (teren_id) REFERENCES tereni (id) ON DELETE CASCADE
+  KEY ix_trosak_uneo (uneo_id),
+  CONSTRAINT fk_trosak_teren FOREIGN KEY (teren_id) REFERENCES tereni (id) ON DELETE CASCADE,
+  CONSTRAINT fk_trosak_uneo  FOREIGN KEY (uneo_id)  REFERENCES korisnici (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
@@ -165,6 +171,45 @@ CREATE TABLE IF NOT EXISTS servis (
   CONSTRAINT fk_servis_kreirao FOREIGN KEY (kreirao_id) REFERENCES korisnici (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ------------------------------------------------------------
+-- Doplate depozita (novac primljen naknadno, tokom terena)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS doplate (
+  id          INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  teren_id    INT UNSIGNED NOT NULL,
+  iznos       DECIMAL(12,2) NOT NULL,
+  valuta      ENUM('EUR','RSD') NOT NULL,
+  predao      VARCHAR(100)  NOT NULL,
+  napomena    VARCHAR(500)      NULL,
+  uneo_id     INT UNSIGNED      NULL,
+  kreirana    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY ix_doplata_teren (teren_id, kreirana),
+  KEY ix_doplata_uneo (uneo_id),
+  CONSTRAINT fk_doplata_teren FOREIGN KEY (teren_id) REFERENCES tereni (id) ON DELETE CASCADE,
+  CONSTRAINT fk_doplata_uneo  FOREIGN KEY (uneo_id)  REFERENCES korisnici (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- Podešavanja aplikacije (tajni ključ za PIN-ove)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS podesavanja (
+  kljuc     VARCHAR(50)  NOT NULL,
+  vrednost  VARCHAR(255) NOT NULL,
+  PRIMARY KEY (kljuc)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- Neuspeli pokušaji prijave (zaštita od pogađanja PIN-a)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS pokusaji_prijave (
+  id     INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  ip     VARCHAR(45)  NOT NULL,
+  vreme  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY ix_ip_vreme (ip, vreme)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
@@ -173,12 +218,17 @@ SET FOREIGN_KEY_CHECKS = 1;
 --  Prvi administrator:  korisničko ime  admin
 --                       lozinka         admin123
 --
---  ODMAH POSLE PRVE PRIJAVE PROMENI OVU LOZINKU
---  (Korisnici > Kancelarija > Promeni lozinku)
+--  Prva prijava ide preko "Prijava lozinkom" na ekranu za PIN.
+--  Odmah zatim: Korisnici > dodeli PIN sebi i šefovima ekipa,
+--  i promeni ovu lozinku.
 -- ============================================================
 INSERT INTO korisnici (ime, korisnicko_ime, lozinka_hash, uloga, aktivan)
 SELECT 'Kancelarija', 'admin',
        '$2y$12$bpU7SOmgp1uWJMgmbC3uF.BhhGaNYruHWfJIH8qQpuPRRGDY4kHZG',
-       'admin', 1
+       'admin', 1 FROM DUAL
 WHERE NOT EXISTS (SELECT 1 FROM korisnici WHERE korisnicko_ime = 'admin');
 
+-- Tajni ključ za PIN-ove, jedinstven za ovu instalaciju.
+INSERT INTO podesavanja (kljuc, vrednost)
+SELECT 'pin_tajna', SHA2(CONCAT(UUID(), RAND(), NOW(6)), 256) FROM DUAL
+WHERE NOT EXISTS (SELECT 1 FROM podesavanja WHERE kljuc = 'pin_tajna');

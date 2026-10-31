@@ -22,7 +22,7 @@ pocetak_strane('Moji tereni');
 <?php if (!$lista): ?>
     <?= prazno_stanje('lista', 'Nema terena', 'Tvoji tereni će se pojaviti ovde.') ?>
 <?php else: ?>
-    <?php foreach ($lista as $t) echo stavka_terena($t); ?>
+    <div class="mreza-stavki"><?php foreach ($lista as $t) echo stavka_terena($t); ?></div>
 <?php endif; ?>
 </div>
 <?php kraj_strane(nav_sef('moji')); ?>

@@ -87,8 +87,8 @@ pocetak_strane('Dodaj gorivo', ['nazad' => 'index.php?s=izvestaj&id=' . (int)$t[
             <input class="unos veliki" id="ag-iz" name="iznos" type="text" required
                    inputmode="decimal" placeholder="0" value="<?= h(post('iznos')) ?>">
             <div class="plocice k2" style="gap:6px">
-                <?= plocica('valuta', 'RSD', 'RSD', $izValuta === 'RSD', '', 'zlato valuta') ?>
-                <?= plocica('valuta', 'EUR', 'EUR', $izValuta === 'EUR', '', 'zlato valuta') ?>
+                <?= plocica('valuta', 'RSD', 'RSD', $izValuta === 'RSD', '', 'akcenat valuta') ?>
+                <?= plocica('valuta', 'EUR', 'EUR', $izValuta === 'EUR', '', 'akcenat valuta') ?>
             </div>
         </div>
     </div>
@@ -126,7 +126,7 @@ pocetak_strane('Dodaj gorivo', ['nazad' => 'index.php?s=izvestaj&id=' . (int)$t[
 </div>
 
 <div class="dno-akcija">
-    <button class="dugme d-zlato" type="submit"><?= ikona('gorivo', 20) ?> Sačuvaj gorivo</button>
+    <button class="dugme d-akcenat" type="submit"><?= ikona('gorivo', 20) ?> Sačuvaj gorivo</button>
 </div>
 </form>
 <?php kraj_strane(); ?>

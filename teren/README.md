@@ -80,19 +80,18 @@ u Chrome-u na Androidu otvoriti adresu → meni ⋮ → *Dodaj na početni ekran
 
 ## Prijava
 
-Svi se prijavljuju **na istoj adresi** — nema odvojenog ulaza za administratore.
-Unosi se korisničko ime i lozinka, a aplikacija po ulozi vodi na odgovarajući ekran:
+Svi se prijavljuju **PIN-om od 4 broja** na istoj adresi. PIN je ujedno i
+identitet – svaki aktivan korisnik ima drugačiji, pa se korisničko ime ne kuca.
+Prijava se šalje sama čim se ukuca četvrti broj.
 
-| Uloga            | Šta vidi posle prijave                                     |
-|------------------|------------------------------------------------------------|
-| Šef ekipe        | Početni ekran sa četiri dugmeta                             |
-| Administrator    | Pregled terena, sa donjom navigacijom Tereni / Vozila / Korisnici |
-
-Sesija traje dok se pregledač ne zatvori. Odjava i promena sopstvene lozinke su
-iza kruga sa inicijalima gore desno.
-
-Zaboravljenu lozinku ne resetuje sam korisnik — administrator je postavlja
-u ekranu **Korisnici**.
+- PIN-ove **dodeljuje samo kancelarija** (Korisnici → Dodeli PIN). Korisnik ne
+  bira sam: kada bi birao, poruka „taj PIN je zauzet" otkrila bi mu tuđi PIN.
+- PIN se vidi samo u trenutku dodele; posle toga se čuva samo kao otisak.
+- Slabi PIN-ovi (1111, 1234, 4321…) se ne prihvataju.
+- Posle 8 pogrešnih pokušaja sa iste adrese prijava se blokira na 15 minuta.
+- Isključen nalog gubi PIN; posle ponovnog uključenja dodeljuje se novi.
+- Rezervni ulaz za kancelariju: „Prijava korisničkim imenom i lozinkom" ispod
+  polja za PIN.
 
 ---
 

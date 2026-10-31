@@ -125,7 +125,7 @@ pocetak_strane('Polazak na teren', ['nazad' => 'index.php?s=pocetna']);
 </div>
 
 <div class="dno-akcija">
-    <button class="dugme d-zlato" type="submit"><?= ikona('cek', 20) ?> Kreni na teren</button>
+    <button class="dugme d-akcenat" type="submit"><?= ikona('cek', 20) ?> Kreni na teren</button>
 </div>
 </form>
 <?php kraj_strane(); ?>
