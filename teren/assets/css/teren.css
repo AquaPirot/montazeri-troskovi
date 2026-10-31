@@ -314,19 +314,23 @@ textarea.unos{min-height:88px;resize:vertical;font-size:16px;line-height:1.5}
 .tab .br{opacity:.65;margin-left:5px;font-variant-numeric:tabular-nums}
 
 /* ---------- troškovi ---------- */
-.trosak{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--linija)}
+.trosak{display:flex;align-items:center;gap:8px;padding:12px 0;border-bottom:1px solid var(--linija)}
 .trosak:last-child{border-bottom:none}
 .trosak .ik{
   width:36px;height:36px;flex:none;border-radius:var(--r-s);background:#F0F1F3;color:var(--grafit);
   display:flex;align-items:center;justify-content:center;
 }
 .trosak .sred{flex:1;min-width:0}
-.trosak .n1{font-size:15px;font-weight:600}
-.trosak .n2{font-size:12px;color:var(--tekst-2)}
+.trosak .n1{display:block;font-size:15px;font-weight:600}
+.trosak .n2{display:block;font-size:12px;color:var(--tekst-2);overflow-wrap:anywhere}
 .trosak .n2 .lose{color:var(--crvena);font-weight:600}
-.trosak .iz{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.trosak .iz{
+  flex:none;min-width:64px;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;
+  white-space:nowrap;text-align:right;
+}
 .trosak .iz small{display:block;font-size:11px;font-weight:600;color:var(--tekst-3)}
-.trosak .brisi{color:var(--tekst-3);background:none;border:none;padding:6px;flex:none}
+.trosak form{flex:none;margin:0}
+.trosak .brisi{color:var(--tekst-3);background:none;border:none;padding:4px;flex:none}
 
 /* ---------- galerija ---------- */
 .galerija{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}

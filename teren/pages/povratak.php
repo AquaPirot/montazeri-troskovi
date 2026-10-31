@@ -33,8 +33,8 @@ if (je_post()) {
     proveri_csrf();
 
     $kmKraj = postCeo('km_kraj');
-    $vrEur  = postBroj('vraceno_eur');
-    $vrRsd  = postBroj('vraceno_rsd');
+    $vrEur  = postNovac('vraceno_eur', 'EUR');
+    $vrRsd  = postNovac('vraceno_rsd', 'RSD');
 
     if ($kmKraj === null)                   $greske[] = 'Unesi završnu kilometražu.';
     elseif ($kmKraj < (int)$t['km_start'])  $greske[] = 'Završna kilometraža je manja od polazne (' . broj($t['km_start'], 0) . ').';
@@ -109,8 +109,8 @@ pocetak_strane($ispravka ? 'Ispravi izveštaj' : 'Povratak sa terena', ['nazad' 
         <div class="sitno" style="margin-top:7px;color:var(--tekst-2)" data-km-rezultat>Ukupno pređeno: —</div>
     </div>
     <?= foto_polje('foto_km_kraj',
-            $t['foto_km_kraj'] ? 'Zameni fotografiju instrument table' : 'Slikaj instrument tablu',
-            'Mora da se vidi kilometraža') ?>
+            $t['foto_km_kraj'] ? 'Zameni fotografiju instrument table' : 'Dodaj fotografiju instrument table',
+            'Slikaj sada ili izaberi iz galerije') ?>
 </div></div>
 
 <div class="sekcija-naslov">Vraćanje novca</div>
@@ -121,12 +121,12 @@ pocetak_strane($ispravka ? 'Ispravi izveštaj' : 'Povratak sa terena', ['nazad' 
             <div class="novac">
                 <div class="val">Treba vratiti EUR</div>
                 <div class="iznos"><?= broj($o['ocek_eur'], 2) ?></div>
-                <div class="opis"><?= broj($t['depozit_eur'], 0) ?> – <?= broj($o['got_eur'], 2) ?> potrošeno</div>
+                <div class="opis"><?= broj($o['uk_depozit_eur'], 2) ?> ukupno primljeno – <?= broj($o['got_eur'], 2) ?> potrošeno</div>
             </div>
             <div class="novac">
                 <div class="val">Treba vratiti RSD</div>
                 <div class="iznos"><?= broj($o['ocek_rsd'], 0) ?></div>
-                <div class="opis"><?= broj($t['depozit_rsd'], 0) ?> – <?= broj($o['got_rsd'], 0) ?> potrošeno</div>
+                <div class="opis"><?= broj($o['uk_depozit_rsd'], 0) ?> ukupno primljeno – <?= broj($o['got_rsd'], 0) ?> potrošeno</div>
             </div>
         </div>
         <div class="dva">

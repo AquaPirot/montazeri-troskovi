@@ -174,8 +174,38 @@ function postBroj(string $k): ?float
     return is_numeric($v) ? (float)$v : null;
 }
 
+/**
+ * Novčani iznos uz uvažavanje izabrane valute.
+ *
+ * Kod RSD prihvata i tačku i zarez kao razdvajač hiljada:
+ *   "1650", "1.650" i "1,650" -> 1650
+ *
+ * Ovo je namerno odvojeno od postBroj(), jer kod litara i potrošnje
+ * "1,650" treba i dalje da znači decimalni broj 1.65.
+ */
+function postNovac(string $k, string $valuta): ?float
+{
+    $v = post($k);
+    if ($v === '') return null;
+
+    $v = str_replace(["\u{00A0}", ' '], '', $v);
+    if ($valuta === 'RSD' && preg_match('/^-?\d{1,3}([.,]\d{3})+$/', $v)) {
+        $v = str_replace([',', '.'], '', $v);
+        return is_numeric($v) ? (float)$v : null;
+    }
+
+    return postBroj($k);
+}
+
 function postCeo(string $k): ?int
 {
+    $tekst = post($k);
+    $tekst = str_replace(["\u{00A0}", ' '], '', $tekst);
+    if ($tekst !== '' && preg_match('/^-?\d{1,3}([.,]\d{3})+$/', $tekst)) {
+        $tekst = str_replace([',', '.'], '', $tekst);
+        return is_numeric($tekst) ? (int)round((float)$tekst) : null;
+    }
+
     $v = postBroj($k);
     return $v === null ? null : (int)round($v);
 }

@@ -26,6 +26,7 @@ $strane = [
     'pocetna'   => 'pocetna.php',
     'polazak'   => 'polazak.php',
     'trosak'    => 'trosak.php',
+    'doplata'   => 'doplata.php',
     'prijavi'   => 'prijavi.php',
     'povratak'  => 'povratak.php',
     'moji'      => 'moji.php',
@@ -37,6 +38,7 @@ $strane = [
     'vozila'    => 'admin_vozila.php',
     'vozilo'    => 'vozilo.php',
     'korisnici' => 'admin_korisnici.php',
+    'admin_gorivo' => 'admin_gorivo.php',
 ];
 
 $s = get('s', prijavljen() ? (admin() ? 'admin' : 'pocetna') : 'prijava');

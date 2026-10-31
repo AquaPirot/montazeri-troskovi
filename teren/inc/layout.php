@@ -67,7 +67,7 @@ function pocetak_strane(string $naslov, array $o = []): void
 <meta name="theme-color" content="#22252A">
 <meta name="robots" content="noindex, nofollow">
 <title><?= h($naslov) ?> · <?= h($p['naziv']) ?></title>
-<link rel="stylesheet" href="assets/css/teren.css?v=1">
+<link rel="stylesheet" href="assets/css/teren.css?v=2">
 </head>
 <body>
 <div id="app">
@@ -102,7 +102,7 @@ function kraj_strane(string $nav = ''): void
     echo $nav;
     ?>
 </div>
-<script src="assets/js/teren.js?v=1"></script>
+<script src="assets/js/teren.js?v=2"></script>
 </body>
 </html>
 <?php
@@ -193,14 +193,14 @@ function izbor_red(string $grupa, string $vrednost, string $natpis, string $podn
 }
 
 /** Polje za fotografiju sa pregledom pre slanja. */
-function foto_polje(string $ime, string $naslov, string $opis = 'Dodirni i slikaj telefonom'): string
+function foto_polje(string $ime, string $naslov, string $opis = 'Slikaj ili izaberi iz galerije'): string
 {
     return '<label class="foto" data-foto>'
          . '<span class="ik">' . ikona('kamera', 22) . '</span>'
          . '<span class="tx"><span class="t1">' . h($naslov) . '</span>'
          . '<span class="t2">' . h($opis) . '</span></span>'
          . '<img class="pregled" alt="" hidden>'
-         . '<input type="file" name="' . h($ime) . '" accept="image/*" capture="environment">'
+         . '<input type="file" name="' . h($ime) . '" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">'
          . '</label>';
 }
 

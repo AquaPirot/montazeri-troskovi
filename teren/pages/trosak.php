@@ -28,8 +28,8 @@ $greske = [];
 if (je_post()) {
     proveri_csrf();
 
-    $iznos = postBroj('iznos');
     $val   = post('valuta');
+    $iznos = postNovac('iznos', $val);
     $vrsta = post('vrsta');
     $nacin = post('nacin_placanja');
 
@@ -60,11 +60,11 @@ if (je_post()) {
 
     if (!$greske) {
         upit('INSERT INTO troskovi
-                (teren_id, iznos, valuta, vrsta, nacin_placanja, litri, km_sipanja, foto_racun, foto_slip)
-              VALUES (?,?,?,?,?,?,?,?,?)',
-             [$t['id'], $iznos, $val, $vrsta, $nacin, $litri, $kmSip, $fotoRacun, $fotoSlip]);
+                (teren_id, uneo_id, izvor, iznos, valuta, vrsta, nacin_placanja, litri, km_sipanja, foto_racun, foto_slip)
+              VALUES (?,?,"radnik",?,?,?,?,?,?,?,?)',
+             [$t['id'], $k['id'], $iznos, $val, $vrsta, $nacin, $litri, $kmSip, $fotoRacun, $fotoSlip]);
 
-        postavi_poruku('Trošak je sačuvan.');
+        postavi_poruku('Sačuvano: ' . novac((float)$iznos, $val) . ' · ' . VRSTE[$vrsta]['n'] . '.');
         idi($t['status'] === 'ispravka' ? 'izvestaj' : 'pocetna',
             $t['status'] === 'ispravka' ? ['id' => (int)$t['id']] : []);
     }
@@ -92,6 +92,7 @@ pocetak_strane('Dodaj trošak', ['nazad' => $nazad]);
                 <?= plocica('valuta', 'RSD', 'RSD', $izVal === 'RSD', '', 'zlato valuta') ?>
             </div>
         </div>
+        <div class="sitno" style="margin-top:7px">Za 1.650 dinara možeš uneti: <b>1650</b>, <b>1.650</b> ili <b>1,650</b>.</div>
     </div>
 </div></div>
 
@@ -141,9 +142,9 @@ pocetak_strane('Dodaj trošak', ['nazad' => $nazad]);
 </div>
 
 <div class="sekcija-naslov">Dokaz</div>
-<?= foto_polje('foto_racun', 'Slikaj račun', 'Fiskalni ili gotovinski račun') ?>
+<?= foto_polje('foto_racun', 'Dodaj fotografiju računa', 'Slikaj sada ili izaberi iz galerije') ?>
 <div data-prikazi-ako="nacin_placanja=kartica" <?= $izNacin === 'kartica' ? '' : 'hidden' ?>>
-    <?= foto_polje('foto_slip', 'Slikaj slip (ako je odvojen)', 'Nije obavezno ako je slip na računu') ?>
+    <?= foto_polje('foto_slip', 'Dodaj fotografiju slipa', 'Slikaj ili izaberi iz galerije; nije obavezno ako je na računu') ?>
 </div>
 
 <div class="dno-akcija">

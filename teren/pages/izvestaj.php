@@ -26,6 +26,34 @@ if (je_post() && $jeAdmin) {
     proveri_csrf();
     $akcija = post('akcija');
 
+    if ($akcija === 'obrisi_admin_trosak' && $t['status'] !== 'odobren') {
+        $tid = postCeo('trosak_id');
+        $tr = $tid ? red('SELECT * FROM troskovi WHERE id = ? AND teren_id = ? AND izvor = "admin"', [$tid, $t['id']]) : null;
+        if ($tr) {
+            upit('DELETE FROM troskovi WHERE id = ? AND teren_id = ? AND izvor = "admin"', [$tid, $t['id']]);
+            obrisi_foto($tr['foto_racun']);
+            obrisi_foto($tr['foto_slip']);
+            postavi_poruku('Administratorski unos goriva je obrisan.');
+        }
+        idi('izvestaj', ['id' => (int)$t['id']]);
+    }
+
+    if ($akcija === 'obrisi_teren') {
+        if (post('potvrda_brisanja') !== 'OBRISI') {
+            postavi_poruku('Za trajno brisanje upiši OBRISI velikim slovima.', 'greska');
+            idi('izvestaj', ['id' => (int)$t['id']]);
+        }
+
+        $povratniTab = $t['status'];
+        if (obrisi_teren_sa_slikama((int)$t['id'])) {
+            postavi_poruku('Teren, njegovi troškovi, prijave i fotografije su trajno obrisani.');
+            idi('admin', ['tab' => $povratniTab]);
+        }
+
+        postavi_poruku('Teren nije pronađen ili je već obrisan.', 'greska');
+        idi('admin');
+    }
+
     if ($akcija === 'odobri' && in_array($t['status'], ['pregled', 'ispravka'], true)) {
         upit('UPDATE tereni SET status = "odobren", odobrio_id = ?, vreme_odobrenja = NOW(),
                      komentar_admina = NULL WHERE id = ?', [$k['id'], $t['id']]);
@@ -51,7 +79,7 @@ if (je_post() && $mojJe && $t['status'] === 'ispravka' && post('akcija') === 'ob
     proveri_csrf();
     $tid = postCeo('trosak_id');
     $tr  = $tid ? red('SELECT * FROM troskovi WHERE id = ? AND teren_id = ?', [$tid, $t['id']]) : null;
-    if ($tr) {
+    if ($tr && ($tr['izvor'] ?? 'radnik') !== 'admin') {
         obrisi_foto($tr['foto_racun']);
         obrisi_foto($tr['foto_slip']);
         upit('DELETE FROM troskovi WHERE id = ? AND teren_id = ?', [$tid, $t['id']]);
@@ -60,9 +88,21 @@ if (je_post() && $mojJe && $t['status'] === 'ispravka' && post('akcija') === 'ob
     idi('izvestaj', ['id' => (int)$t['id']]);
 }
 
+/* Šef ekipe briše pogrešnu doplatu tokom ispravke. */
+if (je_post() && $mojJe && $t['status'] === 'ispravka' && post('akcija') === 'obrisi_doplatu') {
+    proveri_csrf();
+    $did = postCeo('doplata_id');
+    if ($did) {
+        upit('DELETE FROM doplate WHERE id = ? AND teren_id = ?', [$did, $t['id']]);
+        postavi_poruku('Doplata je obrisana.');
+    }
+    idi('izvestaj', ['id' => (int)$t['id']]);
+}
+
 $troskovi = troskovi_terena((int)$t['id']);
 $prijave  = prijave_terena((int)$t['id']);
-$o        = obracun($t, $troskovi);
+$doplate  = doplate_terena((int)$t['id']);
+$o        = obracun($t, $troskovi, $doplate);
 $dokazi   = dokazi_terena($t, $troskovi, $prijave);
 
 /* Šef ekipe može da dopuni teren koji je vraćen na ispravku. */
@@ -110,7 +150,9 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
 <div class="karta">
     <div class="karta-zaglavlje"><?= ikona('novac', 16) ?> Gotovina iz depozita</div>
     <div class="karta-telo">
-        <?= novac_red('Primljen depozit', (float)$t['depozit_eur'], (float)$t['depozit_rsd']) ?>
+        <?= novac_red('Početni depozit', (float)$t['depozit_eur'], (float)$t['depozit_rsd']) ?>
+        <?= novac_red('Naknadno dodato', $o['dop_eur'], $o['dop_rsd']) ?>
+        <?= novac_red('Ukupno primljeno', $o['uk_depozit_eur'], $o['uk_depozit_rsd']) ?>
         <?= novac_red('Potrošeno gotovinom', -$o['got_eur'], -$o['got_rsd']) ?>
         <?= novac_red('Očekivano za vraćanje', $o['ocek_eur'], $o['ocek_rsd']) ?>
         <?= novac_red('Stvarno vraćeno',
@@ -130,6 +172,34 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
         <?php endif; ?>
     </div>
 </div>
+
+<?php if ($doplate): ?>
+<div class="karta">
+    <div class="karta-zaglavlje"><?= ikona('plus', 16) ?> Doplate depozita</div>
+    <div class="karta-telo">
+    <?php foreach ($doplate as $d): ?>
+        <div class="trosak">
+            <span class="ik"><?= ikona('novac', 18) ?></span>
+            <span class="sred">
+                <span class="n1">Predao/la <?= h($d['predao']) ?></span>
+                <span class="n2"><?= h(datumKratko($d['kreirana'])) ?><?php if ($d['uneo_ime']): ?> · evidentirao/la <?= h($d['uneo_ime']) ?><?php endif; ?></span>
+                <?php if ($d['napomena']): ?><span class="n2"><?= h($d['napomena']) ?></span><?php endif; ?>
+            </span>
+            <span class="iz"><?= broj($d['iznos'], $d['valuta'] === 'RSD' ? 0 : 2) ?><small><?= h($d['valuta']) ?></small></span>
+            <?php if ($mozeIspravku): ?>
+                <form method="post" data-bez-zakljucavanja>
+                    <?= csrf_polje() ?>
+                    <input type="hidden" name="akcija" value="obrisi_doplatu">
+                    <input type="hidden" name="doplata_id" value="<?= (int)$d['id'] ?>">
+                    <button class="brisi" type="submit" data-pitaj="Obrisati ovu doplatu?"
+                            aria-label="Obriši doplatu"><?= ikona('kanta', 18) ?></button>
+                </form>
+            <?php endif; ?>
+        </div>
+    <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="karta">
     <div class="karta-zaglavlje"><?= ikona('kartica', 16) ?> Službena kartica</div>
@@ -196,6 +266,9 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
         <span class="sred">
             <span class="n1"><?= h(VRSTE[$tr['vrsta']]['n']) ?></span>
             <span class="n2"><?= h(datumKratko($tr['kreiran'])) ?> · <?= h(PLACANJA[$tr['nacin_placanja']]['k']) ?><?php
+                if (($tr['izvor'] ?? 'radnik') === 'admin') {
+                    echo ' · unela kancelarija' . ($tr['uneo_ime'] ? ': ' . h($tr['uneo_ime']) : '');
+                }
                 if ($tr['vrsta'] === 'gorivo' && $tr['litri'] !== null) {
                     echo ' · ' . broj($tr['litri'], 1) . ' L na ' . broj((int)$tr['km_sipanja'], 0) . ' km';
                 }
@@ -203,12 +276,20 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
             ?></span>
         </span>
         <span class="iz"><?= broj($tr['iznos'], $tr['valuta'] === 'RSD' ? 0 : 2) ?><small><?= h($tr['valuta']) ?></small></span>
-        <?php if ($mozeIspravku): ?>
+        <?php if ($mozeIspravku && ($tr['izvor'] ?? 'radnik') !== 'admin'): ?>
             <form method="post" style="flex:none" data-bez-zakljucavanja>
                 <?= csrf_polje() ?>
                 <input type="hidden" name="akcija" value="obrisi_trosak">
                 <input type="hidden" name="trosak_id" value="<?= (int)$tr['id'] ?>">
                 <button class="brisi" type="submit" data-pitaj="Obrisati ovaj trošak?" aria-label="Obriši trošak"><?= ikona('kanta', 18) ?></button>
+            </form>
+        <?php elseif ($jeAdmin && ($tr['izvor'] ?? 'radnik') === 'admin' && $t['status'] !== 'odobren'): ?>
+            <form method="post" data-bez-zakljucavanja>
+                <?= csrf_polje() ?>
+                <input type="hidden" name="akcija" value="obrisi_admin_trosak">
+                <input type="hidden" name="trosak_id" value="<?= (int)$tr['id'] ?>">
+                <button class="brisi" type="submit" data-pitaj="Obrisati ovaj unos goriva kancelarije?"
+                        aria-label="Obriši unos goriva"><?= ikona('kanta', 18) ?></button>
             </form>
         <?php endif; ?>
     </div>
@@ -272,6 +353,15 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
 </div></div>
 
 <!-- ================= AKCIJE ================= -->
+<?php if ($jeAdmin && in_array($t['status'], ['aktivan', 'pregled', 'ispravka'], true)): ?>
+    <div class="sekcija-naslov">Unos kancelarije</div>
+    <div class="dugmad">
+        <a class="dugme d-zlato" href="index.php?s=admin_gorivo&teren=<?= (int)$t['id'] ?>">
+            <?= ikona('gorivo', 20) ?> Dodaj sipanje goriva
+        </a>
+    </div>
+<?php endif; ?>
+
 <?php if ($jeAdmin && in_array($t['status'], ['pregled', 'ispravka'], true)): ?>
     <div class="sekcija-naslov">Odluka</div>
     <div class="dugmad">
@@ -302,10 +392,35 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
 <?php if ($mozeIspravku): ?>
     <div class="sekcija-naslov">Ispravka</div>
     <div class="dugmad">
+        <a class="dugme d-obrub" href="index.php?s=doplata&teren=<?= (int)$t['id'] ?>"><?= ikona('novac', 20) ?> Dodaj primljeni novac</a>
         <a class="dugme d-obrub" href="index.php?s=trosak&teren=<?= (int)$t['id'] ?>"><?= ikona('plus', 20) ?> Dodaj trošak koji fali</a>
         <a class="dugme d-obrub" href="index.php?s=prijavi&teren=<?= (int)$t['id'] ?>"><?= ikona('alarm', 20) ?> Dodaj prijavu</a>
         <a class="dugme d-zlato" href="index.php?s=povratak&teren=<?= (int)$t['id'] ?>"><?= ikona('olovka', 20) ?> Ispravi i pošalji ponovo</a>
     </div>
+<?php endif; ?>
+
+<?php if ($jeAdmin): ?>
+    <div class="sekcija-naslov">Brisanje testnog terena</div>
+    <div class="karta"><div class="karta-telo">
+        <?= napomena_box(
+            '<b>Koristi samo za probne unose.</b> Teren, svi troškovi, prijave i fotografije biće trajno obrisani.',
+            'greska',
+            'kanta'
+        ) ?>
+        <form method="post">
+            <?= csrf_polje() ?>
+            <input type="hidden" name="akcija" value="obrisi_teren">
+            <div class="polje">
+                <label for="potvrda_brisanja">Za potvrdu upiši OBRISI</label>
+                <input class="unos" id="potvrda_brisanja" name="potvrda_brisanja"
+                       type="text" autocomplete="off" required placeholder="OBRISI">
+            </div>
+            <button class="dugme d-obrub" type="submit"
+                    data-pitaj="Trajno obrisati ovaj testni teren i sve njegove podatke?">
+                <?= ikona('kanta', 20) ?> Trajno obriši testni teren
+            </button>
+        </form>
+    </div></div>
 <?php endif; ?>
 
 </div>

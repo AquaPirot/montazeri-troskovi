@@ -83,10 +83,13 @@
     return (neg ? '-' : '') + d[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (d[1] ? ',' + d[1] : '');
   }
   /* Čita broj isto kao PHP: "62,5", "40.000", "12.469,50", "1 250". */
-  function brojIz(v) {
+  function brojIz(v, valuta) {
     if (v === null || v === undefined) return null;
     v = String(v).replace(/[\s ]/g, '');
     if (v === '') return null;
+    if ((valuta === 'RSD' || valuta === 'CEO') && /^-?\d{1,3}([.,]\d{3})+$/.test(v)) {
+      v = v.replace(/[.,]/g, '');
+    }
     var tacka = v.indexOf('.') !== -1, zarez = v.indexOf(',') !== -1;
     if (tacka && zarez)      v = v.replace(/\./g, '').replace(',', '.');
     else if (zarez)          v = v.replace(',', '.');
@@ -106,7 +109,7 @@
     var kmPolje = f.querySelector('[name=km_kraj]');
     var kmIzlaz = f.querySelector('[data-km-rezultat]');
     if (kmPolje && kmIzlaz) {
-      var v = brojIz(kmPolje.value);
+      var v = brojIz(kmPolje.value, 'CEO');
       if (v === null) {
         kmIzlaz.innerHTML = 'Ukupno pređeno: —';
       } else if (v < kmStart) {
@@ -121,7 +124,7 @@
     var pe = f.querySelector('[name=vraceno_eur]');
     var pr = f.querySelector('[name=vraceno_rsd]');
     var e = pe ? brojIz(pe.value) : null;
-    var r = pr ? brojIz(pr.value) : null;
+    var r = pr ? brojIz(pr.value, 'RSD') : null;
 
     if (e === null && r === null) { izlaz.innerHTML = ''; return; }
     var de = e === null ? 0 : e - ocekEur;

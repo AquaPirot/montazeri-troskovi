@@ -1,0 +1,41 @@
+PROHORECA TEREN - NADOGRADNJA 1.4
+================================
+
+Ovo je kumulativna nadogradnja i sadrži sve izmene iz verzija 1.1-1.3.
+
+NOVO U 1.4
+-----------
+
+1. Doplata depozita na terenu
+   - Radnik bira "Dodaj primljeni novac".
+   - Unosi iznos, EUR/RSD, ko je predao novac i opcionu napomenu.
+   - Doplata povećava ukupan primljeni depozit i očekivani povraćaj.
+   - Radnik i administrator vide sve doplate u izveštaju.
+
+2. Gorivo koje unosi kancelarija
+   - Administrator otvara konkretan teren i bira "Dodaj sipanje goriva".
+   - Unosi iznos, valutu, način plaćanja, litre, kilometražu, račun i slip.
+   - Unos ulazi u troškove, litre i potrošnju vozila.
+   - Jasno je označeno da je unos napravila kancelarija i ko ga je uneo.
+   - Radnik vidi unos, ali ne može da ga obriše.
+
+OBAVEZAN REDOSLED POSTAVLJANJA
+-----------------------------
+
+1. Napravi rezervnu kopiju baze i fajlova.
+2. U cPanel-u otvori phpMyAdmin i izaberi bazu aplikacije.
+3. Importuj fajl:
+      nadogradnja-02-doplate-admin-gorivo.sql
+   Ovaj SQL pokreće se samo jednom.
+4. Tek kada SQL import prođe uspešno, u File Manager-u otvori folder aplikacije
+   u kome je index.php.
+5. Otpremi ZIP verzije 1.4, klikni Extract / Izdvoji i potvrdi zamenu fajlova.
+6. Obriši ZIP sa servera i ponovo otvori aplikaciju.
+
+VAŽNO
+-----
+
+- Ako PHP fajlove postaviš pre SQL nadogradnje, aplikacija neće raditi dok ne
+  importuješ SQL fajl.
+- Paket NE sadrži config.php i ne menja korisnike, lozinke ni postojeće podatke.
+- SQL samo dodaje novu tabelu doplata i podatke o tome ko je uneo trošak.

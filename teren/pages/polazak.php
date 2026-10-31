@@ -23,8 +23,8 @@ if (je_post()) {
 
     $projekat = post('projekat');
     $vozilo   = postCeo('vozilo_id');
-    $depEur   = postBroj('depozit_eur') ?? 0.0;
-    $depRsd   = postBroj('depozit_rsd') ?? 0.0;
+    $depEur   = postNovac('depozit_eur', 'EUR') ?? 0.0;
+    $depRsd   = postNovac('depozit_rsd', 'RSD') ?? 0.0;
     $kmStart  = postCeo('km_start');
 
     if ($projekat === '')            $greske[] = 'Unesi naziv projekta ili mesto montaže.';
@@ -110,7 +110,7 @@ pocetak_strane('Polazak na teren', ['nazad' => 'index.php?s=pocetna']);
             <span class="sufiks">km</span>
         </div>
     </div>
-    <?= foto_polje('foto_km_start', 'Slikaj instrument tablu', 'Mora da se vidi kilometraža') ?>
+    <?= foto_polje('foto_km_start', 'Dodaj fotografiju instrument table', 'Slikaj sada ili izaberi iz galerije') ?>
 </div></div>
 
 <div class="sekcija-naslov">Kratka provera pre polaska</div>

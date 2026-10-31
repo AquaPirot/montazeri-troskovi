@@ -32,12 +32,72 @@ function aktivan_teren(int $korisnik_id): ?array
 
 function troskovi_terena(int $teren_id): array
 {
-    return redovi('SELECT * FROM troskovi WHERE teren_id = ? ORDER BY kreiran ASC, id ASC', [$teren_id]);
+    return redovi('SELECT x.*, k.ime AS uneo_ime
+                     FROM troskovi x
+                LEFT JOIN korisnici k ON k.id = x.uneo_id
+                    WHERE x.teren_id = ?
+                 ORDER BY x.kreiran ASC, x.id ASC', [$teren_id]);
 }
 
 function prijave_terena(int $teren_id): array
 {
     return redovi('SELECT * FROM prijave WHERE teren_id = ? ORDER BY kreirana ASC, id ASC', [$teren_id]);
+}
+
+/** Naknadno primljeni gotovinski depozit na jednom terenu. */
+function doplate_terena(int $teren_id): array
+{
+    return redovi('SELECT d.*, k.ime AS uneo_ime
+                     FROM doplate d
+                LEFT JOIN korisnici k ON k.id = d.uneo_id
+                    WHERE d.teren_id = ?
+                 ORDER BY d.kreirana ASC, d.id ASC', [$teren_id]);
+}
+
+/**
+ * Administrator trajno briše jedan teren i sve njegove fotografije.
+ *
+ * Troškovi i prijave se brišu preko ON DELETE CASCADE pravila u bazi.
+ * Fotografije se uklanjaju tek nakon uspešnog brisanja iz baze, da zapis ne bi
+ * ostao bez dokaza ako SQL operacija ne uspe.
+ */
+function obrisi_teren_sa_slikama(int $teren_id): bool
+{
+    $t = red('SELECT foto_km_start, foto_km_kraj FROM tereni WHERE id = ?', [$teren_id]);
+    if (!$t) return false;
+
+    $fotografije = [];
+    foreach ([$t['foto_km_start'], $t['foto_km_kraj']] as $foto) {
+        if ($foto) $fotografije[] = $foto;
+    }
+
+    $troskovi = redovi('SELECT foto_racun, foto_slip FROM troskovi WHERE teren_id = ?', [$teren_id]);
+    foreach ($troskovi as $tr) {
+        if ($tr['foto_racun']) $fotografije[] = $tr['foto_racun'];
+        if ($tr['foto_slip'])  $fotografije[] = $tr['foto_slip'];
+    }
+
+    $prijave = redovi('SELECT foto FROM prijave WHERE teren_id = ?', [$teren_id]);
+    foreach ($prijave as $p) {
+        if ($p['foto']) $fotografije[] = $p['foto'];
+    }
+
+    $pdo = baza();
+    $pdo->beginTransaction();
+    try {
+        $obrisano = upit('DELETE FROM tereni WHERE id = ?', [$teren_id])->rowCount();
+        if ($obrisano !== 1) {
+            $pdo->rollBack();
+            return false;
+        }
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        throw $e;
+    }
+
+    foreach (array_unique($fotografije) as $foto) obrisi_foto($foto);
+    return true;
 }
 
 /**
@@ -47,21 +107,26 @@ function prijave_terena(int $teren_id): array
  *   got_eur/got_rsd   – potrošeno gotovinom iz depozita
  *   kar_eur/kar_rsd   – plaćeno službenom karticom (ne dira depozit)
  *   lic_eur/lic_rsd   – plaćeno ličnim novcem (dug firme prema zaposlenom)
+ *   dop_eur/dop_rsd   – naknadno primljeni gotovinski depozit
+ *   uk_depozit_*      – početni depozit + doplate
  *   ocek_eur/ocek_rsd – koliko gotovine treba vratiti
  *   raz_eur/raz_rsd   – razlika stvarno vraćeno − očekivano (null dok se ne vrati)
  *   km, litri, gorivo_eur/gorivo_rsd, potrosnja, ocek_potrosnja, odstupanje, upozorenje
  */
-function obracun(array $t, ?array $troskovi = null): array
+function obracun(array $t, ?array $troskovi = null, ?array $doplate = null): array
 {
     $troskovi = $troskovi ?? troskovi_terena((int)$t['id']);
+    $doplate  = $doplate  ?? doplate_terena((int)$t['id']);
 
     $o = [
         'got_eur' => 0.0, 'got_rsd' => 0.0,
         'kar_eur' => 0.0, 'kar_rsd' => 0.0,
         'lic_eur' => 0.0, 'lic_rsd' => 0.0,
         'gorivo_eur' => 0.0, 'gorivo_rsd' => 0.0,
+        'dop_eur' => 0.0, 'dop_rsd' => 0.0,
         'litri' => 0.0,
         'broj_troskova' => count($troskovi),
+        'broj_doplata' => count($doplate),
         'bez_racuna' => 0,
     ];
 
@@ -76,9 +141,15 @@ function obracun(array $t, ?array $troskovi = null): array
         if (empty($tr['foto_racun'])) $o['bez_racuna']++;
     }
 
+    foreach ($doplate as $d) {
+        $o['dop_' . strtolower($d['valuta'])] += (float)$d['iznos'];
+    }
+
     // Gotovina: samo gotovinski troškovi skidaju depozit.
-    $o['ocek_eur'] = round((float)$t['depozit_eur'] - $o['got_eur'], 2);
-    $o['ocek_rsd'] = round((float)$t['depozit_rsd'] - $o['got_rsd'], 2);
+    $o['uk_depozit_eur'] = round((float)$t['depozit_eur'] + $o['dop_eur'], 2);
+    $o['uk_depozit_rsd'] = round((float)$t['depozit_rsd'] + $o['dop_rsd'], 2);
+    $o['ocek_eur'] = round($o['uk_depozit_eur'] - $o['got_eur'], 2);
+    $o['ocek_rsd'] = round($o['uk_depozit_rsd'] - $o['got_rsd'], 2);
 
     $o['raz_eur'] = $t['vraceno_eur'] === null ? null : round((float)$t['vraceno_eur'] - $o['ocek_eur'], 2);
     $o['raz_rsd'] = $t['vraceno_rsd'] === null ? null : round((float)$t['vraceno_rsd'] - $o['ocek_rsd'], 2);

@@ -61,8 +61,8 @@ if (je_post()) {
         $vrsta = post('vrsta');
         $opis  = post('opis');
         $km    = postCeo('km');
-        $tros  = postBroj('trosak');
         $val   = post('valuta');
+        $tros  = postNovac('trosak', $val);
         $vazi  = post('vazi_do');
 
         if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $datum) || !strtotime($datum)) $greske[] = 'Izaberi datum.';
