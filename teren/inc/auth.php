@@ -96,11 +96,16 @@ function pin_tajna(): string
     } catch (PDOException $e) {
         $t = '';
     }
-    if ($t === '') {
-        http_response_code(500);
-        exit('Baza nije nadograđena za prijavu PIN-om. Pokreni sql/nadogradnja-03-pin.sql u phpMyAdmin-u.');
-    }
+    if ($t === '') baza_nije_nadogradjena();
     return $t;
+}
+
+/** Jasna poruka umesto greške 500 kada SQL nadogradnja 03 nije pokrenuta. */
+function baza_nije_nadogradjena(): never
+{
+    http_response_code(500);
+    exit('Baza nije nadograđena za prijavu PIN-om. Pokreni sql/nadogradnja-03-pin.sql u phpMyAdmin-u, '
+       . 'u bazi čiji je naziv upisan u config.php.');
 }
 
 function pin_hash(string $pin): string
@@ -164,8 +169,12 @@ function ip_klijenta(): string
 function blokada_minuta(): ?int
 {
     $od = date('Y-m-d H:i:s', time() - PIN_MINUTA * 60);
-    $r = red('SELECT COUNT(*) AS br, MIN(vreme) AS prvi FROM pokusaji_prijave WHERE ip = ? AND vreme > ?',
-             [ip_klijenta(), $od]);
+    try {
+        $r = red('SELECT COUNT(*) AS br, MIN(vreme) AS prvi FROM pokusaji_prijave WHERE ip = ? AND vreme > ?',
+                 [ip_klijenta(), $od]);
+    } catch (PDOException $e) {
+        baza_nije_nadogradjena();
+    }
     if (!$r || (int)$r['br'] < PIN_POKUSAJA) return null;
     $kraj = strtotime($r['prvi']) + PIN_MINUTA * 60;
     return max(1, (int)ceil(($kraj - time()) / 60));
