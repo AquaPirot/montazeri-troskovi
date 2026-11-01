@@ -342,11 +342,7 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
     <div class="karta"><div class="karta-telo sitno">Ovim vozilom još nije išao nijedan teren.</div></div>
 <?php else: ?>
     <div class="karta"><div class="karta-telo">
-    <?php foreach ($tereni as $t):
-        $odst = ($t['potrosnja'] !== null && $st['ocek_potrosnja'])
-            ? round(($t['potrosnja'] - $st['ocek_potrosnja']) / $st['ocek_potrosnja'] * 100, 1) : null;
-        $lose = $odst !== null && abs($odst) > $st['prag'];
-    ?>
+    <?php foreach ($tereni as $t): ?>
         <a class="trosak" href="index.php?s=izvestaj&id=<?= (int)$t['id'] ?>">
             <span class="ik"><?= ikona('kamion', 18) ?></span>
             <span class="sred">
@@ -355,19 +351,17 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
                     if ($t['km'] !== null) echo ' · ' . h(broj($t['km'], 0)) . ' km';
                 ?></span>
             </span>
-            <span class="iz" style="<?= $lose ? 'color:var(--narandzasta)' : '' ?>">
+            <span class="iz">
                 <?= $t['potrosnja'] !== null ? h(broj($t['potrosnja'], 1)) : '—' ?>
                 <small><?= $t['potrosnja'] !== null ? 'L/100' : ($t['km_kraj'] === null ? 'u toku' : 'bez goriva') ?></small>
             </span>
         </a>
     <?php endforeach; ?>
     </div></div>
-    <?php if ($st['ocek_potrosnja']): ?>
-        <div class="sitno" style="margin:-4px 2px 12px">
-            Narandžasto je označen teren koji odstupa više od <?= broj($st['prag'], 0) ?>% od očekivanih
-            <?= broj($st['ocek_potrosnja'], 1) ?> L/100 km.
-        </div>
-    <?php endif; ?>
+    <div class="sitno" style="margin:-4px 2px 12px">
+        Potrošnja po jednom terenu je procena iz sipanja i zavisi od toga koliko je goriva bilo u
+        rezervoaru na polasku i povratku. Pouzdaniji je prosek vozila kroz više terena, gore.
+    </div>
 <?php endif; ?>
 
 <!-- ================= STANJE VOZILA ================= -->

@@ -26,7 +26,8 @@ if ($trazeni) {
 
 $ispravka = $t['status'] === 'ispravka';
 $nazad    = 'index.php?s=' . ($ispravka ? 'izvestaj&id=' . (int)$t['id'] : 'pocetna');
-$o        = obracun($t);
+$troskoviT = troskovi_terena((int)$t['id']);
+$o        = obracun($t, $troskoviT);
 $greske   = [];
 
 if (je_post()) {
@@ -157,6 +158,26 @@ pocetak_strane($ispravka ? 'Ispravi izveštaj' : 'Povratak sa terena', ['nazad' 
     <?= napomena_box('Firma ti duguje za troškove plaćene ličnim novcem: <b>' . h(implode(' i ', $d)) . '</b>.', 'info', 'novcanik') ?>
 <?php endif; ?>
 
+<?php
+    // Isto što kancelarija vidi u obračunu – ono što se zna pre unosa završne kilometraže.
+    $pre = nepravilnosti(array_merge($t, ['km_kraj' => null, 'vreme_povratka' => null]), $o, $troskoviT);
+?>
+<div class="sekcija-naslov">Šta ide u obračun</div>
+<div class="karta"><div class="karta-telo">
+    <div class="red"><span class="k">Evidentirani troškovi</span>
+        <span class="v mono"><?= broj($o['uk_rsd'], 0) ?> RSD<?= $o['uk_eur'] > 0 ? '<br>' . broj($o['uk_eur'], 2) . ' EUR' : '' ?></span></div>
+    <div class="red"><span class="k">Broj računa</span><span class="v mono"><?= count($troskoviT) ?></span></div>
+    <div class="red"><span class="k">Sipano gorivo</span><span class="v mono"><?= broj($o['litri'], 1) ?> L</span></div>
+    <?php if ($pre): ?>
+        <div class="op-provera">
+            <div class="op-lab" style="color:#9A3412"><?= ikona('alarm', 14) ?> Proveri pre slanja</div>
+            <ul><?php foreach ($pre as $p): ?><li><?= h($p) ?></li><?php endforeach; ?></ul>
+            <div class="sitno" style="margin-top:6px;color:#9A3412">Možeš poslati i ovako – kancelarija će videti iste napomene.</div>
+        </div>
+    <?php endif; ?>
+    <div class="sitno" style="margin-top:10px">Obračun po kategorijama i razduženje aplikacija pravi sama – ne moraš ništa da sabiraš.</div>
+</div></div>
+
 <div class="sekcija-naslov">Potvrda pre zatvaranja</div>
 <?= potvrda('k_vozilo', 'Stanje vozila provereno i problem prijavljen', $cek('k_vozilo')) ?>
 <?= potvrda('k_kabina', 'Kabina i tovarni prostor su uredni',           $cek('k_kabina')) ?>
@@ -171,7 +192,7 @@ pocetak_strane($ispravka ? 'Ispravi izveštaj' : 'Povratak sa terena', ['nazad' 
 
 <div class="dno-akcija">
     <button class="dugme d-glavno" type="submit">
-        <?= ikona('povratak', 20) ?> <?= $ispravka ? 'Pošalji ispravljen izveštaj' : 'Zatvori teren i pošalji izveštaj' ?>
+        <?= ikona('povratak', 20) ?> <?= $ispravka ? 'Pošalji ispravku na pregled' : 'Pošalji na pregled' ?>
     </button>
 </div>
 </form>

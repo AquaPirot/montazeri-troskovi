@@ -69,7 +69,7 @@ function pocetak_strane(string $naslov, array $o = []): void
 <meta name="theme-color" content="#0F172A">
 <meta name="robots" content="noindex, nofollow">
 <title><?= h($naslov) ?> · AG GROUP Teren</title>
-<link rel="stylesheet" href="assets/css/teren.css?v=4">
+<link rel="stylesheet" href="assets/css/teren.css?v=5">
 </head>
 <?php
     $jeAdmin = $k && $k['uloga'] === 'admin';

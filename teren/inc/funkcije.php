@@ -8,15 +8,25 @@ if (!defined('TEREN')) { http_response_code(403); exit('Zabranjen pristup.'); }
    ŠIFARNICI
    ============================================================ */
 const VRSTE = [
-    'gorivo'    => ['n' => 'Gorivo',           'ik' => 'gorivo'],
-    'put'       => ['n' => 'Put i putarina',   'ik' => 'put'],
-    'smestaj'   => ['n' => 'Smeštaj',          'ik' => 'krevet'],
-    'hrana'     => ['n' => 'Hrana',            'ik' => 'hrana'],
-    'pice'      => ['n' => 'Piće',             'ik' => 'pice'],
-    'materijal' => ['n' => 'Materijal',        'ik' => 'materijal'],
-    'alat'      => ['n' => 'Alat',             'ik' => 'alat'],
-    'ostalo'    => ['n' => 'Ostalo',           'ik' => 'ostalo'],
+    'gorivo'    => ['n' => 'Gorivo',          'ik' => 'gorivo',    'opis' => 'Sva sipanja tokom puta'],
+    'put'       => ['n' => 'Put i parking',   'ik' => 'put',       'opis' => 'Putarine, parking i slično'],
+    'smestaj'   => ['n' => 'Smeštaj',         'ik' => 'krevet',    'opis' => 'Hotel, apartman, prenoćište'],
+    'hrana'     => ['n' => 'Hrana i piće',    'ik' => 'hrana',     'opis' => 'Obroci, voda, kafa'],
+    'materijal' => ['n' => 'Materijal',       'ik' => 'materijal', 'opis' => 'Kupljeno za posao'],
+    'alat'      => ['n' => 'Alat',            'ik' => 'alat',      'opis' => 'Kupljen alat i oprema'],
+    'ostalo'    => ['n' => 'Ostalo',          'ik' => 'ostalo',    'opis' => 'Uz kratak opis'],
 ];
+
+/** Vrsta troška; stari unosi "pice" (verzija 1.6) vode se kao "Hrana i piće". */
+function vrsta_kljuc(?string $v): string
+{
+    if ($v === 'pice') return 'hrana';
+    return isset(VRSTE[$v]) ? $v : 'ostalo';
+}
+function vrsta(?string $v): array
+{
+    return VRSTE[vrsta_kljuc($v)];
+}
 
 const PLACANJA = [
     'gotovina' => ['n' => 'Gotovina iz depozita',    'k' => 'Gotovina',     'ik' => 'novac'],

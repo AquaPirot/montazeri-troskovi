@@ -138,7 +138,7 @@ function obracun(array $t, ?array $troskovi = null, ?array $doplate = null): arr
 
     $mapa = ['gotovina' => 'got', 'kartica' => 'kar', 'licni' => 'lic'];
     foreach ($troskovi as $tr) {
-        $vr = isset($o['po_vrsti'][$tr['vrsta']]) ? $tr['vrsta'] : 'ostalo';
+        $vr = vrsta_kljuc($tr['vrsta']);
         $o['po_vrsti'][$vr][strtolower($tr['valuta'])] += (float)$tr['iznos'];
         $o['po_vrsti'][$vr]['broj']++;
         if ($vr === 'gorivo') $o['po_vrsti'][$vr]['litri'] += (float)$tr['litri'];
@@ -212,7 +212,7 @@ function dokazi_terena(array $t, array $troskovi, array $prijave): array
     if ($t['foto_km_start']) $d[] = ['f' => $t['foto_km_start'], 'l' => 'Km polazak',  'ik' => 'slika'];
     if ($t['foto_km_kraj'])  $d[] = ['f' => $t['foto_km_kraj'],  'l' => 'Km povratak', 'ik' => 'slika'];
     foreach ($troskovi as $tr) {
-        $naziv = VRSTE[$tr['vrsta']]['n'];
+        $naziv = vrsta($tr['vrsta'])['n'];
         if ($tr['foto_racun']) $d[] = ['f' => $tr['foto_racun'], 'l' => 'Račun · ' . $naziv, 'ik' => 'racun'];
         if ($tr['foto_slip'])  $d[] = ['f' => $tr['foto_slip'],  'l' => 'Slip · ' . $naziv,  'ik' => 'kartica'];
     }
@@ -305,6 +305,53 @@ function registracija_vozila(int $vozilo_id): ?array
     return red('SELECT datum, vazi_do FROM servis
                  WHERE vozilo_id = ? AND vrsta = "registracija" AND vazi_do IS NOT NULL
               ORDER BY vazi_do DESC LIMIT 1', [$vozilo_id]);
+}
+
+/**
+ * Šta treba proveriti pre odobrenja. Računa se samo iz unetih podataka –
+ * radnik ništa dodatno ne popunjava. Vraća listu kratkih rečenica.
+ */
+function nepravilnosti(array $t, array $o, array $troskovi): array
+{
+    $n = [];
+
+    if ($o['ocek_eur'] < -0.005 || $o['ocek_rsd'] < -0.5) {
+        $d = [];
+        if ($o['ocek_eur'] < -0.005) $d[] = broj(-$o['ocek_eur'], 2) . ' EUR';
+        if ($o['ocek_rsd'] < -0.5)   $d[] = broj(-$o['ocek_rsd'], 0) . ' RSD';
+        $n[] = 'Iz gotovine je potrošeno više nego što je primljeno: ' . implode(', ', $d) . '.';
+    }
+
+    if ($t['km_kraj'] !== null && ima_razlike($o['raz_eur'], $o['raz_rsd'])) {
+        $n[] = 'Vraćena gotovina se ne slaže sa obračunom: ' . opis_razlike($o['raz_eur'], $o['raz_rsd']) . '.';
+    }
+
+    $bezRacuna = count(array_filter($troskovi, fn($x) => empty($x['foto_racun'])));
+    if ($bezRacuna) $n[] = mnozina($bezRacuna, 'trošak', 'troška', 'troškova') . ' bez fotografije računa.';
+
+    $bezOpisa = count(array_filter($troskovi,
+        fn($x) => vrsta_kljuc($x['vrsta']) === 'ostalo' && trim((string)($x['opis'] ?? '')) === ''));
+    if ($bezOpisa) $n[] = mnozina($bezOpisa, 'stavka', 'stavke', 'stavki') . ' u „Ostalo" bez opisa.';
+
+    foreach ($troskovi as $x) {
+        if ($x['vrsta'] !== 'gorivo' || $x['km_sipanja'] === null) continue;
+        $km = (int)$x['km_sipanja'];
+        if ($km < (int)$t['km_start'] || ($t['km_kraj'] !== null && $km > (int)$t['km_kraj'])) {
+            $n[] = 'Sipanje na ' . broj($km, 0) . ' km je van kilometraže terena ('
+                 . broj($t['km_start'], 0) . ' – ' . ($t['km_kraj'] !== null ? broj($t['km_kraj'], 0) : 'u toku') . ').';
+        }
+    }
+
+    if ($t['vreme_povratka']) {
+        $nisu = [];
+        if (!(int)$t['k_vozilo'])  $nisu[] = 'vozilo';
+        if (!(int)$t['k_kabina'])  $nisu[] = 'kabina i tovarni prostor';
+        if (!(int)$t['k_alat'])    $nisu[] = 'alat i materijal';
+        if (!(int)$t['k_racuni'])  $nisu[] = 'svi računi uneti';
+        if ($nisu) $n[] = 'Na povratku nije potvrđeno: ' . implode(', ', $nisu) . '.';
+    }
+
+    return $n;
 }
 
 /** Brojači za kartice u administratorskom pregledu. */

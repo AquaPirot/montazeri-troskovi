@@ -38,6 +38,13 @@ if (je_post()) {
     if (!isset(VRSTE[$vrsta]))                    $greske[] = 'Izaberi vrstu troška.';
     if (!isset(PLACANJA[$nacin]))                 $greske[] = 'Izaberi način plaćanja.';
 
+    $opis = null;
+    if ($vrsta === 'ostalo') {
+        $opis = post('opis');
+        if (mb_strlen($opis) < 3)   $greske[] = 'Za „Ostalo" napiši kratko šta je plaćeno.';
+        if (mb_strlen($opis) > 200) $greske[] = 'Opis je predugačak (najviše 200 znakova).';
+    }
+
     $litri = null; $kmSip = null;
     if ($vrsta === 'gorivo') {
         $litri = postBroj('litri');
@@ -59,19 +66,22 @@ if (je_post()) {
     }
 
     if (!$greske) {
+        // Kolona "opis" se šalje samo za "Ostalo", da ostali unosi rade i pre SQL nadogradnje 05.
+        $kolone = ['teren_id', 'uneo_id', 'izvor', 'iznos', 'valuta', 'vrsta', 'nacin_placanja',
+                   'litri', 'km_sipanja', 'foto_racun', 'foto_slip'];
+        $vrednosti = [$t['id'], $k['id'], 'radnik', $iznos, $val, $vrsta, $nacin, $litri, $kmSip, $fotoRacun, $fotoSlip];
+        if ($opis !== null) { $kolone[] = 'opis'; $vrednosti[] = $opis; }
         try {
-            upit('INSERT INTO troskovi
-                    (teren_id, uneo_id, izvor, iznos, valuta, vrsta, nacin_placanja, litri, km_sipanja, foto_racun, foto_slip)
-                  VALUES (?,?,"radnik",?,?,?,?,?,?,?,?)',
-                 [$t['id'], $k['id'], $iznos, $val, $vrsta, $nacin, $litri, $kmSip, $fotoRacun, $fotoSlip]);
+            upit('INSERT INTO troskovi (' . implode(', ', $kolone) . ') VALUES ('
+                 . implode(',', array_fill(0, count($kolone), '?')) . ')', $vrednosti);
         } catch (PDOException $e) {
-            // Piće i Alat traže SQL nadogradnju 04; bez nje baza odbija novu vrstu.
+            // "Alat" i opis za "Ostalo" traže SQL nadogradnju 05.
             obrisi_foto($fotoRacun);
             obrisi_foto($fotoSlip);
-            if (!in_array($vrsta, ['pice', 'alat'], true)) throw $e;
+            if (!in_array($vrsta, ['alat', 'ostalo'], true)) throw $e;
             error_log('TEREN trošak: ' . $e->getMessage());
-            postavi_poruku('Vrsta „' . VRSTE[$vrsta]['n'] . '" još nije uključena u bazi. '
-                . 'Izaberi „Hrana" ili „Materijal" i javi kancelariji (nadogradnja 04).', 'greska');
+            postavi_poruku('„' . VRSTE[$vrsta]['n'] . '" još nije uključeno u bazi. '
+                . 'Izaberi „Materijal" i javi kancelariji (nadogradnja 05).', 'greska');
             idi('trosak', $t['status'] === 'ispravka' ? ['teren' => (int)$t['id']] : []);
         }
 
@@ -113,6 +123,11 @@ pocetak_strane('Dodaj trošak', ['nazad' => $nazad]);
     <?php foreach (VRSTE as $kljuc => $v): ?>
         <?= plocica('vrsta', $kljuc, $v['n'], $izVrsta === $kljuc, $v['ik']) ?>
     <?php endforeach; ?>
+    </div>
+    <div class="polje" style="margin-top:14px" data-prikazi-ako="vrsta=ostalo" <?= $izVrsta === 'ostalo' ? '' : 'hidden' ?>>
+        <label for="opis">Šta je plaćeno?</label>
+        <input class="unos" id="opis" name="opis" maxlength="200" placeholder="npr. pranje kombija, fotokopije"
+               value="<?= h(post('opis')) ?>">
     </div>
 </div></div>
 

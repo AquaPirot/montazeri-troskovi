@@ -1,0 +1,82 @@
+PROHORECA TEREN - NADOGRADNJA 1.7
+=================================
+
+Postavlja se preko verzije 1.5 ili 1.6 - svejedno koja je na serveru.
+
+NOVO U 1.7
+----------
+
+1. Obračun terena na vrhu izveštaja - pravi se sam iz unetih podataka
+   - Teren, šef ekipe, vozilo, datum polaska i povratka.
+   - Četiri podatka: evidentirani troškovi (RSD i EUR odvojeno),
+     pređeno km, trajanje, sipano gorivo u litrima sa procenom
+     potrošnje i objašnjenjem da je to procena iz sipanja.
+   - "Za proveru": šta ne štima (gotovina, računi koji fale,
+     sipanje van kilometraže, nepotvrđene stavke).
+   - Dok je ekipa na terenu piše "Obračun terena · u toku".
+
+2. Na šta je potrošeno - jedna tabela po kategoriji
+   - Prikazuju se samo kategorije sa troškom.
+   - Dodir na kategoriju otvara pojedinačne račune.
+
+3. Razduženje - čijim novcem
+   - Primljena gotovina (sa doplatama), potrošeno iz gotovine,
+     treba vratiti, stvarno vraćeno, razlika.
+   - Plaćeno službenom karticom; radnik platio svojim novcem.
+
+4. Vrste troška
+   - "Hrana i piće" (piće se više ne odvaja; stari unosi "Piće"
+     iz 1.6 automatski prelaze ovde)
+   - "Put i parking" (ranije "Put i putarina")
+   - nova vrsta "Alat"
+   - "Ostalo" traži kratak opis šta je plaćeno
+
+5. Povratak
+   - Pre slanja šef vidi šta ide u obračun i šta treba proveriti.
+   - Dugme se zove "Pošalji na pregled".
+
+6. Potrošnja goriva po jednom terenu više se ne poredi sa
+   očekivanom i ne označava narandžasto - nije osnova za ocenu
+   vozača. Prosek vozila kroz više terena ostaje u kartonu vozila.
+
+
+OBAVEZAN REDOSLED POSTAVLJANJA
+------------------------------
+
+1. phpMyAdmin > aggroup_tereni > Export > Go   (rezervna kopija)
+
+2. phpMyAdmin > aggroup_tereni > kartica SQL > nalepi SVE ispod > Go
+
+      ALTER TABLE troskovi
+        MODIFY vrsta ENUM('gorivo','put','smestaj','hrana','pice',
+                          'materijal','alat','ostalo') NOT NULL;
+
+      UPDATE troskovi SET vrsta = 'hrana' WHERE vrsta = 'pice';
+
+      ALTER TABLE troskovi
+        MODIFY vrsta ENUM('gorivo','put','smestaj','hrana',
+                          'materijal','alat','ostalo') NOT NULL;
+
+      ALTER TABLE troskovi
+        ADD COLUMN opis VARCHAR(200) NULL AFTER nacin_placanja;
+
+   Treba da prođu sve četiri. Ako poslednja javi
+   "Duplicate column name 'opis'", nadogradnja je već bila
+   pokrenuta - to je u redu.
+   Isto je u fajlu sql/nadogradnja-05-obracun-terena.sql.
+
+3. File Manager > teren.aggroup.rs > Otpremi ZIP 1.7 > Izdvoji >
+   potvrdi zamenu fajlova.
+
+4. Obriši ZIP i ovaj TXT sa servera.
+
+Ako 1.6 NISI postavio, ne moraš ništa posebno - ova nadogradnja
+sadrži i nju.
+
+
+VAŽNO
+-----
+
+- Ako fajlove postaviš pre SQL-a, sve radi osim izbora "Alat" i
+  "Ostalo" - aplikacija tada kaže radniku da izabere "Materijal".
+- Paket NE sadrži config.php ni fotografije i ne menja PIN-ove.

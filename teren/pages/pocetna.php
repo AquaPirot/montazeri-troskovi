@@ -170,9 +170,9 @@ pocetak_strane('Zdravo, ' . $ime);
         <div class="sitno">Još nema unetih troškova.</div>
     <?php else: foreach (array_reverse($troskovi) as $tr): ?>
         <div class="trosak">
-            <span class="ik"><?= ikona(VRSTE[$tr['vrsta']]['ik'], 18) ?></span>
+            <span class="ik"><?= ikona(vrsta($tr['vrsta'])['ik'], 18) ?></span>
             <span class="sred">
-                <span class="n1"><?= h(VRSTE[$tr['vrsta']]['n']) ?></span>
+                <span class="n1"><?= h(vrsta($tr['vrsta'])['n']) ?></span>
                 <span class="n2">
                     <?= h(datumKratko($tr['kreiran'])) ?> · <?= h(PLACANJA[$tr['nacin_placanja']]['k']) ?>
                     <?php if (($tr['izvor'] ?? 'radnik') === 'admin'): ?> · unela kancelarija<?php endif; ?>

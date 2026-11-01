@@ -121,22 +121,86 @@ function novac_red(string $naziv, ?float $eur, ?float $rsd): string
          . '<span class="v mono">' . $fe . '<br>' . $fr . '</span></div>';
 }
 
-pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? 'admin' : 'moji')]);
+pocetak_strane('Obračun terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? 'admin' : 'moji')]);
 ?>
 <div class="sadrzaj">
 
-<!-- ================= OSNOVNI PODACI ================= -->
-<div class="karta"><div class="karta-telo">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px">
-        <div style="font-size:19px;font-weight:700;letter-spacing:-.3px;line-height:1.25"><?= h($t['projekat']) ?></div>
+<?php
+    $zavrsen   = $t['km_kraj'] !== null;
+    $problemi  = nepravilnosti($t, $o, $troskovi);
+    $poKat     = [];
+    foreach ($troskovi as $tr) $poKat[vrsta_kljuc($tr['vrsta'])][] = $tr;
+    $sumaVrste = array_filter($o['po_vrsti'], fn($x) => $x['broj'] > 0);
+    $iznosEurRsd = function (float $eur, float $rsd, bool $nula = true): string {
+        $d = [];
+        if ($rsd > 0 || ($nula && $eur <= 0)) $d[] = broj($rsd, 0) . ' RSD';
+        if ($eur > 0) $d[] = broj($eur, 2) . ' EUR';
+        return implode(' · ', $d);
+    };
+    $kolone = function (?float $eur, ?float $rsd, string $klasa = ''): string {
+        $e = $eur === null ? '—' : broj($eur, 2);
+        $r = $rsd === null ? '—' : broj($rsd, 0);
+        return '<td class="desno mono ' . $klasa . '">' . $r . '</td><td class="desno mono ' . $klasa . '">' . $e . '</td>';
+    };
+?>
+<!-- ================= OBRAČUN TERENA ================= -->
+<div class="sekcija-naslov" style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <span>Obračun terena<?= $zavrsen ? '' : ' · u toku' ?></span>
+    <button type="button" class="stampaj ne-stampaj" onclick="window.print()"><?= ikona('stampa', 16) ?> Štampaj / PDF</button>
+</div>
+
+<div class="karta obracun-puta"><div class="karta-telo">
+    <div class="op-glava">
+        <div style="min-width:0">
+            <div class="op-naziv"><?= h($t['projekat']) ?></div>
+            <div class="op-meta">
+                <span><?= ikona('korisnik', 14) ?> <?= h($t['sef_ime']) ?></span>
+                <span><?= ikona('kamion', 14) ?> <?= h($t['vozilo_naziv']) ?> · <?= h($t['vozilo_reg']) ?></span>
+                <span><?= ikona('kalendar', 14) ?> <?= h(datum($t['vreme_polaska'])) ?> – <?= $t['vreme_povratka'] ? h(datum($t['vreme_povratka'])) : 'u toku' ?></span>
+                <?php if ($t['odobrio_ime']): ?>
+                    <span><?= ikona('cek', 14) ?> odobrio <?= h($t['odobrio_ime']) ?>, <?= h(datum($t['vreme_odobrenja'], false)) ?></span>
+                <?php endif; ?>
+            </div>
+        </div>
         <?= oznaka_statusa($t['status']) ?>
     </div>
-    <div class="red"><span class="k">Šef ekipe</span><span class="v"><?= h($t['sef_ime']) ?></span></div>
-    <div class="red"><span class="k">Vozilo</span><span class="v"><?= h($t['vozilo_naziv']) ?> · <?= h($t['vozilo_reg']) ?></span></div>
-    <div class="red"><span class="k">Polazak</span><span class="v mono"><?= h(datum($t['vreme_polaska'])) ?></span></div>
-    <div class="red"><span class="k">Povratak</span><span class="v mono"><?= $t['vreme_povratka'] ? h(datum($t['vreme_povratka'])) : 'u toku' ?></span></div>
-    <?php if ($t['odobrio_ime']): ?>
-        <div class="red"><span class="k">Odobrio</span><span class="v"><?= h($t['odobrio_ime']) ?> · <?= h(datum($t['vreme_odobrenja'], false)) ?></span></div>
+
+    <div class="op-brojke">
+        <div>
+            <div class="op-lab">Evidentirani troškovi</div>
+            <div class="op-br"><?= broj($o['uk_rsd'], 0) ?><small>RSD</small></div>
+            <div class="op-pod"><?= $o['uk_eur'] > 0 ? '+ ' . broj($o['uk_eur'], 2) . ' EUR' : 'bez troškova u EUR' ?></div>
+        </div>
+        <div>
+            <div class="op-lab">Pređeno</div>
+            <div class="op-br"><?= $o['km'] !== null ? broj($o['km'], 0) : '—' ?><small>km</small></div>
+            <div class="op-pod"><?= broj($t['km_start'], 0) ?> → <?= $zavrsen ? broj($t['km_kraj'], 0) : 'u toku' ?></div>
+        </div>
+        <div>
+            <div class="op-lab">Trajanje</div>
+            <div class="op-br"><?= $o['dana'] ?? '—' ?><small><?= $o['dana'] === 1 ? 'dan' : 'dana' ?></small></div>
+            <div class="op-pod"><?= $zavrsen ? 'od polaska do povratka' : 'do danas' ?></div>
+        </div>
+        <div>
+            <div class="op-lab">Sipano gorivo</div>
+            <div class="op-br"><?= broj($o['litri'], 1) ?><small>L</small></div>
+            <div class="op-pod"><?= $o['potrosnja'] !== null
+                ? 'procenjeno ' . broj($o['potrosnja'], 1) . ' L/100 km'
+                : ($zavrsen ? 'nema sipanja za procenu' : 'procena posle povratka') ?></div>
+        </div>
+    </div>
+    <?php if ($o['potrosnja'] !== null): ?>
+        <div class="op-fusnota">Procena je zbir sipanja podeljen sa pređenim kilometrima. Tačna je samo ako je rezervoar
+            na polasku bio pun i na kraju ponovo dopunjen do punog – nije osnova za ocenu vozača.</div>
+    <?php endif; ?>
+
+    <?php if ($problemi): ?>
+        <div class="op-provera">
+            <div class="op-lab" style="color:#9A3412"><?= ikona('alarm', 14) ?> Za proveru</div>
+            <ul><?php foreach ($problemi as $p): ?><li><?= h($p) ?></li><?php endforeach; ?></ul>
+        </div>
+    <?php elseif ($zavrsen): ?>
+        <div class="op-provera ok"><?= ikona('cek', 16) ?> Nema ničeg neuobičajenog u unetim podacima.</div>
     <?php endif; ?>
 </div></div>
 
@@ -144,132 +208,104 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
     <?= napomena_box('<b>Vraćeno na ispravku:</b><br>' . nl2br(h($t['komentar_admina'])), 'greska', 'vrati') ?>
 <?php endif; ?>
 
-<!-- ================= ZAVRŠNI OBRAČUN PUTA ================= -->
-<?php
-    $zavrsen = $t['km_kraj'] !== null;
-    $kat = array_filter($o['po_vrsti'], fn($x) => $x['broj'] > 0);
-    $gorivoPoKm = ($o['km'] && $o['po_vrsti']['gorivo']['rsd'] > 0)
-        ? $o['po_vrsti']['gorivo']['rsd'] / $o['km'] : null;
-?>
-<div class="sekcija-naslov" style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-    <span><?= $zavrsen ? 'Završni obračun puta' : 'Obračun do sada' ?></span>
-    <button type="button" class="stampaj ne-stampaj" onclick="window.print()"><?= ikona('stampa', 16) ?> Štampaj / PDF</button>
-</div>
-
-<div class="karta obracun-puta"><div class="karta-telo">
-    <div class="op-brojke">
-        <div>
-            <div class="op-lab">Pređeno</div>
-            <div class="op-br"><?= $o['km'] !== null ? broj($o['km'], 0) : '—' ?><small>km</small></div>
-            <div class="op-pod"><?= broj($t['km_start'], 0) ?> → <?= $t['km_kraj'] !== null ? broj($t['km_kraj'], 0) : 'u toku' ?></div>
-        </div>
-        <div>
-            <div class="op-lab">Trajanje</div>
-            <div class="op-br"><?= $o['dana'] ?? '—' ?><small><?= $o['dana'] === 1 ? 'dan' : 'dana' ?></small></div>
-            <div class="op-pod"><?= h(datum($t['vreme_polaska'], false)) ?><?= $t['vreme_povratka'] ? ' – ' . h(datum($t['vreme_povratka'], false)) : ' – u toku' ?></div>
-        </div>
-        <div>
-            <div class="op-lab">Potrošnja goriva</div>
-            <div class="op-br <?= $o['upozorenje'] ? 'lose' : '' ?>"><?= $o['potrosnja'] !== null ? broj($o['potrosnja'], 1) : '—' ?><small>L/100</small></div>
-            <div class="op-pod"><?php
-                echo broj($o['litri'], 1) . ' L';
-                if ($o['odstupanje'] !== null) echo ' · ' . ($o['odstupanje'] > 0 ? '+' : '') . broj($o['odstupanje'], 0) . '% od očekivanog';
-            ?></div>
-        </div>
-        <div>
-            <div class="op-lab">Ukupno troškovi</div>
-            <div class="op-br"><?= broj($o['uk_rsd'], 0) ?><small>RSD</small></div>
-            <div class="op-pod"><?= $o['uk_eur'] > 0 ? '+ ' . broj($o['uk_eur'], 2) . ' EUR' : 'bez troškova u EUR' ?></div>
-        </div>
-    </div>
-
-    <?php if (!$kat): ?>
-        <div class="sitno" style="margin-top:14px">Još nema unetih troškova.</div>
-    <?php else: ?>
-    <table class="op-tabela">
-        <thead><tr><th>Vrsta</th><th class="desno">RSD</th><th class="desno">EUR</th></tr></thead>
-        <tbody>
-        <?php foreach ($kat as $kljuc => $x): ?>
-            <tr>
-                <td>
-                    <span class="op-vrsta"><?= ikona(VRSTE[$kljuc]['ik'], 16) ?> <?= h(VRSTE[$kljuc]['n']) ?></span>
-                    <span class="sitno"><?= h(mnozina($x['broj'], 'račun', 'računa', 'računa')) ?><?php
-                        if ($kljuc === 'gorivo' && $x['litri'] > 0) echo ' · ' . broj($x['litri'], 1) . ' L';
+<!-- ================= TROŠKOVI PO KATEGORIJI ================= -->
+<div class="sekcija-naslov">Na šta je potrošeno</div>
+<div class="karta"><div class="karta-telo">
+<?php if (!$sumaVrste): ?>
+    <div class="sitno">Još nema unetih troškova.</div>
+<?php else: ?>
+    <div class="kat-glava"><span>Kategorija</span><span>RSD</span><span>EUR</span></div>
+    <?php foreach ($sumaVrste as $kljuc => $x): ?>
+    <details class="kat">
+        <summary>
+            <span class="kat-ime"><?= ikona(VRSTE[$kljuc]['ik'], 17) ?>
+                <span><b><?= h(VRSTE[$kljuc]['n']) ?></b>
+                <span class="sitno"><?= h(mnozina($x['broj'], 'račun', 'računa', 'računa')) ?><?=
+                    $kljuc === 'gorivo' && $x['litri'] > 0 ? ' · ' . broj($x['litri'], 1) . ' L' : '' ?></span></span>
+            </span>
+            <span class="mono"><?= $x['rsd'] > 0 ? broj($x['rsd'], 0) : '—' ?></span>
+            <span class="mono"><?= $x['eur'] > 0 ? broj($x['eur'], 2) : '—' ?></span>
+        </summary>
+        <div class="kat-stavke">
+        <?php foreach ($poKat[$kljuc] as $tr): ?>
+            <div class="trosak">
+                <span class="sred">
+                    <span class="n1"><?= $tr['opis'] ?? null ? h($tr['opis']) : h(datumKratko($tr['kreiran'])) ?></span>
+                    <span class="n2"><?php
+                        if ($tr['opis'] ?? null) echo h(datumKratko($tr['kreiran'])) . ' · ';
+                        echo h(PLACANJA[$tr['nacin_placanja']]['k']);
+                        if (($tr['izvor'] ?? 'radnik') === 'admin') echo ' · unela kancelarija' . ($tr['uneo_ime'] ? ': ' . h($tr['uneo_ime']) : '');
+                        if ($tr['vrsta'] === 'gorivo' && $tr['litri'] !== null) echo ' · ' . broj($tr['litri'], 1) . ' L na ' . broj((int)$tr['km_sipanja'], 0) . ' km';
+                        if ($kljuc === 'ostalo' && !($tr['opis'] ?? null)) echo ' · <span class="lose">bez opisa</span>';
+                        if (!$tr['foto_racun']) echo ' · <span class="lose">bez računa</span>';
                     ?></span>
-                </td>
-                <td class="desno mono"><?= $x['rsd'] > 0 ? broj($x['rsd'], 0) : '—' ?></td>
-                <td class="desno mono"><?= $x['eur'] > 0 ? broj($x['eur'], 2) : '—' ?></td>
-            </tr>
+                    <?php if ($tr['foto_racun'] || $tr['foto_slip']): ?>
+                    <span class="n2 ne-stampaj">
+                        <?php if ($tr['foto_racun']): ?><a class="link" href="index.php?s=slika&amp;f=<?= h(rawurlencode($tr['foto_racun'])) ?>" target="_blank" rel="noopener">račun</a><?php endif; ?>
+                        <?php if ($tr['foto_slip']): ?> · <a class="link" href="index.php?s=slika&amp;f=<?= h(rawurlencode($tr['foto_slip'])) ?>" target="_blank" rel="noopener">slip</a><?php endif; ?>
+                    </span>
+                    <?php endif; ?>
+                </span>
+                <span class="iz"><?= broj($tr['iznos'], $tr['valuta'] === 'RSD' ? 0 : 2) ?><small><?= h($tr['valuta']) ?></small></span>
+                <?php if ($mozeIspravku && ($tr['izvor'] ?? 'radnik') !== 'admin'): ?>
+                    <form method="post" data-bez-zakljucavanja>
+                        <?= csrf_polje() ?>
+                        <input type="hidden" name="akcija" value="obrisi_trosak">
+                        <input type="hidden" name="trosak_id" value="<?= (int)$tr['id'] ?>">
+                        <button class="brisi" type="submit" data-pitaj="Obrisati ovaj trošak?" aria-label="Obriši trošak"><?= ikona('kanta', 18) ?></button>
+                    </form>
+                <?php elseif ($jeAdmin && ($tr['izvor'] ?? 'radnik') === 'admin' && $t['status'] !== 'odobren'): ?>
+                    <form method="post" data-bez-zakljucavanja>
+                        <?= csrf_polje() ?>
+                        <input type="hidden" name="akcija" value="obrisi_admin_trosak">
+                        <input type="hidden" name="trosak_id" value="<?= (int)$tr['id'] ?>">
+                        <button class="brisi" type="submit" data-pitaj="Obrisati ovaj unos goriva kancelarije?" aria-label="Obriši unos goriva"><?= ikona('kanta', 18) ?></button>
+                    </form>
+                <?php endif; ?>
+            </div>
         <?php endforeach; ?>
-        </tbody>
-        <tfoot><tr>
-            <td>Ukupno</td>
-            <td class="desno mono"><?= broj($o['uk_rsd'], 0) ?></td>
-            <td class="desno mono"><?= broj($o['uk_eur'], 2) ?></td>
-        </tr></tfoot>
-    </table>
-    <?php endif; ?>
-
-    <?php
-        $par = function (float $eur, float $rsd): string {
-            $d = [];
-            if ($rsd > 0) $d[] = '<b>' . broj($rsd, 0) . ' RSD</b>';
-            if ($eur > 0) $d[] = '<b>' . broj($eur, 2) . ' EUR</b>';
-            return $d ? implode(' · ', $d) : '<b>0</b>';
-        };
-    ?>
-    <div class="op-dno">
-        <span>Gotovina <?= $par($o['got_eur'], $o['got_rsd']) ?></span>
-        <span>Kartica <?= $par($o['kar_eur'], $o['kar_rsd']) ?></span>
-        <?php if ($o['lic_eur'] > 0 || $o['lic_rsd'] > 0): ?>
-            <span>Lični novac <?= $par($o['lic_eur'], $o['lic_rsd']) ?></span>
-        <?php endif; ?>
-        <?php if ($gorivoPoKm !== null): ?>
-            <span>Gorivo po km <b><?= broj($gorivoPoKm, 1) ?> RSD</b></span>
-        <?php endif; ?>
-    </div>
+        </div>
+    </details>
+    <?php endforeach; ?>
+    <div class="kat-ukupno"><span>Ukupno evidentirano</span>
+        <span class="mono"><?= broj($o['uk_rsd'], 0) ?></span><span class="mono"><?= broj($o['uk_eur'], 2) ?></span></div>
+    <div class="sitno ne-stampaj" style="margin-top:8px">Dodirni kategoriju za pojedinačne račune.</div>
+<?php endif; ?>
 </div></div>
 
-<!-- ================= NOVAC ================= -->
-<div class="sekcija-naslov">Novac – EUR i RSD odvojeno</div>
-
-<div class="karta">
-    <div class="karta-zaglavlje"><?= ikona('novac', 16) ?> Gotovina iz depozita</div>
-    <div class="karta-telo">
-        <?= novac_red('Početni depozit', (float)$t['depozit_eur'], (float)$t['depozit_rsd']) ?>
-        <?= novac_red('Naknadno dodato', $o['dop_eur'], $o['dop_rsd']) ?>
-        <?= novac_red('Ukupno primljeno', $o['uk_depozit_eur'], $o['uk_depozit_rsd']) ?>
-        <?= novac_red('Potrošeno gotovinom', -$o['got_eur'], -$o['got_rsd']) ?>
-        <?= novac_red('Očekivano za vraćanje', $o['ocek_eur'], $o['ocek_rsd']) ?>
-        <?= novac_red('Stvarno vraćeno',
-                $t['vraceno_eur'] === null ? null : (float)$t['vraceno_eur'],
-                $t['vraceno_rsd'] === null ? null : (float)$t['vraceno_rsd']) ?>
-        <?php if ($o['raz_eur'] !== null || $o['raz_rsd'] !== null): ?>
-            <?php if (ima_razlike($o['raz_eur'], $o['raz_rsd'])): ?>
-                <div style="margin-top:12px">
-                <?= napomena_box('Razlika: <b>' . h(opis_razlike($o['raz_eur'], $o['raz_rsd']))
-                    . '</b> – proveriti sa šefom ekipe.', 'upozorenje', 'alarm') ?>
-                </div>
-            <?php else: ?>
-                <div style="margin-top:12px">
-                <?= napomena_box('Vraćeni iznosi se slažu sa obračunom.', 'uspeh', 'cek') ?>
-                </div>
+<!-- ================= RAZDUŽENJE ================= -->
+<div class="sekcija-naslov">Razduženje · čijim novcem</div>
+<div class="karta"><div class="karta-telo">
+    <table class="razd">
+        <thead><tr><th></th><th class="desno">RSD</th><th class="desno">EUR</th></tr></thead>
+        <tbody>
+            <tr><td>Primljena gotovina<?= ($o['dop_eur'] > 0 || $o['dop_rsd'] > 0)
+                    ? '<span class="sitno">uključuje doplate: ' . h($iznosEurRsd($o['dop_eur'], $o['dop_rsd'], false)) . '</span>' : '' ?></td>
+                <?= $kolone($o['uk_depozit_eur'], $o['uk_depozit_rsd']) ?></tr>
+            <tr><td>Potrošeno iz gotovine</td><?= $kolone($o['got_eur'], $o['got_rsd']) ?></tr>
+            <tr class="jace"><td>Treba vratiti</td><?= $kolone($o['ocek_eur'], $o['ocek_rsd']) ?></tr>
+            <tr><td>Stvarno vraćeno</td><?= $kolone(
+                    $t['vraceno_eur'] === null ? null : (float)$t['vraceno_eur'],
+                    $t['vraceno_rsd'] === null ? null : (float)$t['vraceno_rsd']) ?></tr>
+            <?php if ($o['raz_eur'] !== null && ima_razlike($o['raz_eur'], $o['raz_rsd'])): ?>
+            <tr class="lose"><td>Razlika (+ višak, − manjak)</td><?= $kolone($o['raz_eur'], $o['raz_rsd']) ?></tr>
             <?php endif; ?>
-        <?php endif; ?>
-    </div>
-</div>
+            <tr class="razmak"><td>Plaćeno službenom karticom</td><?= $kolone($o['kar_eur'], $o['kar_rsd']) ?></tr>
+            <tr class="<?= ($o['lic_eur'] > 0 || $o['lic_rsd'] > 0) ? 'jace' : '' ?>"><td>Radnik platio svojim novcem<span class="sitno">firma mu duguje nadoknadu</span></td>
+                <?= $kolone($o['lic_eur'], $o['lic_rsd']) ?></tr>
+        </tbody>
+    </table>
+    <div class="op-fusnota">Kategorije pokazuju <b>na šta</b> je novac potrošen, a razduženje <b>čijim novcem</b>.
+        To su dva pogleda na iste troškove i ne sabiraju se.</div>
 
-<?php if ($doplate): ?>
-<div class="karta">
-    <div class="karta-zaglavlje"><?= ikona('plus', 16) ?> Doplate depozita</div>
-    <div class="karta-telo">
-    <?php foreach ($doplate as $d): ?>
+    <?php if ($doplate): ?>
+    <details class="sklop">
+        <summary><?= h(mnozina(count($doplate), 'doplata', 'doplate', 'doplata')) ?> tokom puta</summary>
+        <?php foreach ($doplate as $d): ?>
         <div class="trosak">
-            <span class="ik"><?= ikona('novac', 18) ?></span>
             <span class="sred">
                 <span class="n1">Predao/la <?= h($d['predao']) ?></span>
-                <span class="n2"><?= h(datumKratko($d['kreirana'])) ?><?php if ($d['uneo_ime']): ?> · evidentirao/la <?= h($d['uneo_ime']) ?><?php endif; ?></span>
-                <?php if ($d['napomena']): ?><span class="n2"><?= h($d['napomena']) ?></span><?php endif; ?>
+                <span class="n2"><?= h(datumKratko($d['kreirana'])) ?><?php if ($d['uneo_ime']): ?> · evidentirao/la <?= h($d['uneo_ime']) ?><?php endif; ?><?= $d['napomena'] ? ' · ' . h($d['napomena']) : '' ?></span>
             </span>
             <span class="iz"><?= broj($d['iznos'], $d['valuta'] === 'RSD' ? 0 : 2) ?><small><?= h($d['valuta']) ?></small></span>
             <?php if ($mozeIspravku): ?>
@@ -277,125 +313,33 @@ pocetak_strane('Izveštaj sa terena', ['nazad' => 'index.php?s=' . ($jeAdmin ? '
                     <?= csrf_polje() ?>
                     <input type="hidden" name="akcija" value="obrisi_doplatu">
                     <input type="hidden" name="doplata_id" value="<?= (int)$d['id'] ?>">
-                    <button class="brisi" type="submit" data-pitaj="Obrisati ovu doplatu?"
-                            aria-label="Obriši doplatu"><?= ikona('kanta', 18) ?></button>
+                    <button class="brisi" type="submit" data-pitaj="Obrisati ovu doplatu?" aria-label="Obriši doplatu"><?= ikona('kanta', 18) ?></button>
                 </form>
             <?php endif; ?>
         </div>
-    <?php endforeach; ?>
-    </div>
-</div>
-<?php endif; ?>
-
-<div class="karta">
-    <div class="karta-zaglavlje"><?= ikona('kartica', 16) ?> Službena kartica</div>
-    <div class="karta-telo"><div class="novac-mreza">
-        <div class="novac"><div class="val">EUR</div><div class="iznos"><?= broj($o['kar_eur'], 2) ?></div><div class="opis">ne dira depozit</div></div>
-        <div class="novac"><div class="val">RSD</div><div class="iznos"><?= broj($o['kar_rsd'], 0) ?></div><div class="opis">ne dira depozit</div></div>
-    </div></div>
-</div>
-
-<div class="karta <?= ($o['lic_eur'] > 0 || $o['lic_rsd'] > 0) ? 'istaknut-okvir' : '' ?>">
-    <div class="karta-zaglavlje"><?= ikona('novcanik', 16) ?> Lični novac zaposlenog</div>
-    <div class="karta-telo"><div class="novac-mreza">
-        <div class="novac <?= $o['lic_eur'] > 0 ? 'negativno' : '' ?>">
-            <div class="val">EUR</div><div class="iznos"><?= broj($o['lic_eur'], 2) ?></div>
-            <div class="opis">dug firme prema zaposlenom</div>
-        </div>
-        <div class="novac <?= $o['lic_rsd'] > 0 ? 'negativno' : '' ?>">
-            <div class="val">RSD</div><div class="iznos"><?= broj($o['lic_rsd'], 0) ?></div>
-            <div class="opis">dug firme prema zaposlenom</div>
-        </div>
-    </div></div>
-</div>
-
-<!-- ================= KILOMETRAŽA I GORIVO ================= -->
-<div class="sekcija-naslov">Kilometraža i gorivo</div>
-<div class="karta"><div class="karta-telo">
-    <div class="red"><span class="k">Početna kilometraža</span><span class="v mono"><?= kmF($t['km_start']) ?></span></div>
-    <div class="red"><span class="k">Završna kilometraža</span><span class="v mono"><?= kmF($t['km_kraj']) ?></span></div>
-    <div class="red"><span class="k">Ukupno pređeno</span><span class="v mono"><?= kmF($o['km']) ?></span></div>
-    <div class="red"><span class="k">Ukupno sipano</span><span class="v mono"><?= broj($o['litri'], 1) ?> L</span></div>
-    <div class="red"><span class="k">Ukupan trošak goriva</span><span class="v mono"><?php
-        $g = [];
-        if ($o['gorivo_rsd'] > 0) $g[] = novac($o['gorivo_rsd'], 'RSD');
-        if ($o['gorivo_eur'] > 0) $g[] = novac($o['gorivo_eur'], 'EUR');
-        echo $g ? implode('<br>', array_map('h', $g)) : '—';
-    ?></span></div>
-    <div class="red"><span class="k">Procenjena prosečna potrošnja</span><span class="v mono"><?=
-        $o['potrosnja'] !== null ? broj($o['potrosnja'], 1) . ' L/100 km' : '—' ?></span></div>
-    <div class="red"><span class="k">Očekivano za ovo vozilo</span><span class="v mono"><?=
-        $o['ocek_potrosnja'] !== null ? broj($o['ocek_potrosnja'], 1) . ' L/100 km' : 'nije uneto' ?></span></div>
-</div></div>
-
-<?php if ($o['odstupanje'] !== null): ?>
-    <?php if ($o['upozorenje']): ?>
-        <?= napomena_box('<b>Odstupanje ' . ($o['odstupanje'] > 0 ? '+' : '') . broj($o['odstupanje'], 1)
-            . '% u odnosu na očekivanu potrošnju.</b><br>Ovo je samo signal za proveru – uzrok može biti '
-            . 'teret, teren, gužva, način vožnje ili greška u unosu.', 'upozorenje', 'alarm') ?>
-    <?php else: ?>
-        <?= napomena_box('Potrošnja je u očekivanom opsegu (' . ($o['odstupanje'] > 0 ? '+' : '')
-            . broj($o['odstupanje'], 1) . '%).', 'uspeh', 'cek') ?>
+        <?php endforeach; ?>
+    </details>
     <?php endif; ?>
-<?php elseif ($o['litri'] > 0 && $o['ocek_potrosnja'] === null): ?>
-    <?= napomena_box('Za ovo vozilo nije uneta očekivana potrošnja, pa nema poređenja.', 'info', 'ostalo') ?>
-<?php endif; ?>
-
-<!-- ================= TROŠKOVI ================= -->
-<div class="sekcija-naslov">Troškovi (<?= count($troskovi) ?>)</div>
-<div class="karta"><div class="karta-telo">
-<?php if (!$troskovi): ?>
-    <div class="sitno">Nema unetih troškova.</div>
-<?php else: foreach ($troskovi as $tr): ?>
-    <div class="trosak">
-        <span class="ik"><?= ikona(VRSTE[$tr['vrsta']]['ik'], 18) ?></span>
-        <span class="sred">
-            <span class="n1"><?= h(VRSTE[$tr['vrsta']]['n']) ?></span>
-            <span class="n2"><?= h(datumKratko($tr['kreiran'])) ?> · <?= h(PLACANJA[$tr['nacin_placanja']]['k']) ?><?php
-                if (($tr['izvor'] ?? 'radnik') === 'admin') {
-                    echo ' · unela kancelarija' . ($tr['uneo_ime'] ? ': ' . h($tr['uneo_ime']) : '');
-                }
-                if ($tr['vrsta'] === 'gorivo' && $tr['litri'] !== null) {
-                    echo ' · ' . broj($tr['litri'], 1) . ' L na ' . broj((int)$tr['km_sipanja'], 0) . ' km';
-                }
-                if (!$tr['foto_racun']) echo ' · <span class="lose">bez računa</span>';
-            ?></span>
-        </span>
-        <span class="iz"><?= broj($tr['iznos'], $tr['valuta'] === 'RSD' ? 0 : 2) ?><small><?= h($tr['valuta']) ?></small></span>
-        <?php if ($mozeIspravku && ($tr['izvor'] ?? 'radnik') !== 'admin'): ?>
-            <form method="post" style="flex:none" data-bez-zakljucavanja>
-                <?= csrf_polje() ?>
-                <input type="hidden" name="akcija" value="obrisi_trosak">
-                <input type="hidden" name="trosak_id" value="<?= (int)$tr['id'] ?>">
-                <button class="brisi" type="submit" data-pitaj="Obrisati ovaj trošak?" aria-label="Obriši trošak"><?= ikona('kanta', 18) ?></button>
-            </form>
-        <?php elseif ($jeAdmin && ($tr['izvor'] ?? 'radnik') === 'admin' && $t['status'] !== 'odobren'): ?>
-            <form method="post" data-bez-zakljucavanja>
-                <?= csrf_polje() ?>
-                <input type="hidden" name="akcija" value="obrisi_admin_trosak">
-                <input type="hidden" name="trosak_id" value="<?= (int)$tr['id'] ?>">
-                <button class="brisi" type="submit" data-pitaj="Obrisati ovaj unos goriva kancelarije?"
-                        aria-label="Obriši unos goriva"><?= ikona('kanta', 18) ?></button>
-            </form>
-        <?php endif; ?>
-    </div>
-<?php endforeach; endif; ?>
 </div></div>
 
-<!-- ================= DOKAZI ================= -->
-<div class="sekcija-naslov ne-stampaj">Računi, slipovi i fotografije (<?= count($dokazi) ?>)</div>
-<?php if (!$dokazi): ?>
-    <div class="karta"><div class="karta-telo sitno">Nema priloženih fotografija.</div></div>
-<?php else: ?>
-    <div class="galerija">
-    <?php foreach ($dokazi as $d): ?>
-        <a class="dokaz" href="index.php?s=slika&f=<?= h(rawurlencode($d['f'])) ?>" target="_blank" rel="noopener">
-            <img src="index.php?s=slika&f=<?= h(rawurlencode($d['f'])) ?>" alt="<?= h($d['l']) ?>" loading="lazy">
-            <span class="lab"><?= h($d['l']) ?></span>
-        </a>
-    <?php endforeach; ?>
+<!-- ================= DOKAZI (sklopljeno) ================= -->
+<details class="karta sklop-karta ne-stampaj">
+    <summary><?= ikona('slika', 17) ?> Računi, slipovi i fotografije (<?= count($dokazi) ?>)</summary>
+    <div class="karta-telo">
+    <?php if (!$dokazi): ?>
+        <div class="sitno">Nema priloženih fotografija.</div>
+    <?php else: ?>
+        <div class="galerija">
+        <?php foreach ($dokazi as $d): ?>
+            <a class="dokaz" href="index.php?s=slika&amp;f=<?= h(rawurlencode($d['f'])) ?>" target="_blank" rel="noopener">
+                <img src="index.php?s=slika&amp;f=<?= h(rawurlencode($d['f'])) ?>" alt="<?= h($d['l']) ?>" loading="lazy">
+                <span class="lab"><?= h($d['l']) ?></span>
+            </a>
+        <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
     </div>
-<?php endif; ?>
+</details>
 
 <!-- ================= PRIJAVE ================= -->
 <div class="sekcija-naslov">Prijave sa terena (<?= count($prijave) ?>)</div>

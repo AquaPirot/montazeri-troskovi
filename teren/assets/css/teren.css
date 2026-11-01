@@ -548,3 +548,66 @@ body.ulaz{background:linear-gradient(160deg,#0F172A 0%,#16233B 45%,#1E3A5F 100%)
   a{color:inherit}
 }
 .op-tabela th.desno{text-align:right}
+/* 7 vrsta troška: poslednja ("Ostalo") zauzima ceo red */
+.plocice.k3 > .plocica:last-child:nth-child(3n+1){grid-column:1/-1;flex-direction:row;gap:8px}
+
+/* ---------- obračun terena (1.7) ---------- */
+.op-glava{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+  padding-bottom:14px;margin-bottom:16px;border-bottom:1px solid var(--linija)}
+.op-naziv{font-size:19px;font-weight:800;letter-spacing:-.3px;line-height:1.25}
+.op-meta{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:6px;font-size:13px;color:var(--tekst-2)}
+.op-meta span{display:inline-flex;align-items:center;gap:5px}
+.op-meta svg{color:var(--tekst-3);flex:none}
+.op-fusnota{font-size:12px;color:var(--tekst-3);line-height:1.45;margin-top:12px}
+.op-provera{margin-top:14px;padding:12px 14px;border-radius:var(--r-m);background:var(--narandzasta-bg);
+  border:1px solid #FBD3B5;font-size:14px;color:#7C2D12}
+.op-provera .op-lab{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.op-provera ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.op-provera.ok{background:var(--zelena-bg);border-color:#BBE5CA;color:#166534;display:flex;align-items:center;gap:8px;font-weight:600}
+
+.kat-glava,.kat > summary,.kat-ukupno{display:grid;grid-template-columns:1fr 92px 80px;gap:10px;align-items:center}
+.kat-glava{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--tekst-2);
+  padding-bottom:8px;border-bottom:1px solid var(--linija-jaka)}
+.kat-glava span+span,.kat > summary > span+span,.kat-ukupno span+span{text-align:right}
+.kat{border-bottom:1px solid var(--linija)}
+.kat > summary{padding:11px 0;cursor:pointer;list-style:none}
+.kat > summary::before{content:none}
+.kat > summary::-webkit-details-marker{display:none}
+.kat > summary .mono{font-weight:800;font-size:15.5px}
+.kat-ime{display:flex;align-items:center;gap:8px;min-width:0}
+.kat-ime svg{color:var(--plava-jaka);flex:none}
+.kat-ime b{display:block;font-size:15.5px}
+.kat-ime .sitno{display:block}
+.kat > summary .kat-ime b::after{content:' ▸';color:var(--tekst-3);font-weight:600;font-size:12px}
+.kat[open] > summary .kat-ime b::after{content:' ▾'}
+.kat[open] > summary{background:#F8FAFC;margin:0 -16px;padding-left:16px;padding-right:16px}
+.kat-stavke{padding:0 0 6px 25px}
+.kat-stavke .trosak{padding:9px 0}
+.kat-stavke .trosak .n1{font-size:14px}
+.kat-ukupno{padding-top:11px;margin-top:-1px;border-top:2px solid var(--tamna);font-weight:800}
+.kat-ukupno .mono{font-size:15.5px}
+.link{color:var(--plava-jaka);font-weight:600}
+
+.razd{width:100%;border-collapse:collapse;font-size:15px}
+.razd th{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--tekst-2);
+  padding:0 0 8px;border-bottom:1px solid var(--linija-jaka);text-align:left}
+.razd th.desno{text-align:right}
+.razd td{padding:10px 0;border-bottom:1px solid var(--linija);vertical-align:top}
+.razd td+td{padding-left:12px;width:92px;white-space:nowrap}
+.razd td+td+td{width:80px}
+.razd td .sitno{display:block}
+.razd tr.jace td{font-weight:800}
+.razd tr.lose td{color:var(--crvena);font-weight:700}
+.razd tr.razmak td{border-top:2px solid var(--linija-jaka)}
+.razd tbody tr:last-child td{border-bottom:none}
+
+.sklop{margin-top:12px;border-top:1px solid var(--linija);padding-top:10px}
+.sklop > summary{font-size:13.5px;font-weight:700;color:var(--plava-jaka)}
+.sklop-karta > summary{padding:14px 16px;font-weight:700;display:flex;align-items:center;gap:8px;list-style:none}
+.sklop-karta > summary::before{content:none}
+.sklop-karta > summary svg{color:var(--plava-jaka)}
+.sklop-karta > summary::after{content:'▸';margin-left:auto;color:var(--tekst-3)}
+.sklop-karta[open] > summary::after{content:'▾'}
+.sklop-karta[open] > summary{border-bottom:1px solid var(--linija)}
+@media print{ .kat > summary .kat-ime b::after{content:none} }
+.kat[open] > summary::before,.sklop-karta[open] > summary::before{content:none}
