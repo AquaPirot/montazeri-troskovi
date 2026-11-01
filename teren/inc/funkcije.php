@@ -12,7 +12,9 @@ const VRSTE = [
     'put'       => ['n' => 'Put i putarina',   'ik' => 'put'],
     'smestaj'   => ['n' => 'Smeštaj',          'ik' => 'krevet'],
     'hrana'     => ['n' => 'Hrana',            'ik' => 'hrana'],
+    'pice'      => ['n' => 'Piće',             'ik' => 'pice'],
     'materijal' => ['n' => 'Materijal',        'ik' => 'materijal'],
+    'alat'      => ['n' => 'Alat',             'ik' => 'alat'],
     'ostalo'    => ['n' => 'Ostalo',           'ik' => 'ostalo'],
 ];
 

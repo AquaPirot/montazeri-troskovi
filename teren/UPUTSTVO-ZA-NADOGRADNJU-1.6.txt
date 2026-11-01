@@ -1,0 +1,60 @@
+PROHORECA TEREN - NADOGRADNJA 1.6
+=================================
+
+Nadogradnja se postavlja preko verzije 1.5.
+
+NOVO U 1.6
+----------
+
+1. Završni obračun puta - na vrhu svakog izveštaja
+   - Pređeni km, trajanje u danima, potrošnja goriva L/100 km
+     i odstupanje od očekivanog, ukupni troškovi.
+   - Tabela po vrsti troška (gorivo, put, smeštaj, hrana, piće,
+     materijal, alat, ostalo), EUR i RSD odvojeno, broj računa,
+     litri kod goriva.
+   - Ispod: koliko je plaćeno gotovinom, karticom i ličnim novcem,
+     i trošak goriva po pređenom kilometru.
+   - Dok je teren otvoren piše "Obračun do sada".
+
+2. Dugme "Štampaj / PDF"
+   - Izveštaj bez menija, dugmadi i fotografija, spreman za
+     štampu ili "Sačuvaj kao PDF" u pregledaču.
+
+3. Nove vrste troška: Piće i Alat
+   - Do sada je piće išlo u hranu, a alat u materijal ili ostalo.
+   - Stari troškovi ostaju u vrsti u kojoj su uneti.
+
+4. Ispravka iz 1.5
+   - Ako SQL nadogradnja nije pokrenuta, prijava pokazuje poruku
+     šta treba uraditi umesto greške 500.
+
+
+OBAVEZAN REDOSLED POSTAVLJANJA
+------------------------------
+
+1. phpMyAdmin > baza aggroup_tereni > Export > Go
+   (rezervna kopija)
+
+2. phpMyAdmin > baza aggroup_tereni > kartica SQL > nalepi:
+
+      ALTER TABLE troskovi
+        MODIFY vrsta ENUM('gorivo','put','smestaj','hrana','pice',
+                          'materijal','alat','ostalo') NOT NULL;
+
+   > Go. Treba da piše da je uspelo (broj redova = broj troškova).
+   Isto se nalazi u fajlu sql/nadogradnja-04-pice-alat.sql.
+
+3. File Manager > teren.aggroup.rs > Otpremi ZIP 1.6 >
+   Izdvoji > potvrdi zamenu fajlova.
+
+4. Obriši ZIP i ovaj TXT sa servera.
+
+
+VAŽNO
+-----
+
+- Ako fajlove postaviš pre SQL-a, sve radi osim izbora "Piće" i
+  "Alat" - aplikacija tada kaže radniku da izabere drugu vrstu.
+  Čim pokreneš SQL, i te dve rade.
+- Paket NE sadrži config.php ni fotografije i ne menja postojeće
+  podatke ni PIN-ove.

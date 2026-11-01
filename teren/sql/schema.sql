@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS troskovi (
   izvor          ENUM('radnik','admin') NOT NULL DEFAULT 'radnik',
   iznos          DECIMAL(12,2) NOT NULL,
   valuta         ENUM('EUR','RSD') NOT NULL,
-  vrsta          ENUM('gorivo','put','smestaj','hrana','materijal','ostalo') NOT NULL,
+  vrsta          ENUM('gorivo','put','smestaj','hrana','pice','materijal','alat','ostalo') NOT NULL,
   nacin_placanja ENUM('gotovina','kartica','licni') NOT NULL,
   litri          DECIMAL(7,2)     NULL,
   km_sipanja     INT UNSIGNED     NULL,

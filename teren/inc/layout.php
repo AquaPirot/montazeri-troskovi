@@ -45,6 +45,8 @@ function ikona(string $ime, int $v = 22): string
         'dokument'  => '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/>',
         'alat'      => '<path d="M14.5 4.5a3.8 3.8 0 0 0 4.8 4.9l-9 9a2.4 2.4 0 1 1-3.4-3.4z"/><path d="M6.5 4.5 4 7l3 3 2.5-2.5z"/>',
         'guma'      => '<circle cx="12" cy="12" r="8.6"/><circle cx="12" cy="12" r="3.4"/><path d="M12 3.4v5.2M12 15.4v5.2M3.4 12h5.2M15.4 12h5.2"/>',
+        'pice'      => '<path d="M6 3h12l-1.6 16.2A2 2 0 0 1 14.4 21H9.6a2 2 0 0 1-2-1.8z"/><path d="M6.6 9h10.8"/>',
+        'stampa'    => '<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
         'kalendar'  => '<rect x="3.5" y="5" width="17" height="16" rx="2"/><path d="M3.5 10h17"/><path d="M8 3v4M16 3v4"/>',
     ];
     $d = $p[$ime] ?? '';
@@ -67,7 +69,7 @@ function pocetak_strane(string $naslov, array $o = []): void
 <meta name="theme-color" content="#0F172A">
 <meta name="robots" content="noindex, nofollow">
 <title><?= h($naslov) ?> · AG GROUP Teren</title>
-<link rel="stylesheet" href="assets/css/teren.css?v=3">
+<link rel="stylesheet" href="assets/css/teren.css?v=4">
 </head>
 <?php
     $jeAdmin = $k && $k['uloga'] === 'admin';

@@ -59,10 +59,21 @@ if (je_post()) {
     }
 
     if (!$greske) {
-        upit('INSERT INTO troskovi
-                (teren_id, uneo_id, izvor, iznos, valuta, vrsta, nacin_placanja, litri, km_sipanja, foto_racun, foto_slip)
-              VALUES (?,?,"radnik",?,?,?,?,?,?,?,?)',
-             [$t['id'], $k['id'], $iznos, $val, $vrsta, $nacin, $litri, $kmSip, $fotoRacun, $fotoSlip]);
+        try {
+            upit('INSERT INTO troskovi
+                    (teren_id, uneo_id, izvor, iznos, valuta, vrsta, nacin_placanja, litri, km_sipanja, foto_racun, foto_slip)
+                  VALUES (?,?,"radnik",?,?,?,?,?,?,?,?)',
+                 [$t['id'], $k['id'], $iznos, $val, $vrsta, $nacin, $litri, $kmSip, $fotoRacun, $fotoSlip]);
+        } catch (PDOException $e) {
+            // Piće i Alat traže SQL nadogradnju 04; bez nje baza odbija novu vrstu.
+            obrisi_foto($fotoRacun);
+            obrisi_foto($fotoSlip);
+            if (!in_array($vrsta, ['pice', 'alat'], true)) throw $e;
+            error_log('TEREN trošak: ' . $e->getMessage());
+            postavi_poruku('Vrsta „' . VRSTE[$vrsta]['n'] . '" još nije uključena u bazi. '
+                . 'Izaberi „Hrana" ili „Materijal" i javi kancelariji (nadogradnja 04).', 'greska');
+            idi('trosak', $t['status'] === 'ispravka' ? ['teren' => (int)$t['id']] : []);
+        }
 
         postavi_poruku('Sačuvano: ' . novac((float)$iznos, $val) . ' · ' . VRSTE[$vrsta]['n'] . '.');
         idi($t['status'] === 'ispravka' ? 'izvestaj' : 'pocetna',

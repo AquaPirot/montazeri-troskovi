@@ -508,3 +508,43 @@ body.ulaz{background:linear-gradient(160deg,#0F172A 0%,#16233B 45%,#1E3A5F 100%)
 }
 .mreza-stavki{align-items:start}
 .mreza-stavki > .karta{margin-bottom:0}
+
+/* ---------- završni obračun puta ---------- */
+.op-brojke{display:grid;grid-template-columns:1fr 1fr;gap:16px 14px}
+@media (min-width:700px){ .op-brojke{grid-template-columns:repeat(4,1fr)} }
+.op-lab{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--tekst-2)}
+.op-br{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.15;font-variant-numeric:tabular-nums;color:var(--tamna);margin-top:2px}
+.op-br small{font-size:13px;font-weight:700;color:var(--tekst-3);margin-left:4px;letter-spacing:0}
+.op-br.lose{color:var(--narandzasta)}
+.op-pod{font-size:12px;color:var(--tekst-3);margin-top:1px}
+.op-tabela{width:100%;border-collapse:collapse;margin-top:18px;font-size:15px}
+.op-tabela th{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--tekst-2);
+  text-align:left;padding:0 0 8px;border-bottom:1px solid var(--linija-jaka)}
+.op-tabela td{padding:9px 0;border-bottom:1px solid var(--linija);vertical-align:top}
+.op-tabela td + td, .op-tabela th + th{padding-left:12px}
+.op-tabela td.desno{font-weight:700;white-space:nowrap}
+.op-tabela .op-vrsta{display:flex;align-items:center;gap:7px;font-weight:700}
+.op-tabela .op-vrsta svg{color:var(--plava-jaka);flex:none}
+.op-tabela .sitno{display:block;margin-left:23px}
+.op-tabela tfoot td{border-bottom:none;border-top:2px solid var(--tamna);font-weight:800;padding-top:10px}
+.op-dno{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:14px;padding-top:12px;border-top:1px solid var(--linija);
+  font-size:13px;color:var(--tekst-2)}
+.op-dno b{color:var(--tekst);font-variant-numeric:tabular-nums}
+.stampaj{
+  display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--linija-jaka);
+  border-radius:var(--r-s);padding:6px 11px;font-size:12.5px;font-weight:700;color:var(--tekst);
+  letter-spacing:0;text-transform:none;cursor:pointer;
+}
+.stampaj svg{color:var(--plava-jaka)}
+
+/* ---------- štampa / PDF ---------- */
+@media print{
+  body{background:#fff}
+  .top,.nav,.traka-poruka,.ne-stampaj,.galerija,.dno-akcija,form,.trosak .brisi{display:none !important}
+  .sadrzaj{max-width:none;padding:0}
+  .karta{box-shadow:none;break-inside:avoid}
+  .sekcija-naslov{break-after:avoid}
+  .stavka,.kpi{box-shadow:none}
+  a{color:inherit}
+}
+.op-tabela th.desno{text-align:right}

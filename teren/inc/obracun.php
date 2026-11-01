@@ -130,8 +130,19 @@ function obracun(array $t, ?array $troskovi = null, ?array $doplate = null): arr
         'bez_racuna' => 0,
     ];
 
+    // Zbir po vrsti troška – EUR i RSD odvojeno, bez obzira na način plaćanja.
+    $o['po_vrsti'] = [];
+    foreach (array_keys(VRSTE) as $v) {
+        $o['po_vrsti'][$v] = ['eur' => 0.0, 'rsd' => 0.0, 'broj' => 0, 'litri' => 0.0];
+    }
+
     $mapa = ['gotovina' => 'got', 'kartica' => 'kar', 'licni' => 'lic'];
     foreach ($troskovi as $tr) {
+        $vr = isset($o['po_vrsti'][$tr['vrsta']]) ? $tr['vrsta'] : 'ostalo';
+        $o['po_vrsti'][$vr][strtolower($tr['valuta'])] += (float)$tr['iznos'];
+        $o['po_vrsti'][$vr]['broj']++;
+        if ($vr === 'gorivo') $o['po_vrsti'][$vr]['litri'] += (float)$tr['litri'];
+
         $kljuc = $mapa[$tr['nacin_placanja']] . '_' . strtolower($tr['valuta']);
         $o[$kljuc] += (float)$tr['iznos'];
         if ($tr['vrsta'] === 'gorivo') {
@@ -146,6 +157,15 @@ function obracun(array $t, ?array $troskovi = null, ?array $doplate = null): arr
     }
 
     // Gotovina: samo gotovinski troškovi skidaju depozit.
+    // Ukupan trošak puta (gotovina + kartica + lični novac).
+    $o['uk_eur'] = round($o['got_eur'] + $o['kar_eur'] + $o['lic_eur'], 2);
+    $o['uk_rsd'] = round($o['got_rsd'] + $o['kar_rsd'] + $o['lic_rsd'], 2);
+
+    // Trajanje u kalendarskim danima, uključujući dan polaska i povratka.
+    $od = strtotime(substr((string)$t['vreme_polaska'], 0, 10));
+    $do = strtotime(substr((string)($t['vreme_povratka'] ?: date('Y-m-d')), 0, 10));
+    $o['dana'] = ($od && $do && $do >= $od) ? (int)round(($do - $od) / 86400) + 1 : null;
+
     $o['uk_depozit_eur'] = round((float)$t['depozit_eur'] + $o['dop_eur'], 2);
     $o['uk_depozit_rsd'] = round((float)$t['depozit_rsd'] + $o['dop_rsd'], 2);
     $o['ocek_eur'] = round($o['uk_depozit_eur'] - $o['got_eur'], 2);
