@@ -1,0 +1,55 @@
+PROHORECA TEREN - NADOGRADNJA 1.8
+=================================
+
+Sadrži sve iz 1.7 (obračun terena). Postavlja se preko 1.5, 1.6 ili 1.7.
+
+NOVO U 1.8
+----------
+
+Prosek potrošnje vozila kreće ispočetka od 2. novembra 2026.
+- NIŠTA SE NE BRIŠE. Svi tereni, sipanja i troškovi ostaju.
+- Stari tereni se i dalje vide u istoriji vozila, ali ne ulaze u
+  prosek.
+- U kartonu vozila postoji polje "Prosek računaj od" - datum se
+  može promeniti za svako vozilo posebno (npr. posle popravke).
+  Prazno polje znači: računaj iz svih terena.
+
+
+REDOSLED POSTAVLJANJA
+---------------------
+
+1. phpMyAdmin > aggroup_tereni > Export > Go   (rezervna kopija)
+
+2. SAMO AKO 1.7 JOŠ NISI POSTAVIO:
+   phpMyAdmin > aggroup_tereni > SQL > nalepi > Go
+
+      ALTER TABLE troskovi
+        MODIFY vrsta ENUM('gorivo','put','smestaj','hrana','pice',
+                          'materijal','alat','ostalo') NOT NULL;
+      UPDATE troskovi SET vrsta = 'hrana' WHERE vrsta = 'pice';
+      ALTER TABLE troskovi
+        MODIFY vrsta ENUM('gorivo','put','smestaj','hrana',
+                          'materijal','alat','ostalo') NOT NULL;
+      ALTER TABLE troskovi
+        ADD COLUMN opis VARCHAR(200) NULL AFTER nacin_placanja;
+
+3. UVEK: phpMyAdmin > aggroup_tereni > SQL > nalepi > Go
+
+      ALTER TABLE vozila
+        ADD COLUMN potrosnja_od DATE NULL AFTER ocekivana_potrosnja;
+      UPDATE vozila SET potrosnja_od = '2026-11-02';
+
+   Druga naredba treba da kaže "N rows affected" (N = broj vozila).
+
+4. File Manager > teren.aggroup.rs > Otpremi ZIP 1.8 > Izdvoji >
+   potvrdi zamenu fajlova.
+
+5. Obriši ZIP i ovaj TXT sa servera.
+
+
+PROVERA
+-------
+
+Vozila > svako vozilo: umesto proseka piše "nema podataka".
+Otvori vozilo: "Prosečna potrošnja · od 02.11.2026." i poruka da
+prvi broj stiže kad se zatvori prvi teren posle tog datuma.

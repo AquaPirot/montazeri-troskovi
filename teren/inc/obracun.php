@@ -234,17 +234,26 @@ function dokazi_terena(array $t, array $troskovi, array $prijave): array
  */
 function statistika_vozila(int $vozilo_id): array
 {
-    $t = red('SELECT COUNT(*) AS broj, COALESCE(SUM(km_kraj - km_start), 0) AS km
-                FROM tereni WHERE vozilo_id = ? AND km_kraj IS NOT NULL', [$vozilo_id]);
+    // Prosek se računa od datuma koji je kancelarija postavila (npr. posle nove evidencije
+    // ili popravke). Stariji tereni ostaju u istoriji, ali ne ulaze u prosek.
+    // SELECT * da strana radi i pre SQL nadogradnje 06 (kolona tada ne postoji).
+    $voz = red('SELECT * FROM vozila WHERE id = ?', [$vozilo_id]) ?? [];
+    $od  = $voz['potrosnja_od'] ?? null;
+    $odUslov = $od ? ' AND t.vreme_polaska >= ?' : '';
+    $par = $od ? [$vozilo_id, $od . ' 00:00:00'] : [$vozilo_id];
+
+    $t = red('SELECT COUNT(*) AS broj, COALESCE(SUM(t.km_kraj - t.km_start), 0) AS km
+                FROM tereni t WHERE t.vozilo_id = ? AND t.km_kraj IS NOT NULL' . $odUslov, $par);
 
     $g = red('SELECT COALESCE(SUM(x.litri), 0) AS litri,
                      COALESCE(SUM(CASE WHEN x.valuta = "EUR" THEN x.iznos ELSE 0 END), 0) AS eur,
                      COALESCE(SUM(CASE WHEN x.valuta = "RSD" THEN x.iznos ELSE 0 END), 0) AS rsd
                 FROM troskovi x
                 JOIN tereni t ON t.id = x.teren_id
-               WHERE t.vozilo_id = ? AND t.km_kraj IS NOT NULL AND x.vrsta = "gorivo"', [$vozilo_id]);
+               WHERE t.vozilo_id = ? AND t.km_kraj IS NOT NULL AND x.vrsta = "gorivo"' . $odUslov, $par);
 
     $s = [
+        'od'          => $od,
         'broj_terena' => (int)$t['broj'],
         'km'          => (int)$t['km'],
         'litri'       => (float)$g['litri'],
@@ -255,8 +264,8 @@ function statistika_vozila(int $vozilo_id): array
     $s['potrosnja'] = ($s['km'] > 0 && $s['litri'] > 0)
         ? round($s['litri'] / $s['km'] * 100, 2) : null;
 
-    $ocek = vrednost('SELECT ocekivana_potrosnja FROM vozila WHERE id = ?', [$vozilo_id]);
-    $s['ocek_potrosnja'] = $ocek !== null && $ocek !== false ? (float)$ocek : null;
+    $ocek = $voz['ocekivana_potrosnja'] ?? null;
+    $s['ocek_potrosnja'] = $ocek !== null ? (float)$ocek : null;
     $s['odstupanje'] = ($s['potrosnja'] !== null && $s['ocek_potrosnja'])
         ? round(($s['potrosnja'] - $s['ocek_potrosnja']) / $s['ocek_potrosnja'] * 100, 1) : null;
 

@@ -37,6 +37,24 @@ if (je_post()) {
     }
 
     /* --- očekivana potrošnja --- */
+    /* --- od kog datuma se računa prosek potrošnje --- */
+    if ($akcija === 'potrosnja_od') {
+        $od = post('potrosnja_od');
+        if ($od !== '' && (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $od) || !strtotime($od))) {
+            postavi_poruku('Datum nije ispravan.', 'greska');
+        } else {
+            try {
+                upit('UPDATE vozila SET potrosnja_od = ? WHERE id = ?', [$od !== '' ? $od : null, $v['id']]);
+                postavi_poruku($od !== ''
+                    ? 'Prosek potrošnje se od sada računa od ' . datumDan($od) . '.'
+                    : 'Prosek potrošnje se računa iz svih terena.');
+            } catch (PDOException $e) {
+                postavi_poruku('Baza još nema ovu mogućnost. Pokreni sql/nadogradnja-06-potrosnja-od.sql.', 'greska');
+            }
+        }
+        idi('vozilo', ['id' => (int)$v['id']]);
+    }
+
     if ($akcija === 'potrosnja') {
         $pot = postBroj('ocekivana_potrosnja');
         if ($pot === null || ($pot > 0 && $pot <= 100)) {
@@ -172,7 +190,7 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
 <?php endif; ?>
 
 <!-- ================= POTROŠNJA ================= -->
-<div class="sekcija-naslov">Potrošnja kroz sve terene</div>
+<div class="sekcija-naslov">Prosečna potrošnja<?= $st['od'] ? ' · od ' . h(datumDan($st['od'])) : ' · svi tereni' ?></div>
 <div class="karta"><div class="karta-telo">
     <div class="novac-mreza" style="margin-bottom:12px">
         <div class="novac">
@@ -206,8 +224,26 @@ pocetak_strane($v['naziv'], ['nazad' => 'index.php?s=vozila', 'naslov_gore' => $
             . broj($st['odstupanje'], 1) . '%).', 'uspeh', 'cek') ?>
     <?php endif; ?>
 <?php elseif ($st['potrosnja'] === null): ?>
-    <?= napomena_box('Još nema dovoljno podataka. Prosek se računa iz zatvorenih terena sa unetim gorivom.', 'info', 'ostalo') ?>
+    <?= napomena_box($st['od'] && strtotime($st['od']) > time()
+        ? 'Prosek kreće od <b>' . h(datumDan($st['od'])) . '</b>. Prvi broj se pojavljuje kad se zatvori prvi teren posle tog datuma.'
+        : 'Još nema dovoljno podataka. Prosek se računa iz zatvorenih terena sa unetim gorivom'
+          . ($st['od'] ? ' od ' . h(datumDan($st['od'])) : '') . '.', 'info', 'ostalo') ?>
 <?php endif; ?>
+
+<div class="karta"><div class="karta-telo">
+    <form method="post">
+        <?= csrf_polje() ?>
+        <input type="hidden" name="akcija" value="potrosnja_od">
+        <label class="nalepnica" for="pod">Prosek računaj od</label>
+        <div style="display:flex;gap:8px">
+            <input class="unos" id="pod" name="potrosnja_od" type="date" style="flex:1"
+                   value="<?= h((string)($st['od'] ?? '')) ?>">
+            <button class="dugme d-glavno d-malo" type="submit" style="width:auto;padding-left:18px;padding-right:18px">Sačuvaj</button>
+        </div>
+        <div class="sitno" style="margin-top:6px">Stariji tereni ostaju u istoriji ispod, ali ne ulaze u prosek.
+            Prazno polje = računaj iz svih terena. Korisno posle popravke ili kad počinje nova evidencija.</div>
+    </form>
+</div></div>
 
 <div class="karta"><div class="karta-telo">
     <form method="post">

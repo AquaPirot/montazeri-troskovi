@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS vozila (
   naziv                VARCHAR(100) NOT NULL,
   registracija         VARCHAR(30)  NOT NULL,
   ocekivana_potrosnja  DECIMAL(5,2)     NULL,
+  potrosnja_od         DATE             NULL,
   aktivno              TINYINT(1)   NOT NULL DEFAULT 1,
   kreirano             DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
